@@ -3,12 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.user.claude-usage-daemon</string>
+    <string>com.clawdmeter.daemon</string>
 
     <key>ProgramArguments</key>
     <array>
         <string>__PYTHON_BIN__</string>
         <string>__DAEMON_PATH__</string>
+        <string>run</string>
     </array>
 
     <key>WorkingDirectory</key>

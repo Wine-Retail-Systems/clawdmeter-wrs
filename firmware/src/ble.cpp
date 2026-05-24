@@ -3,7 +3,10 @@
 #include <NimBLEDevice.h>
 #include <NimBLEHIDDevice.h>
 
-#define DEVICE_NAME "Claude Controller"
+// BLE peripheral name. The daemon's default config.toml uses the same string
+// for device.name; override in both places to rename. Existing pairings on
+// host OSes need to be re-done after a name change.
+#define DEVICE_NAME "Clawdmeter"
 
 // Custom GATT UUIDs for data channel
 #define SERVICE_UUID        "4c41555a-4465-7669-6365-000000000001"

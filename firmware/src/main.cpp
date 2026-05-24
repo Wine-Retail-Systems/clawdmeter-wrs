@@ -19,7 +19,47 @@
 #include "hal/power_hal.h"
 #include "hal/imu_hal.h"
 
-static UsageData usage = {};
+static UsageState g_state = {};
+
+// Look up a provider slot in g_state by slot_id, or carve out a new entry
+// if there is room. Returns nullptr only if CLAWD_MAX_PROVIDERS is exhausted.
+static ProviderUsage* find_or_alloc_slot(const char* slot_id) {
+    for (uint8_t i = 0; i < g_state.count; ++i) {
+        if (strncmp(g_state.providers[i].slot_id, slot_id, CLAWD_SLOT_ID_LEN) == 0) {
+            return &g_state.providers[i];
+        }
+    }
+    if (g_state.count >= CLAWD_MAX_PROVIDERS) return nullptr;
+    ProviderUsage* p = &g_state.providers[g_state.count++];
+    memset(p, 0, sizeof(*p));
+    strlcpy(p->slot_id, slot_id, CLAWD_SLOT_ID_LEN);
+    p->pace = CLAWD_PACE_UNSET;
+    p->kind = PK_UNKNOWN;
+    return p;
+}
+
+// Drop providers we did NOT see in the current cycle. Called from the EOC
+// marker handler so a provider removed from the daemon config disappears
+// from the device.
+static void prune_stale_slots(void) {
+    uint8_t write = 0;
+    for (uint8_t i = 0; i < g_state.count; ++i) {
+        if (g_state.providers[i].cycle_seen == g_state.current_cycle) {
+            if (write != i) g_state.providers[write] = g_state.providers[i];
+            write++;
+        }
+    }
+    g_state.count = write;
+}
+
+static ProviderKind parse_kind(const char* s) {
+    if (!s) return PK_UNKNOWN;
+    if (strcmp(s, "pct_window") == 0)  return PK_PCT_WINDOW;
+    if (strcmp(s, "cost_budget") == 0) return PK_COST_BUDGET;
+    if (strcmp(s, "tokens_abs") == 0)  return PK_TOKENS_ABS;
+    if (strcmp(s, "tpm_rpm") == 0)     return PK_TPM_RPM;
+    return PK_UNKNOWN;
+}
 
 // ---- LVGL draw buffers (PSRAM, partial render mode) ----
 #define BUF_LINES 40
@@ -86,23 +126,106 @@ static void my_touch_cb(lv_indev_t* indev, lv_indev_data_t* data) {
     }
 }
 
-// Parse a JSON line into UsageData.
-static bool parse_json(const char* json, UsageData* out) {
+// Parse one BLE JSON line. Two shapes are accepted:
+//   1. End-of-cycle marker:   {"end":1}
+//   2. Provider payload:       {"p":"...", "n":"...", "k":"...", "m1":..., ...}
+//
+// Provider payloads update the matching slot in g_state. The EOC marker
+// stamps the current cycle counter and drops any provider we did not see in
+// this cycle. Returns true if the message was understood, false to NACK.
+enum ParseResult : uint8_t { PR_PROVIDER, PR_EOC, PR_BAD };
+
+static ParseResult parse_json(const char* json) {
     JsonDocument doc;
     DeserializationError err = deserializeJson(doc, json);
     if (err) {
         Serial.printf("JSON parse error: %s\n", err.c_str());
-        return false;
+        return PR_BAD;
     }
 
-    out->session_pct = doc["s"] | 0.0f;
-    out->session_reset_mins = doc["sr"] | -1;
-    out->weekly_pct = doc["w"] | 0.0f;
-    out->weekly_reset_mins = doc["wr"] | -1;
-    strlcpy(out->status, doc["st"] | "unknown", sizeof(out->status));
-    out->ok = doc["ok"] | false;
-    out->valid = true;
-    return true;
+    if (doc["end"].is<int>() && doc["end"].as<int>() != 0) {
+        g_state.any_received = true;
+        prune_stale_slots();
+        g_state.current_cycle++;
+        return PR_EOC;
+    }
+
+    const char* slot_id = doc["p"] | (const char*)nullptr;
+    if (!slot_id || !*slot_id) {
+        Serial.println("payload missing slot id 'p'");
+        return PR_BAD;
+    }
+    ProviderUsage* p = find_or_alloc_slot(slot_id);
+    if (!p) {
+        Serial.println("provider table full, dropping payload");
+        return PR_BAD;
+    }
+
+    strlcpy(p->name,   doc["n"]    | "", CLAWD_NAME_LEN);
+    strlcpy(p->note,   doc["note"] | "", CLAWD_NOTE_LEN);
+    strlcpy(p->status, doc["st"]   | "ok", CLAWD_STATUS_LEN);
+    strlcpy(p->currency, doc["cur"] | "", CLAWD_CURRENCY_LEN);
+
+    p->kind = parse_kind(doc["k"] | "");
+    p->m1   = doc["m1"] | 0.0f;
+    p->m2   = doc["m2"] | 0.0f;
+    p->r1   = doc["r1"] | 0;
+    p->r2   = doc["r2"] | 0;
+
+    if (doc["m3"].is<float>() || doc["m3"].is<int>()) {
+        p->m3 = doc["m3"] | 0.0f;
+        p->m3_set = true;
+    } else {
+        p->m3 = 0.0f;
+        p->m3_set = false;
+    }
+    p->pace = (doc["pace"].is<int>()) ? (int8_t)doc["pace"].as<int>() : CLAWD_PACE_UNSET;
+    if (doc["regen"].is<float>() || doc["regen"].is<int>()) {
+        p->regen = doc["regen"] | 0.0f;
+        p->regen_set = true;
+    } else {
+        p->regen = 0.0f;
+        p->regen_set = false;
+    }
+
+    // Optional tokens_abs extras: "sp" → 24-bucket sparkline, "sh" → up to
+    // 4 provider-share entries. Both are reset to "absent" if missing so a
+    // provider that stops sending them doesn't keep stale visuals.
+    p->spark_set = false;
+    memset(p->spark, 0, sizeof(p->spark));
+    if (doc["sp"].is<JsonArrayConst>()) {
+        JsonArrayConst sp = doc["sp"].as<JsonArrayConst>();
+        size_t n = sp.size();
+        if (n > CLAWD_SPARK_LEN) n = CLAWD_SPARK_LEN;
+        for (size_t i = 0; i < n; ++i) {
+            long v = sp[i].as<long>();
+            p->spark[i] = (v < 0) ? 0u : (uint32_t)v;
+        }
+        if (n > 0) p->spark_set = true;
+    }
+
+    p->shares_count = 0;
+    memset(p->shares, 0, sizeof(p->shares));
+    if (doc["sh"].is<JsonArrayConst>()) {
+        JsonArrayConst sh = doc["sh"].as<JsonArrayConst>();
+        for (JsonVariantConst entry : sh) {
+            if (p->shares_count >= CLAWD_SHARES_MAX) break;
+            const char* slug = entry["s"] | "";
+            int pct = entry["p"] | 0;
+            if (!*slug) continue;
+            ProviderShare& ps = p->shares[p->shares_count++];
+            strlcpy(ps.slug, slug, CLAWD_SLUG_LEN);
+            if (pct < 0) pct = 0;
+            if (pct > 100) pct = 100;
+            ps.pct = (uint8_t)pct;
+        }
+    }
+
+    p->ok = doc["ok"] | true;
+    p->valid = true;
+    p->last_update_ms = millis();
+    p->cycle_seen = g_state.current_cycle;
+    return PR_PROVIDER;
 }
 
 // ---- Serial command buffer ----
@@ -149,7 +272,7 @@ static void check_serial_cmd() {
             if (strcmp(cmd_buf, "screenshot") == 0) send_screenshot();
             else if (strcmp(cmd_buf, "next") == 0) splash_next();
             else if (strcmp(cmd_buf, "splash") == 0) ui_show_screen(SCREEN_SPLASH);
-            else if (strcmp(cmd_buf, "usage") == 0) ui_show_screen(SCREEN_USAGE);
+            else if (strcmp(cmd_buf, "usage") == 0) ui_show_screen(SCREEN_USAGE_BASE);
             else if (strcmp(cmd_buf, "bluetooth") == 0) ui_show_screen(SCREEN_BLUETOOTH);
             cmd_pos = 0;
         } else if (cmd_pos < CMD_BUF_SIZE - 1) {
@@ -293,19 +416,24 @@ void loop() {
     check_serial_cmd();
 
     if (ble_has_data()) {
-        if (parse_json(ble_get_data(), &usage)) {
-            int g_before = usage_rate_group();
-            usage_rate_sample(usage.session_pct);
-            int g_after = usage_rate_group();
-            if (g_after != g_before) {
-                Serial.printf("usage rate: group %d -> %d (s=%.2f%%)\n",
-                    g_before, g_after, usage.session_pct);
-                if (splash_is_active()) splash_pick_for_current_rate();
-            }
-            ui_update(&usage);
-            ble_send_ack();
-        } else {
+        ParseResult pr = parse_json(ble_get_data());
+        if (pr == PR_BAD) {
             ble_send_nack();
+        } else {
+            ble_send_ack();
+            if (pr == PR_EOC) {
+                // Cycle complete — recompute rate-group + push to UI.
+                float primary = ui_primary_pct_for_rate();
+                int g_before = usage_rate_group();
+                usage_rate_sample(primary);
+                int g_after = usage_rate_group();
+                if (g_after != g_before) {
+                    Serial.printf("usage rate: group %d -> %d (s=%.2f%%)\n",
+                        g_before, g_after, primary);
+                    if (splash_is_active()) splash_pick_for_current_rate();
+                }
+                ui_set_state(&g_state);
+            }
         }
     }
 

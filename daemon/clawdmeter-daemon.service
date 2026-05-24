@@ -1,0 +1,13 @@
+[Unit]
+Description=Clawdmeter daemon (BLE LLM usage monitor)
+After=bluetooth.service network-online.target
+Wants=bluetooth.service network-online.target
+
+[Service]
+Type=simple
+ExecStart=__PYTHON_BIN__ __DAEMON_PATH__ run
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

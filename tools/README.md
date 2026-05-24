@@ -75,11 +75,11 @@ python3 pixellab_to_claudepix.py \
     --out wine_data/wine_bottle_bordeaux.json \
     --category Bottle --grid 48 --palette 31 --hold 150
 
-# Single-frame still
+# Single-frame still (example — kann jedes neue Sprite sein)
 python3 pixellab_to_claudepix.py \
-    --source wine_data/pixellab/cork_still.png \
-    --name "wine cork" --out wine_data/wine_cork.json \
-    --category Cork --grid 48 --palette 16 --hold 1500
+    --source wine_data/pixellab/example_still.png \
+    --name "wine example" --out wine_data/wine_example.json \
+    --category Example --grid 48 --palette 16 --hold 1500
 
 # Rebuild the on-device header from every JSON listed in _index.json
 node convert_to_c.js --in wine_data --out ../firmware/src/splash_animations_wine.h

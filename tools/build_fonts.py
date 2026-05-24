@@ -23,10 +23,18 @@ STYRENE = os.path.join(ASSETS, "StyreneB-Regular.otf")
 TIEMPOS = os.path.join(ASSETS, "TiemposText-400-Regular.otf")
 MONO    = os.path.join(ASSETS, "DejaVuSansMono.ttf")
 
-# ASCII + Latin-1 umlauts (Ä Ö Ü ß ä ö ü, plus § and · used by some labels).
-TEXT_RANGE = "0x20-0x7E,0xA7,0xB7,0xC4,0xD6,0xDC,0xDF,0xE4,0xF6,0xFC"
-# Mono adds the spinner star + ellipsis glyphs the original used.
-MONO_RANGE = TEXT_RANGE + ",0x2026,0x2722,0x2733,0x2736,0x273B,0x273D"
+# ASCII + Latin-1 umlauts (Ä Ö Ü ß ä ö ü, plus § and · used by some labels)
+# plus currency symbols £ (0xA3) and € (0x20AC) used by the cost_budget screens.
+TEXT_RANGE = (
+    "0x20-0x7E,0xA3,0xA7,0xB7,0xC4,0xD6,0xDC,0xDF,0xE4,0xF6,0xFC,0x20AC"
+)
+# Mono adds the spinner star + ellipsis glyphs the original used, plus the
+# pace-indicator glyphs (— ↑ ↓ ▲ ▼) — Styrene/Tiempos lack arrows, DejaVu
+# Mono has them, so the pace label uses a mono font (see ui.cpp).
+MONO_RANGE = TEXT_RANGE + (
+    ",0x2026,0x2722,0x2733,0x2736,0x273B,0x273D"
+    ",0x2014,0x2191,0x2193,0x25B2,0x25BC"
+)
 
 FONTS = [
     ("font_styrene_12.c", STYRENE, 12, TEXT_RANGE),

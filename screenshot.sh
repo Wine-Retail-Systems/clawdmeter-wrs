@@ -3,7 +3,15 @@
 # Usage: ./screenshot.sh [output.png] [port]
 # Default port: /dev/cu.usbmodem101 on macOS, /dev/ttyACM0 on Linux.
 
-OUTPUT="${1:-screenshot.png}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCREENSHOT_DIR="$SCRIPT_DIR/screenshots"
+mkdir -p "$SCREENSHOT_DIR"
+
+NAME="${1:-screenshot.png}"
+NAME="$(basename "$NAME")"
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+OUTPUT="$SCREENSHOT_DIR/${TIMESTAMP}_${NAME}"
+
 if [ -z "$2" ]; then
     case "$(uname -s)" in
         Darwin) PORT="/dev/cu.usbmodem101" ;;

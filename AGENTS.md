@@ -8,9 +8,9 @@ never see board-specific code. See [`docs/porting/adding-a-board.md`](docs/porti
 
 Two reference ports today, plus one brand variant:
 
-- `boards/waveshare_amoled_216/` — original Waveshare ESP32-S3-Touch-AMOLED-2.16 (CO5300, 480×480 square, CST9220 touch, IMU rotation). Build env: `waveshare_amoled_216`.
-- `boards/waveshare_amoled_18/` — Waveshare ESP32-S3-Touch-AMOLED-1.8 (SH8601, 368×448 portrait, FT3168 touch, XCA9554 IO expander). Build env: `waveshare_amoled_18`.
-- `waveshare_amoled_216_wine` — same hardware as the 2.16, but `-DSPLASH_THEME_WINE` swaps the splash animation set (PixelLab-generated wine sprites, 48×48), the boot/UI logo (`logo_wine.h`), the accent colour (Bordeaux red), and the spinner vocabulary (German wine verbs). Brand fork for jacques.de. Build env: `waveshare_amoled_216_wine`.
+- `boards/waveshare_amoled_216/` — original Waveshare ESP32-S3-Touch-AMOLED-2.16 (CO5300, 480×480 square, CST9220 touch, IMU rotation). Build env: `standard-216`.
+- `boards/waveshare_amoled_18/` — Waveshare ESP32-S3-Touch-AMOLED-1.8 (SH8601, 368×448 portrait, FT3168 touch, XCA9554 IO expander). Build env: `standard-180`.
+- `wine-216` — **default env** for `flash-mac.sh` / `flash.sh`. Same hardware as `standard-216`, but `-DSPLASH_THEME_WINE` swaps the splash animation set (PixelLab-generated wine sprites, 48×48), the boot/UI logo (`logo_wine.h`), the accent colour (Bordeaux red), and the spinner vocabulary (German wine verbs). Brand fork for jacques.de.
 
 The shared code calls a small HAL (`firmware/src/hal/`) that each board implements: display, touch, input, power, IMU. Optional features are guarded by `BoardCaps` (runtime) and `BOARD_HAS_*` (compile-time) rather than `#ifdef BOARD_*`.
 
@@ -73,12 +73,12 @@ PlatformIO's `build_src_filter` includes shared code + one board's folder per en
 ## Build / flash
 
 ```bash
-pio run -d firmware -e waveshare_amoled_216                                          # build 2.16 (default original)
-pio run -d firmware -e waveshare_amoled_18                                           # build 1.8 (new port)
-pio run -d firmware -e waveshare_amoled_216_wine                                     # build Wine-Edition (jacques.de)
-pio run -d firmware -e waveshare_amoled_18 -t upload --upload-port /dev/cu.usbmodem101        # flash 1.8 on macOS
-pio run -d firmware -e waveshare_amoled_216 -t upload --upload-port /dev/ttyACM0              # flash 2.16 on Linux
-pio run -d firmware -e waveshare_amoled_216_wine -t upload --upload-port /dev/cu.usbmodem101  # flash Wine-Edition on macOS
+pio run -d firmware -e wine-216                                                # build Wine Edition (default for flash-*.sh)
+pio run -d firmware -e standard-216                                            # build Standard 2.16"
+pio run -d firmware -e standard-180                                            # build Standard 1.8"
+pio run -d firmware -e wine-216      -t upload --upload-port /dev/cu.usbmodem101  # flash Wine Edition on macOS
+pio run -d firmware -e standard-216  -t upload --upload-port /dev/ttyACM0          # flash Standard 2.16" on Linux
+pio run -d firmware -e standard-180  -t upload --upload-port /dev/cu.usbmodem101  # flash Standard 1.8" on macOS
 ```
 
 If `pio` isn't on PATH: try `~/.platformio/penv/bin/pio` (Linux/macOS pio install) or `brew install platformio` on macOS.
@@ -123,7 +123,7 @@ node tools/scrape_claudepix.js  # → tools/claudepix_data/*.json
 node tools/convert_to_c.js      # → firmware/src/splash_animations.h
 ```
 
-**Wine Edition (jacques.de fork, 4 × 48×48 sprites)** generated via PixelLab
+**Wine Edition (jacques.de fork, 3 × 48×48 sprites — Flasche, Glas, Trauben)** generated via PixelLab
 MCP (Tier 2 subscription required for `animate_object`). Pipeline:
 
 ```bash

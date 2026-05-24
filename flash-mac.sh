@@ -2,30 +2,29 @@
 # Build and flash Clawdmeter firmware on macOS.
 #
 # Usage:
-#   ./flash-mac.sh                                 # AMOLED-2.16, auto-detect port
-#   ./flash-mac.sh --board=18                      # AMOLED-1.8, auto-detect port
-#   ./flash-mac.sh --board=216 /dev/cu.usbmodem1101  # explicit board + port
-#   ./flash-mac.sh /dev/cu.usbmodem1101              # 2.16 with explicit port
+#   ./flash-mac.sh                                # Default-Env (wine-216), auto-port
+#   ./flash-mac.sh --env=standard-216             # Standard 2.16"
+#   ./flash-mac.sh --env=standard-180             # Standard 1.8"
+#   ./flash-mac.sh /dev/cu.usbmodem1101           # Default-Env, expliziter Port
+#   ./flash-mac.sh --env=standard-216 /dev/cu.usbmodem1101
 #
-# Without -e, `pio run` builds AND flashes every defined env in sequence —
-# the second upload silently overwrites the first. Always pass -e.
+# Verfügbare Envs (siehe firmware/platformio.ini):
+#   wine-216, standard-216, standard-180
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-BOARD="216"
+# Default — Wine Edition. Mit --env überschreibbar.
+ENV="wine-216"
 PORT=""
 
 for arg in "$@"; do
     case "$arg" in
-        --board=*)
-            BOARD="${arg#--board=}"
-            ;;
         --env=*)
-            ENV_OVERRIDE="${arg#--env=}"
+            ENV="${arg#--env=}"
             ;;
         --help|-h)
-            sed -n '2,9p' "$0"
+            sed -n '2,12p' "$0"
             exit 0
             ;;
         -*)
@@ -38,36 +37,23 @@ for arg in "$@"; do
     esac
 done
 
-if [ -n "$ENV_OVERRIDE" ]; then
-    ENV="$ENV_OVERRIDE"
-else
-    case "$BOARD" in
-        216) ENV="waveshare_amoled_216" ;;
-        18)  ENV="waveshare_amoled_18" ;;
-        *)
-            echo "Error: unknown --board='$BOARD'. Valid values: 216, 18."
-            exit 1
-            ;;
-    esac
-fi
-
 if [ -z "$PORT" ]; then
     PORT=$(ls /dev/cu.usbmodem* 2>/dev/null | head -1)
     if [ -z "$PORT" ]; then
-        echo "Error: no /dev/cu.usbmodem* device found. Plug in via USB-C."
+        echo "Error: kein /dev/cu.usbmodem* Gerät gefunden. USB-C anschließen."
         exit 1
     fi
 fi
 
 if ! command -v pio >/dev/null; then
-    echo "Error: 'pio' not found. Install with:"
+    echo "Error: 'pio' nicht gefunden. Installiere mit:"
     echo "  brew install platformio"
     exit 1
 fi
 
 echo "=== Flashing Clawdmeter ==="
-echo "Board: $ENV"
-echo "Port:  $PORT"
+echo "Env:  $ENV"
+echo "Port: $PORT"
 echo ""
 
 cd "$SCRIPT_DIR/firmware"
@@ -75,4 +61,4 @@ pio run -e "$ENV" -t upload --upload-port "$PORT"
 
 echo ""
 echo "=== Done ==="
-echo "Monitor with: pio device monitor -p $PORT -b 115200"
+echo "Monitor mit: pio device monitor -p $PORT -b 115200"

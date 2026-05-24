@@ -19,12 +19,5 @@
     "category": "Grapes",
     "frame_count": 1,
     "palette_size": 25
-  },
-  {
-    "filename": "wine_cork.html",
-    "name": "wine cork",
-    "category": "Cork",
-    "frame_count": 1,
-    "palette_size": 17
   }
 ]

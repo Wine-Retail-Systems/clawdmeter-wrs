@@ -45,12 +45,12 @@ static uint8_t group_size[GROUP_COUNT] = {0};
 static uint8_t group_rotation[GROUP_COUNT] = {0};
 
 #ifdef SPLASH_THEME_WINE
-// Wine-Edition mapping. 48×48 PixelLab-generated sprites with full wine
-// detail (gold-label bottle, bordeaux-filled glass, grape cluster with leaf,
-// natural cork). Same sprite can appear in multiple groups for rotation.
+// Wine-Edition mapping. 48×48 PixelLab-generated sprites (gold-label bottle,
+// bordeaux-filled glass, grape cluster with leaf). Same sprite can appear in
+// multiple groups for rotation.
 static const char* GROUP_NAMES[GROUP_COUNT][GROUP_MAX] = {
-    // Group 0 — idle / sleepy (cork resting, grapes still on the vine)
-    { "wine cork", "wine grapes", NULL, NULL },
+    // Group 0 — idle / sleepy (grapes still on the vine)
+    { "wine grapes", NULL, NULL, NULL },
     // Group 1 — normal pace (glass poured, bottle next to it)
     { "wine glass red", "wine bottle bordeaux", NULL, NULL },
     // Group 2 — active (glass with bordeaux, grapes alongside)

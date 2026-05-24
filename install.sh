@@ -1,50 +1,69 @@
 #!/bin/bash
+# Linux installer for Clawdmeter daemon (Python + bleak + systemd --user).
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SERVICE_NAME="claude-usage-daemon"
-SERVICE_FILE="$SCRIPT_DIR/daemon/$SERVICE_NAME.service"
+SERVICE_NAME="clawdmeter-daemon"
+SERVICE_SRC="$SCRIPT_DIR/daemon/$SERVICE_NAME.service"
 USER_SERVICE_DIR="$HOME/.config/systemd/user"
+VENV_DIR="$SCRIPT_DIR/daemon/.venv"
+DAEMON_PY="$SCRIPT_DIR/daemon/clawdmeter_daemon.py"
 
-echo "=== Claude Usage Tracker - Install ==="
+echo "=== Clawdmeter Linux install ==="
 echo ""
 
-# Check dependencies
-echo "[1/3] Checking dependencies..."
-for cmd in curl awk bluetoothctl busctl; do
-    command -v "$cmd" >/dev/null || { echo "Error: $cmd is required but not installed"; exit 1; }
+echo "[1/5] Checking dependencies..."
+for cmd in python3 bluetoothctl; do
+    command -v "$cmd" >/dev/null || { echo "Error: $cmd is required"; exit 1; }
 done
-echo "  All dependencies found"
+echo "  OK"
 echo ""
 
-# Install systemd user service with resolved path
-echo "[2/3] Installing systemd user service..."
+echo "[2/5] Creating Python virtualenv at daemon/.venv ..."
+if [ ! -d "$VENV_DIR" ]; then
+    python3 -m venv "$VENV_DIR"
+fi
+"$VENV_DIR/bin/pip" install --quiet --upgrade pip
+"$VENV_DIR/bin/pip" install --quiet "bleak>=0.22" "httpx>=0.27" "tomli>=2.0;python_version<'3.11'"
+PYTHON_BIN="$VENV_DIR/bin/python"
+echo "  OK ($PYTHON_BIN)"
+echo ""
+
+echo "[3/5] Optional provider dependencies"
+echo "  AWS Bedrock-Adapter ist aktuell deaktiviert (kein IAM-Pfad konfiguriert)."
+echo "  Falls du ihn später reaktivierst, installiere boto3 mit:"
+echo "    $VENV_DIR/bin/pip install 'boto3>=1.34'"
+echo ""
+
+echo "[4/5] Running interactive setup wizard..."
+"$PYTHON_BIN" "$DAEMON_PY" setup
+echo ""
+
+echo "[5/5] Installing systemd user service..."
 mkdir -p "$USER_SERVICE_DIR"
-DAEMON_BIN="$SCRIPT_DIR/daemon/$SERVICE_NAME.sh"
-sed "s|DAEMON_PATH|${DAEMON_BIN}|g" "$SERVICE_FILE" > "$USER_SERVICE_DIR/$SERVICE_NAME.service"
+sed \
+    -e "s|__PYTHON_BIN__|${PYTHON_BIN}|g" \
+    -e "s|__DAEMON_PATH__|${DAEMON_PY}|g" \
+    "$SERVICE_SRC" > "$USER_SERVICE_DIR/$SERVICE_NAME.service"
 systemctl --user daemon-reload
-
-# Enable service
-echo "[3/3] Enabling service..."
 systemctl --user enable "$SERVICE_NAME"
+systemctl --user restart "$SERVICE_NAME"
+echo "  Service enabled and started."
+echo ""
 
-echo ""
-echo "=== Done! ==="
-echo ""
-echo "The daemon will now start automatically when you log in"
-echo "and connect to the SC01 Plus over Bluetooth Low Energy."
-echo ""
-echo "First-time Bluetooth pairing:"
-echo "  1. Power on the SC01 Plus"
-echo "  2. Run: bluetoothctl scan le"
-echo "  3. Find 'Claude Controller' and note the MAC address"
-echo "  4. Run: bluetoothctl pair <MAC>"
-echo "  5. Run: bluetoothctl trust <MAC>"
-echo "  6. Start the daemon: systemctl --user start $SERVICE_NAME"
+echo "=== Done ==="
 echo ""
 echo "Useful commands:"
-echo "  systemctl --user status $SERVICE_NAME    # check status"
-echo "  journalctl --user -u $SERVICE_NAME -f    # view logs"
-echo "  systemctl --user restart $SERVICE_NAME   # restart"
-echo "  systemctl --user stop $SERVICE_NAME      # stop"
+echo "  $PYTHON_BIN $DAEMON_PY doctor                        # config + enabled providers"
+echo "  $PYTHON_BIN $DAEMON_PY setup                         # re-run setup wizard"
+echo "  systemctl --user status $SERVICE_NAME                # status"
+echo "  systemctl --user restart $SERVICE_NAME               # restart after config change"
+echo "  journalctl --user -u $SERVICE_NAME -f                # live logs"
+echo ""
+echo "First-time Bluetooth pairing:"
+echo "  1. Power on the Clawdmeter."
+echo "  2. bluetoothctl scan le"
+echo "  3. Find 'Clawdmeter' and note the MAC address."
+echo "  4. bluetoothctl pair <MAC>"
+echo "  5. bluetoothctl trust <MAC>"
 echo ""
