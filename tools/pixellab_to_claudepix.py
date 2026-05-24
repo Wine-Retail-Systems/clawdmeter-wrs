@@ -104,6 +104,14 @@ def main():
     ap.add_argument("--name", required=True, help="sprite name (used for JSON 'name' field)")
     ap.add_argument("--out", help="output JSON path (default: <first-png-base>.json)")
     ap.add_argument("--grid", type=int, default=48, help="output grid size (default 48)")
+    # Palette size default: 31 colours + 1 transparent slot = 32 total. The
+    # transparent slot at index 0 is reserved (see quantise_frames), and 32
+    # is a comfortable size for PixelLab-generated wine sprites without
+    # blowing the on-device palette table (uint16_t indices are still cheap
+    # at this size). Use --palette 16 for low-detail objects like a single
+    # cork; use --palette 24 for organic clusters like grapes where the
+    # extra shading helps individual berries pop. The hard ceiling is the
+    # adaptive-palette limit of PIL (256).
     ap.add_argument("--palette", type=int, default=31, help="palette colour count, excluding transparent slot (default 31, total = palette+1)")
     ap.add_argument("--hold", type=int, default=None, help="per-frame hold in ms (default: 600 multi-frame, 1500 single)")
     ap.add_argument("--category", default="Wine", help="category string written to JSON")

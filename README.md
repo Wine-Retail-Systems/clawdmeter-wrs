@@ -313,9 +313,11 @@ The list of active wine sprites lives in `tools/wine_data/_index.json`. The
 grouping into the four usage-rate buckets (idle, normal, active, heavy) is
 defined inside the `#ifdef SPLASH_THEME_WINE` block in `firmware/src/splash.cpp`.
 
-A legacy hand-pixel pipeline (`tools/build_wine_sprites.py`, 20×20 ASCII
-sprites) is still present for offline / no-subscription work; it overwrites
-the same JSONs and is not part of the active 48×48 workflow.
+A legacy hand-pixel pipeline (`tools/legacy/build_wine_sprites.py`, 20×20
+ASCII sprites) is still present for offline / no-subscription work. It
+writes to a separate `tools/wine_data_handpixel/` directory so it cannot
+overwrite the PixelLab-generated JSONs. See `tools/README.md` for how to
+activate the hand-pixel set instead of the PixelLab one.
 
 #### Wine logo
 

@@ -99,8 +99,12 @@ static void render_anim_frame(const splash_anim_def_t *a, uint16_t frame_idx) {
     const int sprite_dim = grid * cell;                  // may be < canvas_dim
     const int margin     = (canvas_dim - sprite_dim) / 2; // letterbox if not exact
 
-    // Clear the full canvas first so any letterbox margin reads as bg.
-    for (int i = 0; i < canvas_dim * canvas_dim; i++) canvas_buf[i] = COL_EMPTY;
+    // Clear the full canvas only when the sprite doesn't fully cover it —
+    // otherwise the per-cell writes below overwrite every pixel anyway and
+    // the memset would be wasted work (~230 KB at 480×480).
+    if (margin > 0) {
+        for (int i = 0; i < canvas_dim * canvas_dim; i++) canvas_buf[i] = COL_EMPTY;
+    }
 
     const uint8_t *cells = a->frames + (size_t)frame_idx * grid * grid;
     for (int gy = 0; gy < grid; gy++) {

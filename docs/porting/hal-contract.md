@@ -81,6 +81,11 @@ A new screen size lands on the closer breakpoint and renders correctly
 without pixel-perfect alignment. If you want polish, add another branch
 to `compute_layout()` (please open a PR — others with that size benefit).
 
-The splash screen is fully responsive — `CELL` is computed as
-`min(width, height) / 20` so the 20×20 pixel-art creature fills the
-smaller display dimension and centers in the larger one.
+The splash screen is fully responsive and grid-agnostic. Each sprite
+declares its own `grid` and `palette_size` (see `splash_anim_def_t`); the
+cell pitch is computed per sprite as `min(width, height) / sprite.grid`.
+The original Claudepix Clawd set uses 20×20 sprites, the Wine-Edition
+fork uses 48×48 — both render through the same code path, just with
+different cell sizes. New sprite sets can pick any integer grid that
+divides the panel's smaller dimension evenly; non-integer ratios are
+letterboxed.

@@ -16,6 +16,11 @@ The shared code calls a small HAL (`firmware/src/hal/`) that each board implemen
 
 Connects to a host daemon over BLE; daemon polls Anthropic API for usage data. This file is for future Claude Code sessions to bootstrap quickly. Read this first.
 
+## Dokumentationspflicht
+
+- **Feature-Dokumentation:** Im Ordner `feature-documentation/` müssen alle neuen Funktionen und Features sowie deren Anpassungen in einzelnen `.md`-Dateien im Markdown-Format dokumentiert werden. Pro Funktion und Markdown eine Datei. Sollte ein Feature aus mehreren Funktionen bestehen, dürfen Unterordner pro Feature angelegt werden. Diese Dokumentation dient vor allem anderen KI-Coding-Agenten zum besseren Verständnis der Codebase.
+- **Entwicklungsfortschritt:** Der aktuelle Entwicklungsfortschritt ist fortlaufend neben dem PRD zu dokumentieren — z. B. in einer `PROGRESS.md` neben dem PRD. Dort wird festgehalten, welche MVP-Features bereits umgesetzt sind, welche in Arbeit sind und welche noch ausstehen. So haben alle Beteiligten (Mensch und KI-Agent) jederzeit einen aktuellen Überblick über den Stand der Entwicklung.
+
 ## Hardware (critical pins)
 
 ### AMOLED-2.16 (original)

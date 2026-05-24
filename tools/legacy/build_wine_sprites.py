@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-# Generates tools/wine_data/*.json + _index.json from inline ASCII pixel-art.
+# Legacy hand-pixel 20×20 wine sprite generator. KEPT for offline / no-
+# subscription work; the active 48×48 PixelLab pipeline lives at
+# `tools/pixellab_to_claudepix.py` + the PixelLab MCP server.
+#
+# Writes to `tools/wine_data_handpixel/` (NOT the active `tools/wine_data/`)
+# so running this script can never silently overwrite the PixelLab-generated
+# JSONs. To activate this set instead, point the converter at this dir:
+#   node tools/convert_to_c.js --in tools/wine_data_handpixel \
+#       --out firmware/src/splash_animations_wine.h
 #
 # Each sprite is a list of (ascii_grid, hold_ms) frames. Characters in the
 # grid map directly to palette indices: '0'..'9' = index, '.' = 0 (transparent).
@@ -11,7 +19,8 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT_DIR = os.path.join(HERE, "wine_data")
+# tools/legacy/.. -> tools/, then into wine_data_handpixel/
+OUT_DIR = os.path.join(HERE, "..", "wine_data_handpixel")
 
 # ---------- Sprite definitions ----------
 # Palette index legend per sprite (kept consistent across sprites so frames in
