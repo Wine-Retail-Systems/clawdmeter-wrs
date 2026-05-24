@@ -147,6 +147,10 @@ static void check_serial_cmd() {
         if (c == '\n' || c == '\r') {
             cmd_buf[cmd_pos] = '\0';
             if (strcmp(cmd_buf, "screenshot") == 0) send_screenshot();
+            else if (strcmp(cmd_buf, "next") == 0) splash_next();
+            else if (strcmp(cmd_buf, "splash") == 0) ui_show_screen(SCREEN_SPLASH);
+            else if (strcmp(cmd_buf, "usage") == 0) ui_show_screen(SCREEN_USAGE);
+            else if (strcmp(cmd_buf, "bluetooth") == 0) ui_show_screen(SCREEN_BLUETOOTH);
             cmd_pos = 0;
         } else if (cmd_pos < CMD_BUF_SIZE - 1) {
             cmd_buf[cmd_pos++] = c;

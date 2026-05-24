@@ -1,7 +1,17 @@
 #include "ui.h"
 #include "splash.h"
 #include <lvgl.h>
+#ifdef SPLASH_THEME_WINE
+#include "logo_wine.h"
+#define LOGO_DATA   logo_wine_data
+#define LOGO_W      LOGO_WINE_WIDTH
+#define LOGO_H      LOGO_WINE_HEIGHT
+#else
 #include "logo.h"
+#define LOGO_DATA   logo_data
+#define LOGO_W      LOGO_WIDTH
+#define LOGO_H      LOGO_HEIGHT
+#endif
 #include "icons.h"
 #include "hal/board_caps.h"
 
@@ -146,6 +156,21 @@ static const uint16_t spinner_ms[SPINNER_COUNT] = {
     260, 130, 130, 130, 130, 260,
 };
 
+#ifdef SPLASH_THEME_WINE
+// Wine-Edition: deutsche Wein-Begriffe (Infinitive im Spinner-Stil).
+static const char* const anim_messages[] = {
+    "Dekantieren", "Schwenken", "Verkosten",
+    "Atmen lassen", "Schnuppern", "Degustieren",
+    "Entkorken", "Einschenken", "Karaffieren",
+    "Belüften", "Filtrieren", "Klären",
+    "Reifen", "Lagern", "Würdigen",
+    "Genießen", "Probieren", "Schlürfen",
+    "Anstoßen", "Kredenzen", "Servieren",
+    "Inspizieren", "Verfeinern", "Reflektieren",
+    "Erkunden", "Vinifizieren", "Aufgießen",
+    "Ausgießen", "Nachschenken",
+};
+#else
 static const char* const anim_messages[] = {
     "Accomplishing", "Elucidating", "Perusing",
     "Actioning", "Enchanting", "Philosophising",
@@ -179,6 +204,7 @@ static const char* const anim_messages[] = {
     "Effecting", "Wizarding",
     "Working", "Wrangling",
 };
+#endif
 #define ANIM_MSG_COUNT (sizeof(anim_messages) / sizeof(anim_messages[0]))
 
 static lv_color_t pct_color(float pct) {
@@ -191,11 +217,11 @@ static void format_reset_time(int mins, char* buf, size_t len) {
     if (mins < 0) {
         snprintf(buf, len, "---");
     } else if (mins < 60) {
-        snprintf(buf, len, "Resets in %dm", mins);
+        snprintf(buf, len, "Reset in %dm", mins);
     } else if (mins < 1440) {
-        snprintf(buf, len, "Resets in %dh %dm", mins / 60, mins % 60);
+        snprintf(buf, len, "Reset in %dh %dm", mins / 60, mins % 60);
     } else {
-        snprintf(buf, len, "Resets in %dd %dh", mins / 1440, (mins % 1440) / 60);
+        snprintf(buf, len, "Reset in %dd %dh", mins / 1440, (mins % 1440) / 60);
     }
 }
 
@@ -312,16 +338,16 @@ static void init_usage_screen(lv_obj_t* scr) {
     lv_obj_add_event_cb(usage_container, global_click_cb, LV_EVENT_CLICKED, NULL);
 
     lbl_title = lv_label_create(usage_container);
-    lv_label_set_text(lbl_title, "Usage");
+    lv_label_set_text(lbl_title, "Verbrauch");
     lv_obj_set_style_text_font(lbl_title, &font_tiempos_56, 0);
     lv_obj_set_style_text_color(lbl_title, COL_TEXT, 0);
     lv_obj_align(lbl_title, LV_ALIGN_TOP_MID, 16, L.title_y);
 
-    make_usage_panel(usage_container, L.content_y, "Current",
+    make_usage_panel(usage_container, L.content_y, "Aktuell",
                      &lbl_session_pct, &lbl_session_label,
                      &bar_session, &lbl_session_reset);
     make_usage_panel(usage_container,
-                     L.content_y + L.usage_panel_h + L.usage_panel_gap, "Weekly",
+                     L.content_y + L.usage_panel_h + L.usage_panel_gap, "Wöchentlich",
                      &lbl_weekly_pct, &lbl_weekly_label,
                      &bar_weekly, &lbl_weekly_reset);
 
@@ -361,19 +387,19 @@ static void init_bluetooth_screen(lv_obj_t* scr) {
     lv_obj_set_pos(bt_img, 0, 0);
 
     lbl_ble_status = lv_label_create(p_info);
-    lv_label_set_text(lbl_ble_status, "Initializing...");
+    lv_label_set_text(lbl_ble_status, "Initialisierung...");
     lv_obj_set_style_text_font(lbl_ble_status, L.bt_status_font, 0);
     lv_obj_set_style_text_color(lbl_ble_status, COL_DIM, 0);
     lv_obj_set_pos(lbl_ble_status, 56, 2);
 
     lbl_ble_device = lv_label_create(p_info);
-    lv_label_set_text(lbl_ble_device, "Device: ---");
+    lv_label_set_text(lbl_ble_device, "Gerät: ---");
     lv_obj_set_style_text_font(lbl_ble_device, L.bt_device_font, 0);
     lv_obj_set_style_text_color(lbl_ble_device, COL_DIM, 0);
     lv_obj_set_pos(lbl_ble_device, 0, 64);
 
     lbl_ble_mac = lv_label_create(p_info);
-    lv_label_set_text(lbl_ble_mac, "Address: ---");
+    lv_label_set_text(lbl_ble_mac, "Adresse: ---");
     lv_obj_set_style_text_font(lbl_ble_mac, L.bt_device_font, 0);
     lv_obj_set_style_text_color(lbl_ble_mac, COL_DIM, 0);
     lv_obj_set_pos(lbl_ble_mac, 0, 100);
@@ -398,18 +424,18 @@ static void init_bluetooth_screen(lv_obj_t* scr) {
     lv_image_set_src(trash_img, &icon_trash_dsc);
 
     lv_obj_t* reset_lbl = lv_label_create(reset_zone);
-    lv_label_set_text(reset_lbl, "Reset Bluetooth");
+    lv_label_set_text(reset_lbl, "Bluetooth zurücksetzen");
     lv_obj_set_style_text_font(reset_lbl, L.bt_device_font, 0);
     lv_obj_set_style_text_color(reset_lbl, COL_DIM, 0);
 
     lv_obj_t* lbl_credit = lv_label_create(ble_container);
-    lv_label_set_text(lbl_credit, "Built by @hermannbjorgvin");
+    lv_label_set_text(lbl_credit, "Built by Sascha");
     lv_obj_set_style_text_font(lbl_credit, L.bt_credit_1_font, 0);
     lv_obj_set_style_text_color(lbl_credit, COL_DIM, 0);
     lv_obj_align(lbl_credit, LV_ALIGN_BOTTOM_MID, 0, -46);
 
     lv_obj_t* lbl_credit2 = lv_label_create(ble_container);
-    lv_label_set_text(lbl_credit2, "Clawd animation by @amaanbuilds");
+    lv_label_set_text(lbl_credit2, "Inspired by hermannbjrgvin");
     lv_obj_set_style_text_font(lbl_credit2, L.bt_credit_2_font, 0);
     lv_obj_set_style_text_color(lbl_credit2, COL_DIM, 0);
     lv_obj_align(lbl_credit2, LV_ALIGN_BOTTOM_MID, 0, -20);
@@ -426,7 +452,7 @@ void ui_init(void) {
     lv_obj_set_style_bg_color(scr, COL_BG, 0);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
 
-    init_icon_dsc_rgb565a8(&logo_dsc, LOGO_WIDTH, LOGO_HEIGHT, logo_data);
+    init_icon_dsc_rgb565a8(&logo_dsc, LOGO_W, LOGO_H, LOGO_DATA);
     init_battery_icons();
 
     init_usage_screen(scr);
@@ -554,31 +580,31 @@ screen_t ui_get_current_screen(void) {
 void ui_update_ble_status(ble_state_t state, const char* name, const char* mac) {
     switch (state) {
     case BLE_STATE_CONNECTED:
-        lv_label_set_text(lbl_ble_status, "Connected");
+        lv_label_set_text(lbl_ble_status, "Verbunden");
         lv_obj_set_style_text_color(lbl_ble_status, COL_GREEN, 0);
         break;
     case BLE_STATE_ADVERTISING:
-        lv_label_set_text(lbl_ble_status, "Advertising...");
+        lv_label_set_text(lbl_ble_status, "Sucht...");
         lv_obj_set_style_text_color(lbl_ble_status, COL_AMBER, 0);
         break;
     case BLE_STATE_DISCONNECTED:
-        lv_label_set_text(lbl_ble_status, "Disconnected");
+        lv_label_set_text(lbl_ble_status, "Getrennt");
         lv_obj_set_style_text_color(lbl_ble_status, COL_RED, 0);
         break;
     default:
-        lv_label_set_text(lbl_ble_status, "Initializing...");
+        lv_label_set_text(lbl_ble_status, "Initialisierung...");
         lv_obj_set_style_text_color(lbl_ble_status, COL_DIM, 0);
         break;
     }
 
     if (name) {
         static char nbuf[48];
-        snprintf(nbuf, sizeof(nbuf), "Device: %s", name);
+        snprintf(nbuf, sizeof(nbuf), "Gerät: %s", name);
         lv_label_set_text(lbl_ble_device, nbuf);
     }
     if (mac) {
         static char mbuf[48];
-        snprintf(mbuf, sizeof(mbuf), "Address: %s", mac);
+        snprintf(mbuf, sizeof(mbuf), "Adresse: %s", mac);
         lv_label_set_text(lbl_ble_mac, mbuf);
     }
 }

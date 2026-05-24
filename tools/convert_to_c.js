@@ -2,9 +2,12 @@
 /**
  * Converts scraped JSON animation data to firmware/src/splash_animations.h.
  *
- * Per-animation palette (up to 10 entries) is converted to RGB565. Cells in
- * each frame are palette indices (0..9). Splash module looks up colors via
- * palette[cell].
+ * Each animation carries its own grid size (auto-detected from frame data —
+ * the original claudepix set is 20×20; the Wine-Edition 48×48 sprites use the
+ * same JSON schema with a larger grid). The palette length is also per-sprite
+ * (was fixed at 10; PixelLab-generated sprites use up to 32). splash.cpp reads
+ * grid + palette_size from each splash_anim_def_t at render time, so both
+ * resolutions coexist in the same firmware build.
  *
  * Usage: node convert_to_c.js [--in DIR] [--out FILE]
  */
@@ -18,8 +21,6 @@ const opt = (k, def) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1]
 const IN_DIR = path.resolve(opt('--in', path.join(__dirname, 'claudepix_data')));
 const OUT_FILE = path.resolve(opt('--out',
   path.join(__dirname, '..', 'firmware', 'src', 'splash_animations.h')));
-
-const PALETTE_SIZE = 10;
 
 function safeIdent(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -36,11 +37,7 @@ function hexToRgb565(hex) {
 }
 
 function paletteToRgb565(palette) {
-  const out = new Array(PALETTE_SIZE).fill(0x0000);
-  for (let i = 0; i < palette.length && i < PALETTE_SIZE; i++) {
-    out[i] = hexToRgb565(palette[i]);
-  }
-  return out;
+  return palette.map(hexToRgb565);
 }
 
 function main() {
@@ -66,18 +63,19 @@ function main() {
   out += '// from per-animation HTML files served by the source site.\n';
   out += '// Do not edit by hand — re-run the scraper + converter to refresh.\n';
   out += '// ============================================================\n';
-  out += '// Each animation carries a 10-entry RGB565 palette.\n';
-  out += '// Cell values 0..9 index into palette.\n';
+  out += '// Each animation carries its own per-sprite palette (up to 256 entries)\n';
+  out += '// and grid size. The splash module reads `grid` and `palette_size`\n';
+  out += '// from each entry, so 20×20 and 48×48 sets coexist in one build.\n';
   out += '#pragma once\n#include <stdint.h>\n\n';
-
-  out += `#define SPLASH_PALETTE_SIZE ${PALETTE_SIZE}\n\n`;
 
   out += 'typedef struct {\n';
   out += '    const char *name;\n';
   out += '    const char *category;\n';
   out += '    uint16_t frame_count;\n';
+  out += '    uint16_t grid;          /* sprite is grid×grid cells */\n';
+  out += '    uint16_t palette_size;  /* number of valid entries in palette */\n';
   out += '    const uint16_t *palette;\n';
-  out += '    const uint8_t (*frames)[400];\n';
+  out += '    const uint8_t *frames;  /* frame_count × grid × grid bytes */\n';
   out += '    const uint16_t *holds;\n';
   out += '} splash_anim_def_t;\n\n';
 
@@ -88,18 +86,27 @@ function main() {
     const dataPath = path.join(IN_DIR, meta.filename.replace(/\.html?$/, '.json'));
     const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
+    // Auto-detect grid from the first frame's row count. We require square
+    // grids and identical sizes across frames within one animation.
+    const grid = data.frames[0].grid.length;
+    for (const f of data.frames) {
+      if (f.grid.length !== grid || f.grid.some(r => r.length !== grid)) {
+        throw new Error(`${meta.filename}: non-square or mismatched grid (expected ${grid}×${grid})`);
+      }
+    }
+
+    const palSize = data.palette.length;
     const pal565 = paletteToRgb565(data.palette);
-    out += `static const uint16_t splash_${ident}_palette[${PALETTE_SIZE}] = {`;
+    out += `static const uint16_t splash_${ident}_palette[${palSize}] = {`;
     out += pal565.map(c => `0x${c.toString(16).toUpperCase().padStart(4, '0')}`).join(',');
     out += '};\n';
 
-    out += `static const uint8_t splash_${ident}_frames[${data.frames.length}][400] = {\n`;
+    const cells = grid * grid;
+    out += `static const uint8_t splash_${ident}_frames[${data.frames.length * cells}] = {\n`;
     for (const f of data.frames) {
-      const flat = [];
-      for (let r = 0; r < 20; r++)
-        for (let c = 0; c < 20; c++)
-          flat.push(f.grid[r][c]);
-      out += '    {' + flat.join(',') + '},\n';
+      for (let r = 0; r < grid; r++) {
+        out += '    ' + f.grid[r].join(',') + ',\n';
+      }
     }
     out += '};\n';
 
@@ -107,13 +114,13 @@ function main() {
     out += data.frames.map(f => f.hold).join(',');
     out += '};\n\n';
 
-    entries.push({ ident, name: data.name, category: data.category, count: data.frames.length });
+    entries.push({ ident, name: data.name, category: data.category, count: data.frames.length, grid, palSize });
   }
 
   out += `#define SPLASH_ANIM_COUNT ${entries.length}\n`;
   out += 'static const splash_anim_def_t splash_anims[SPLASH_ANIM_COUNT] = {\n';
   for (const e of entries) {
-    out += `    {"${e.name}", "${e.category}", ${e.count}, splash_${e.ident}_palette, splash_${e.ident}_frames, splash_${e.ident}_holds},\n`;
+    out += `    {"${e.name}", "${e.category}", ${e.count}, ${e.grid}, ${e.palSize}, splash_${e.ident}_palette, splash_${e.ident}_frames, splash_${e.ident}_holds},\n`;
   }
   out += '};\n';
 

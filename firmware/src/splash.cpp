@@ -1,5 +1,9 @@
 #include "splash.h"
+#ifdef SPLASH_THEME_WINE
+#include "splash_animations_wine.h"
+#else
 #include "splash_animations.h"
+#endif
 #include "theme.h"
 #include "usage_rate.h"
 #include "hal/board_caps.h"
@@ -7,13 +11,10 @@
 #include <string.h>
 #include <esp_heap_caps.h>
 
-// 20×20 grid. CELL sized so the canvas fits the smaller display dimension —
-// the canvas is square and centered, so on portrait or letterboxed panels
-// it leaves vertical margin rather than cropping.
-#define GRID         20
-static int  cell      = 24;        // recomputed in splash_init()
-static int  canvas_w  = GRID * 24;
-static int  canvas_h  = GRID * 24;
+// Square canvas sized to fit the smaller display dimension. Cell pitch is
+// derived per sprite from its `grid` field so 20×20 and 48×48 sets share the
+// same render path and the same canvas — bigger grids just get smaller cells.
+static int  canvas_dim = 480;     // recomputed in splash_init()
 
 // Background fallback when palette is missing
 #define COL_EMPTY    0x0000  // true black (matches THEME_BG)
@@ -43,6 +44,21 @@ static int8_t  group_lists[GROUP_COUNT][GROUP_MAX];
 static uint8_t group_size[GROUP_COUNT] = {0};
 static uint8_t group_rotation[GROUP_COUNT] = {0};
 
+#ifdef SPLASH_THEME_WINE
+// Wine-Edition mapping. 48×48 PixelLab-generated sprites with full wine
+// detail (gold-label bottle, bordeaux-filled glass, grape cluster with leaf,
+// natural cork). Same sprite can appear in multiple groups for rotation.
+static const char* GROUP_NAMES[GROUP_COUNT][GROUP_MAX] = {
+    // Group 0 — idle / sleepy (cork resting, grapes still on the vine)
+    { "wine cork", "wine grapes", NULL, NULL },
+    // Group 1 — normal pace (glass poured, bottle next to it)
+    { "wine glass red", "wine bottle bordeaux", NULL, NULL },
+    // Group 2 — active (glass with bordeaux, grapes alongside)
+    { "wine glass red", "wine grapes", NULL, NULL },
+    // Group 3 — heavy (full table rotation)
+    { "wine bottle bordeaux", "wine glass red", "wine grapes", NULL },
+};
+#else
 static const char* GROUP_NAMES[GROUP_COUNT][GROUP_MAX] = {
     // Group 0 — idle / sleepy
     { "expression sleep", "idle breathe", "idle blink", "expression wink" },
@@ -53,6 +69,7 @@ static const char* GROUP_NAMES[GROUP_COUNT][GROUP_MAX] = {
     // Group 3 — heavy
     { "dance bounce dj", "dance sway dj", "dance djmix", NULL },
 };
+#endif
 
 static void resolve_group_lists(void) {
     for (int g = 0; g < GROUP_COUNT; g++) {
@@ -71,19 +88,32 @@ static void resolve_group_lists(void) {
     }
 }
 
-static uint16_t *row_buf = NULL;   // scratch row, sized to canvas_w
+static uint16_t *row_buf = NULL;   // scratch row, sized to canvas_dim
 
-static void render_frame(const uint8_t *cells, const uint16_t *palette) {
-    if (!row_buf || !canvas_buf) return;
-    for (int gy = 0; gy < GRID; gy++) {
-        for (int gx = 0; gx < GRID; gx++) {
-            uint8_t code = cells[gy * GRID + gx];
-            uint16_t color = (palette && code < SPLASH_PALETTE_SIZE) ? palette[code] : COL_EMPTY;
+static void render_anim_frame(const splash_anim_def_t *a, uint16_t frame_idx) {
+    if (!row_buf || !canvas_buf || !a) return;
+    const int grid = a->grid;
+    if (grid <= 0) return;
+    int cell = canvas_dim / grid;
+    if (cell < 1) cell = 1;
+    const int sprite_dim = grid * cell;                  // may be < canvas_dim
+    const int margin     = (canvas_dim - sprite_dim) / 2; // letterbox if not exact
+
+    // Clear the full canvas first so any letterbox margin reads as bg.
+    for (int i = 0; i < canvas_dim * canvas_dim; i++) canvas_buf[i] = COL_EMPTY;
+
+    const uint8_t *cells = a->frames + (size_t)frame_idx * grid * grid;
+    for (int gy = 0; gy < grid; gy++) {
+        for (int gx = 0; gx < grid; gx++) {
+            uint8_t code = cells[gy * grid + gx];
+            uint16_t color = (a->palette && code < a->palette_size)
+                                 ? a->palette[code] : COL_EMPTY;
             uint16_t *p = &row_buf[gx * cell];
             for (int i = 0; i < cell; i++) p[i] = color;
         }
         for (int dy = 0; dy < cell; dy++) {
-            memcpy(&canvas_buf[(gy * cell + dy) * canvas_w], row_buf, canvas_w * 2);
+            int y = margin + gy * cell + dy;
+            memcpy(&canvas_buf[y * canvas_dim + margin], row_buf, sprite_dim * 2);
         }
     }
     if (canvas) lv_obj_invalidate(canvas);
@@ -92,7 +122,7 @@ static void render_frame(const uint8_t *cells, const uint16_t *palette) {
 static void show_placeholder() {
     // Solid dark background + centered status label.
     if (canvas_buf) {
-        for (int i = 0; i < canvas_w * canvas_h; i++) canvas_buf[i] = COL_EMPTY;
+        for (int i = 0; i < canvas_dim * canvas_dim; i++) canvas_buf[i] = COL_EMPTY;
     }
     if (canvas) lv_obj_invalidate(canvas);
     if (label_status) lv_obj_clear_flag(label_status, LV_OBJ_FLAG_HIDDEN);
@@ -101,13 +131,10 @@ static void show_placeholder() {
 void splash_init(lv_obj_t *parent) {
     const BoardCaps& c = board_caps();
     int min_dim = (c.width < c.height) ? c.width : c.height;
-    cell     = min_dim / GRID;       // fits within the smaller display dimension
-    if (cell < 4) cell = 4;
-    canvas_w = GRID * cell;
-    canvas_h = GRID * cell;
-
-    canvas_buf = (uint16_t*)heap_caps_malloc(canvas_w * canvas_h * 2, MALLOC_CAP_SPIRAM);
-    row_buf    = (uint16_t*)heap_caps_malloc(canvas_w * 2,             MALLOC_CAP_SPIRAM);
+    canvas_dim = min_dim;
+    // Row buffer must be big enough for the canvas; one row of RGB565.
+    canvas_buf = (uint16_t*)heap_caps_malloc(canvas_dim * canvas_dim * 2, MALLOC_CAP_SPIRAM);
+    row_buf    = (uint16_t*)heap_caps_malloc(canvas_dim * 2,              MALLOC_CAP_SPIRAM);
     if (!canvas_buf || !row_buf) {
         Serial.println("splash: failed to alloc canvas buffer");
         return;
@@ -123,7 +150,7 @@ void splash_init(lv_obj_t *parent) {
     lv_obj_clear_flag(splash_container, LV_OBJ_FLAG_SCROLLABLE);
 
     canvas = lv_canvas_create(splash_container);
-    lv_canvas_set_buffer(canvas, canvas_buf, canvas_w, canvas_h, LV_COLOR_FORMAT_RGB565);
+    lv_canvas_set_buffer(canvas, canvas_buf, canvas_dim, canvas_dim, LV_COLOR_FORMAT_RGB565);
     lv_obj_center(canvas);
 
     // Placeholder label (visible only when no animations are loaded)
@@ -143,8 +170,7 @@ void splash_init(lv_obj_t *parent) {
         show_placeholder();
     } else {
         lv_obj_add_flag(label_status, LV_OBJ_FLAG_HIDDEN);
-        const splash_anim_def_t *a = &splash_anims[0];
-        render_frame(a->frames[0], a->palette);
+        render_anim_frame(&splash_anims[0], 0);
         frame_started_ms = millis();
     }
 
@@ -166,7 +192,7 @@ void splash_tick(void) {
     if (millis() - frame_started_ms >= hold) {
         cur_frame = (cur_frame + 1) % a->frame_count;
         frame_started_ms = millis();
-        render_frame(a->frames[cur_frame], a->palette);
+        render_anim_frame(a, cur_frame);
     }
 }
 
@@ -176,9 +202,8 @@ void splash_next(void) {
     cur_frame = 0;
     frame_started_ms = millis();
     last_pick_ms = frame_started_ms;
-    const splash_anim_def_t *a = &splash_anims[cur_anim];
-    render_frame(a->frames[0], a->palette);
-    Serial.printf("splash: -> %s\n", a->name);
+    render_anim_frame(&splash_anims[cur_anim], 0);
+    Serial.printf("splash: -> %s\n", splash_anims[cur_anim].name);
 }
 
 void splash_pick_for_current_rate(void) {
@@ -196,8 +221,7 @@ void splash_pick_for_current_rate(void) {
     cur_frame = 0;
     frame_started_ms = millis();
     last_pick_ms = frame_started_ms;
-    const splash_anim_def_t *a = &splash_anims[cur_anim];
-    render_frame(a->frames[0], a->palette);
+    render_anim_frame(&splash_anims[cur_anim], 0);
 }
 
 bool splash_is_active(void) { return active; }

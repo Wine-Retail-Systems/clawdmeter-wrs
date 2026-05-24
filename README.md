@@ -52,9 +52,12 @@ The macOS host pieces — Python daemon, LaunchAgent, and flash helper — were 
 ### Flash the firmware
 
 ```bash
-./flash-mac.sh                       # auto-detects /dev/cu.usbmodem*
-./flash-mac.sh /dev/cu.usbmodem1101  # or pass an explicit USB serial port
+./flash-mac.sh                                 # AMOLED-2.16 (default), auto-detect port
+./flash-mac.sh --board=18                      # AMOLED-1.8
+./flash-mac.sh --board=216 /dev/cu.usbmodem1101  # explicit board + port
 ```
+
+Pass `--board=216` or `--board=18` to pick the env explicitly. The default is the 2.16. Omitting the flag was fine when only one board existed; with two, an unselected build would flash both envs in sequence and the second upload would silently overwrite the first.
 
 ### Pair the device
 
@@ -84,8 +87,16 @@ launchctl load -w ~/Library/LaunchAgents/com.user.claude-usage-daemon.plist # st
 ### Flash the firmware
 
 ```bash
+./flash.sh                              # AMOLED-2.16 (default), /dev/ttyACM0
+./flash.sh --board=18                   # AMOLED-1.8
+./flash.sh --board=216 /dev/ttyACM1     # explicit board + port
+```
+
+Or call PlatformIO directly — but you must pass `-e <env>`, otherwise `pio run` builds and flashes every defined env in sequence and the second upload silently overwrites the first:
+
+```bash
 cd firmware
-pio run -t upload --upload-port /dev/ttyACM0
+pio run -e waveshare_amoled_216 -t upload --upload-port /dev/ttyACM0
 ```
 
 ### Pair the device
@@ -159,42 +170,27 @@ Fields: `s` = session %, `sr` = session reset (minutes), `w` = weekly %, `wr` = 
 
 ## Recompiling fonts
 
-The `firmware/src/font_*.c` files are pre-compiled LVGL bitmap fonts.
+The `firmware/src/font_*.c` files are pre-compiled LVGL bitmap fonts. All
+eleven of them (Tiempos 34/56, Styrene 12/14/16/20/24/28/48, Mono 18/32) are
+regenerated in one step:
 
 ```bash
-npm install -g lv_font_conv
+python3 tools/build_fonts.py            # all 11 fonts
+python3 tools/build_fonts.py font_styrene_28.c font_mono_32.c   # just a subset
 ```
 
-Generate each one (one at a time — `lv_font_conv` doesn't like loop-driven invocations) with `--no-compress` (required for LVGL 9):
+The script wraps `lv_font_conv` (called via `npx`, no global install needed)
+and applies the LVGL 9 struct patch automatically. The glyph range covers
+ASCII plus the German Latin-1 supplement (`Ä Ö Ü ß ä ö ü`, `§`, `·`) so the
+UI labels render correctly under the Wine-Edition's German strings. The Mono
+fonts additionally include the spinner glyphs (`·`, `…`, `✢ ✳ ✶ ✻ ✽`).
 
-```bash
-# Tiempos Text (titles, 56px)
-lv_font_conv --font assets/TiemposText-400-Regular.otf -r 0x20-0x7E \
-  --size 56 --format lvgl --bpp 4 --no-compress \
-  -o firmware/src/font_tiempos_56.c --lv-include "lvgl.h"
-
-# Styrene B (large numbers 48, panel labels 28, small text 24, minimal 20)
-for size in 48 28 24 20; do
-  lv_font_conv --font assets/StyreneB-Regular.otf -r 0x20-0x7E \
-    --size $size --format lvgl --bpp 4 --no-compress \
-    -o firmware/src/font_styrene_${size}.c --lv-include "lvgl.h"
-done
-
-# DejaVu Sans Mono (32px, with spinner Unicode chars)
-lv_font_conv --font assets/DejaVuSansMono.ttf \
-  -r 0x20-0x7E,0xB7,0x2026,0x2722,0x2733,0x2736,0x273B,0x273D \
-  --size 32 --format lvgl --bpp 4 --no-compress \
-  -o firmware/src/font_mono_32.c --lv-include "lvgl.h"
-```
-
-**Important:** `lv_font_conv` v1.5.3 outputs LVGL 8 format. Each generated file must be patched for LVGL 9 compatibility:
-
-1. Remove `#if LVGL_VERSION_MAJOR >= 8` guards around `font_dsc` and the font struct
-2. Remove the `.cache` field from `font_dsc`
-3. Add `.release_glyph = NULL`, `.kerning = 0`, `.static_bitmap = 0` to the font struct
-4. Add `.fallback = NULL`, `.user_data = NULL` to the font struct
-
-Without these patches, fonts compile but render as invisible.
+The script keeps the `#if LV_VERSION_CHECK(...)` guards that `lv_font_conv`
+v1.5.3 emits — they evaluate true under LVGL 9 so the new struct fields
+(`release_glyph`, `kerning`, `static_bitmap`, `fallback`, `user_data`) end
+up populated and the fonts render correctly. If you bypass the script and
+call `lv_font_conv` directly, replicate the same patch — without it the
+fonts compile but render as invisible.
 
 ### CJK support
 
@@ -244,16 +240,119 @@ To re-pull (e.g. when the source library updates):
 ```bash
 node tools/scrape_claudepix.js
 node tools/convert_to_c.js
-pio run -d firmware -t upload
+pio run -d firmware -e waveshare_amoled_216 -t upload  # or -e waveshare_amoled_18
 ```
 
-See `tools/README.md` for details.
+### Grid-agnostic engine
+
+`splash.cpp` reads `grid` and `palette_size` from each `splash_anim_def_t` at
+render time. The original Claudepix set is 20×20 with a 10-colour palette;
+the Wine Edition is 48×48 with up to 32 colours per sprite. Both formats
+coexist in the same build — cell pitch is computed per sprite as
+`min(display_w, display_h) / sprite_grid`, so a 20×20 sprite gets 24-pixel
+cells on the 2.16" panel and a 48×48 sprite gets 10-pixel cells. New sprite
+sets can pick any integer grid that divides the display's smaller dimension
+evenly; non-integer ratios are letterboxed.
+
+`tools/convert_to_c.js` auto-detects the grid and palette length from each
+JSON and accepts `--in <dir>` / `--out <file>` so multiple animation sets
+(per brand theme) live alongside the default. See `tools/README.md` for the
+schema and full pipeline.
+
+### Wine Edition (jacques.de brand variant)
+
+A "Wine Edition" theme is built as a separate PlatformIO env on the same
+2.16" hardware. At compile time, `-DSPLASH_THEME_WINE` swaps:
+
+- **Splash sprites** — `splash_animations_wine.h` (4 PixelLab-generated 48×48
+  sprites with native multi-frame animations: bordeaux bottle with label
+  shimmer, wine glass with red-wine swirl, grape cluster with leaf sway,
+  natural cork still) instead of the Claudepix Clawd set.
+- **Boot/UI logo** — `logo_wine.h` (80×80 pixel-art wine glass) instead of
+  the Anthropic-style Clawd in `logo.h`.
+- **Accent colour** — `THEME_ACCENT` switches to Bordeaux red `#7a2e36`
+  (used by the bottom-of-screen spinner and brand glyphs) instead of the
+  default terra-cotta.
+- **Spinner vocabulary** — German wine verbs (Dekantieren, Schwenken,
+  Verkosten, Karaffieren, Entkorken, …) instead of the English Claude-style
+  Gerunds.
+
+The non-splash UI strings (`Verbrauch`, `Aktuell`, `Wöchentlich`, `Gerät`,
+`Adresse`, `Bluetooth zurücksetzen`, …) are German across all build envs —
+the fonts include the Latin-1 umlaut range so they render without
+substitution. If you want to keep the original Claude branding English,
+revert the relevant strings in `firmware/src/ui.cpp`.
+
+```bash
+pio run -d firmware -e waveshare_amoled_216_wine                 # build
+./flash-mac.sh --env=waveshare_amoled_216_wine                   # macOS
+./flash.sh --env=waveshare_amoled_216_wine /dev/ttyACM0          # Linux
+```
+
+#### Wine asset pipeline (PixelLab Tier 2)
+
+The wine sprites are generated end-to-end through the PixelLab MCP server
+(subscription required for `animate_object`). Per sprite:
+
+1. `create_1_direction_object(description, size=48, view='sidescroller')` —
+   produces a 16-candidate review pack (costs 20 generations).
+2. `select_object_frames(object_id, indices=[k])` — promotes the chosen
+   candidate to its own completed sprite (free).
+3. `animate_object(object_id, animation_description, frame_count=6/7)` —
+   generates a multi-frame animation (~1 generation per frame).
+4. Frame PNGs are downloaded into `tools/wine_data/pixellab/<sprite>_anim/`.
+5. `tools/pixellab_to_claudepix.py --frames a.png,b.png,... --name "wine X"
+   --out tools/wine_data/wine_X.json --grid 48 --palette 31 --hold 160`
+   bbox-crops, square-pads, runs adaptive quantisation across the union of
+   all frames (shared palette), and emits a claudepix-schema JSON.
+6. `node tools/convert_to_c.js --in tools/wine_data
+   --out firmware/src/splash_animations_wine.h` bakes everything into the
+   on-device header.
+
+The list of active wine sprites lives in `tools/wine_data/_index.json`. The
+grouping into the four usage-rate buckets (idle, normal, active, heavy) is
+defined inside the `#ifdef SPLASH_THEME_WINE` block in `firmware/src/splash.cpp`.
+
+A legacy hand-pixel pipeline (`tools/build_wine_sprites.py`, 20×20 ASCII
+sprites) is still present for offline / no-subscription work; it overwrites
+the same JSONs and is not part of the active 48×48 workflow.
+
+#### Wine logo
+
+`tools/build_wine_logo.py` describes the 80×80 wine-glass logo as a 20×20
+logical grid that's 4× nearest-neighbour scaled. Edit the `ART` string in
+that file and re-run it to regenerate `firmware/src/logo_wine.h`.
+
+### Per-build QA serial commands
+
+`firmware/src/main.cpp` accepts these single-line commands on the USB serial
+port (used by `screenshot.sh` and the iteration helpers):
+
+| Command      | Effect                                                |
+| ------------ | ----------------------------------------------------- |
+| `screenshot` | dumps the LVGL framebuffer (`SCREENSHOT_START`/`_END`) |
+| `next`       | advances the splash to the next sprite (`splash_next`)|
+| `splash`     | switch to the splash screen                           |
+| `usage`      | switch to the Usage screen                            |
+| `bluetooth`  | switch to the Bluetooth screen                        |
+
+`screenshot.sh` uses `screenshot`. Combining `next` + `screenshot` lets a CI
+or iteration script walk through every sprite without physical button
+presses; combining `usage` + `screenshot` (or `bluetooth`) does the same for
+the non-splash screens, which is necessary because a fresh flash boots into
+the splash and stays there until input.
 
 ## Credits
 
 - Pixel-art Clawd animation by [@amaanbuilds](https://x.com/amaanbuilds), sourced from [claudepix.vercel.app](https://claudepix.vercel.app). Frame data and palettes scraped + converted by the tooling in `tools/`.
+- Wine-Edition sprites generated with [PixelLab](https://pixellab.ai)'s MCP
+  server (Tier 2: Pixel Artisan subscription) — see the Wine asset pipeline
+  section.
 - Lucide icon set ([lucide.dev](https://lucide.dev), MIT) for bluetooth and battery UI glyphs.
 - Anthropic brand fonts (Tiempos Text, Styrene B) — see licensing warning below.
+- Original Clawdmeter firmware by [hermannbjrgvin](https://github.com/hermannbjrgvin). The
+  Bluetooth-screen credits in the Wine build read "Built by Sascha" / "Inspired
+  by hermannbjrgvin" to reflect the brand-fork lineage.
 
 ## Licensing gray area warning
 
