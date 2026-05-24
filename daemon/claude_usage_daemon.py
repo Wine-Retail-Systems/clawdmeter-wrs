@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Claude Usage Tracker Daemon (BLE) — macOS port of claude-usage-daemon.sh.
+"""Claude Usage Tracker Daemon (BLE) — cross-platform port of claude-usage-daemon.sh.
 
 Polls Claude API rate-limit headers and writes a JSON payload to the
 ESP32 "Claude Controller" peripheral over a custom GATT service. Uses
-bleak (CoreBluetooth backend on macOS).
+bleak, which picks the right backend per OS:
+  - macOS:   CoreBluetooth
+  - Windows: WinRT (Windows.Devices.Bluetooth)
+  - Linux:   BlueZ over D-Bus
 """
 
 import asyncio
@@ -30,11 +33,30 @@ POLL_INTERVAL = 60
 TICK = 5
 SCAN_TIMEOUT = 8.0
 
-# macOS: token lives in Keychain (service "Claude Code-credentials").
-# Linux: token lives in ~/.claude/.credentials.json.
+# macOS:   token lives in Keychain (service "Claude Code-credentials").
+# Linux:   token lives in ~/.claude/.credentials.json.
+# Windows: token lives in %USERPROFILE%\.claude\.credentials.json (same path as Linux via Path.home()).
+# CLAUDE_CONFIG_DIR overrides the default location on Linux/Windows if set.
 KEYCHAIN_SERVICE = "Claude Code-credentials"
-CREDENTIALS_PATH = Path.home() / ".claude" / ".credentials.json"
-SAVED_ADDR_FILE = Path.home() / ".config" / "claude-usage-monitor" / "ble-address"
+
+
+def _claude_config_dir() -> Path:
+    env = os.environ.get("CLAUDE_CONFIG_DIR")
+    if env:
+        return Path(env)
+    return Path.home() / ".claude"
+
+
+def _state_dir() -> Path:
+    """Per-platform location for the daemon's BLE-address cache."""
+    if sys.platform == "win32":
+        base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
+        return Path(base) / "claude-usage-monitor"
+    return Path.home() / ".config" / "claude-usage-monitor"
+
+
+CREDENTIALS_PATH = _claude_config_dir() / ".credentials.json"
+SAVED_ADDR_FILE = _state_dir() / "ble-address"
 
 API_URL = "https://api.anthropic.com/v1/messages"
 API_HEADERS_TEMPLATE = {
@@ -114,7 +136,7 @@ def _read_token_keychain() -> str | None:
 
 def _read_token_file() -> str | None:
     try:
-        raw = CREDENTIALS_PATH.read_text()
+        raw = CREDENTIALS_PATH.read_text(encoding="utf-8")
     except OSError as e:
         log(f"Error reading credentials: {e}")
         return None
@@ -295,8 +317,13 @@ async def main() -> None:
         except NotImplementedError:
             signal.signal(sig, _stop)
 
-    log("=== Claude Usage Tracker Daemon (BLE, macOS) ===")
+    platform_label = {"darwin": "macOS", "win32": "Windows", "linux": "Linux"}.get(
+        sys.platform, sys.platform
+    )
+    log(f"=== Claude Usage Tracker Daemon (BLE, {platform_label}) ===")
     log(f"Poll interval: {POLL_INTERVAL}s")
+    log(f"Credentials: {CREDENTIALS_PATH}")
+    log(f"Address cache: {SAVED_ADDR_FILE}")
 
     backoff = 1
     while not stop_event.is_set():

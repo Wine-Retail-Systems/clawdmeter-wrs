@@ -39,10 +39,11 @@ Plus per board:
 
 ## Prerequisites
 
-- Linux (tested on Ubuntu) or macOS
+- Linux (tested on Ubuntu), macOS, or Windows 10/11
 - [PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)
 - Linux: `curl`, `bluetoothctl`, `busctl` (BlueZ Bluetooth stack)
-- macOS: `python3` (the installer sets up a venv with `bleak` and `httpx`)
+- macOS / Windows: `python3` 3.9+ (the installer sets up a venv with `bleak` and `httpx`)
+- Windows: BLE-capable adapter, Windows 10 build 1903+ or Windows 11
 - Claude Code with an active subscription
 
 ## macOS installation
@@ -80,6 +81,52 @@ launchctl list | grep claude-usage                                          # ch
 tail -F ~/Library/Logs/claude-usage-daemon.out.log                          # live logs
 launchctl unload ~/Library/LaunchAgents/com.user.claude-usage-daemon.plist  # stop
 launchctl load -w ~/Library/LaunchAgents/com.user.claude-usage-daemon.plist # start
+```
+
+## Windows installation
+
+The Windows host pieces reuse the cross-platform Python daemon (`bleak` picks the WinRT backend automatically) and register it as a per-user Scheduled Task that starts at logon.
+
+### Flash the firmware
+
+Use PlatformIO directly — the `flash.sh` / `flash-mac.sh` helpers are shell-only:
+
+```powershell
+cd firmware
+pio run -e waveshare_amoled_216 -t upload --upload-port COM5    # AMOLED-2.16
+pio run -e waveshare_amoled_18  -t upload --upload-port COM5    # AMOLED-1.8
+```
+
+Use Device Manager to find the COM port (it shows up as a USB Serial Device once the board enumerates over native USB-JTAG — no boot-mode dance needed).
+
+### Pair the device
+
+After flashing, open **Settings → Bluetooth & devices → Add device → Bluetooth** and pair *Claude Controller*. The daemon will discover it on its next scan (~30 s).
+
+### Install the daemon
+
+The daemon reads your Claude OAuth token from `%USERPROFILE%\.claude\.credentials.json`, polls usage every 60 s, and pushes it to the display over BLE.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1
+```
+
+The installer creates a Python venv in `daemon\.venv\`, installs `bleak` and `httpx`, primes the Bluetooth permission prompt with an interactive run, and registers a Scheduled Task named `ClaudeUsageDaemon` that runs at logon and auto-restarts on crash. Stdout/stderr are appended to `%LOCALAPPDATA%\claude-usage-monitor\logs\daemon.log`.
+
+Useful commands:
+
+```powershell
+schtasks /Query  /TN ClaudeUsageDaemon /V /FO LIST     # task status
+schtasks /End    /TN ClaudeUsageDaemon                 # stop
+schtasks /Run    /TN ClaudeUsageDaemon                 # start
+schtasks /Delete /TN ClaudeUsageDaemon /F              # uninstall
+Get-Content -Wait -Tail 50 "$env:LOCALAPPDATA\claude-usage-monitor\logs\daemon.log"   # live logs
+```
+
+To debug interactively (live console output, no log file indirection):
+
+```powershell
+& .\daemon\.venv\Scripts\python.exe .\daemon\claude_usage_daemon.py
 ```
 
 ## Linux installation
@@ -129,7 +176,7 @@ View logs: `journalctl --user -u claude-usage-daemon -f`
 
 ## How it works
 
-1. The daemon reads your Claude Code OAuth token from `~/.claude/.credentials.json`.
+1. The daemon reads your Claude Code OAuth token (macOS: Keychain service `Claude Code-credentials`; Linux/Windows: `~/.claude/.credentials.json` resp. `%USERPROFILE%\.claude\.credentials.json`).
 2. It makes a minimal API call to `api.anthropic.com/v1/messages` — one token of Haiku, basically free.
 3. The usage numbers come straight out of the response headers (`anthropic-ratelimit-unified-5h-utilization` and friends).
 4. The daemon connects to the ESP32 over BLE and writes a JSON payload to the GATT RX characteristic.
