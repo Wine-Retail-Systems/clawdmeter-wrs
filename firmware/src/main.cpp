@@ -274,6 +274,8 @@ static void check_serial_cmd() {
             else if (strcmp(cmd_buf, "splash") == 0) ui_show_screen(SCREEN_SPLASH);
             else if (strcmp(cmd_buf, "usage") == 0) ui_show_screen(SCREEN_USAGE_BASE);
             else if (strcmp(cmd_buf, "bluetooth") == 0) ui_show_screen(SCREEN_BLUETOOTH);
+            else if (strcmp(cmd_buf, "cycle") == 0) ui_cycle_screen();
+            else if (strncmp(cmd_buf, "slot ", 5) == 0) ui_show_screen(SCREEN_USAGE_BASE + atoi(cmd_buf + 5));
             cmd_pos = 0;
         } else if (cmd_pos < CMD_BUF_SIZE - 1) {
             cmd_buf[cmd_pos++] = c;

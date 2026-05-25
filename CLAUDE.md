@@ -94,7 +94,7 @@ Device path differs by OS: `/dev/cu.usbmodem*` on macOS, `/dev/ttyACM0` on Linux
 
 The firmware ships a `screenshot` serial command that dumps the LVGL framebuffer. `./screenshot.sh out.png [port]` captures a PNG sized to the active display (480×480 or 368×448). **Use this on every UI iteration** — Read the PNG with the Read tool, verify the change visually, iterate. Script auto-picks the macOS/Linux default port and falls back to pio's bundled Python if pyserial isn't on the system Python.
 
-The boot screen is `SCREEN_SPLASH` and only advances on a physical button press, so a fresh flash will sit on the splash. Use the serial commands `splash` / `usage` / `bluetooth` to switch screens without touching the device, and `next` to advance the splash to the next sprite. Combining `next` + `screenshot` lets a script walk every sprite without physical input. (No need to recompile by hand-editing the boot screen any more — those serial commands were added for exactly this case.)
+The boot screen is `SCREEN_SPLASH` and only advances on a physical button press, so a fresh flash will sit on the splash. Use the serial commands `splash` / `usage` / `slot N` / `cycle` / `bluetooth` to switch screens without touching the device, and `next` to advance the splash to the next sprite. `slot N` jumps directly to provider slot N (0 = first active provider); `cycle` mirrors the PWR-button order (provider 0 → 1 → ... → bluetooth → provider 0). Combining `next` + `screenshot` lets a script walk every sprite without physical input. (No need to recompile by hand-editing the boot screen any more — those serial commands were added for exactly this case.)
 
 ## Critical gotchas
 
