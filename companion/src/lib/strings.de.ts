@@ -21,7 +21,17 @@ export const STRINGS = {
     running: "Daemon läuft",
     stopped: "Daemon gestoppt",
     unknown: "Status unbekannt",
-    error: "Daemon-Fehler",
+    error: "Daemon nicht erreichbar",
+    notInstalled: "Daemon nicht installiert",
+    installAction: "Daemon installieren",
+    installing: "Installiere Daemon …",
+    legacyHeading: "Älterer Daemon erkannt",
+    legacyBody:
+      "Auf diesem Mac läuft noch ein älterer Clawdmeter-Daemon. Die Companion-App kann ihn übernehmen: Sie entfernt die alte launchd-Registrierung und richtet den aktuellen Daemon ein. Deine Provider-Konfiguration unter ~/.config/clawdmeter bleibt unverändert.",
+    legacyAction: "Alten Daemon übernehmen",
+    legacyMigrating: "Migriere …",
+    legacyDone: "Migration abgeschlossen.",
+    legacyError: "Migration fehlgeschlagen",
   },
 
   flash: {

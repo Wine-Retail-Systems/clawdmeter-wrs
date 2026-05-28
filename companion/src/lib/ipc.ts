@@ -14,6 +14,8 @@ export type DaemonStatus = {
   last_poll_at: string | null;
   active_provider: string | null;
   message: string | null;
+  installed: boolean;
+  legacy_labels: string[];
 };
 
 export type SerialPort = {
@@ -65,6 +67,8 @@ export async function getDaemonStatus(): Promise<DaemonStatus> {
       last_poll_at: new Date().toISOString(),
       active_provider: "anthropic",
       message: null,
+      installed: true,
+      legacy_labels: [],
     };
   }
   return invoke<DaemonStatus>("daemon_status");
@@ -88,6 +92,11 @@ export async function restartDaemon(): Promise<void> {
 export async function installDaemonService(): Promise<void> {
   if (MOCK) return;
   await invoke("daemon_install_service");
+}
+
+export async function migrateLegacyDaemon(): Promise<void> {
+  if (MOCK) return;
+  await invoke("daemon_migrate_legacy");
 }
 
 export async function tailDaemonLogs(lines: number): Promise<string[]> {

@@ -31,6 +31,7 @@ DAEMON_ENTRY = REPO / "daemon" / "clawdmeter_daemon.py"
 DAEMON_PKG = REPO / "daemon" / "clawdmeter_daemon"
 OUTPUT_DIR = REPO / "companion" / "resources" / "daemon"
 WORK_DIR = REPO / "companion" / "build" / "pyinstaller"
+ENTITLEMENTS = REPO / "companion" / "src-tauri" / "macos" / "entitlements.plist"
 
 HIDDEN_IMPORTS = [
     # bleak — die WinRT-Backend-Pfade müssen wir explizit nennen, sonst zieht
@@ -147,8 +148,42 @@ def build(python: str, *, clean: bool) -> Path:
     final = OUTPUT_DIR / out_name
     shutil.copy2(produced, final)
     final.chmod(0o755)
+    codesign_macos(final)
     print(f"[done] {final}")
     return final
+
+
+def codesign_macos(binary: Path) -> None:
+    """Signiert das Binary mit Developer ID + Hardened Runtime + Timestamp.
+
+    Apples Notarization-Service prüft jedes eingebettete Binary einzeln —
+    ohne Signatur wird das umgebende .app-Bundle abgelehnt. PyInstaller
+    entpackt Libraries zur Laufzeit, daher brauchen wir die gleichen
+    Entitlements wie die Companion-App selbst.
+
+    Skippt graceful, wenn `APPLE_SIGNING_IDENTITY` nicht gesetzt ist
+    (z. B. lokale Dev-Builds ohne Apple-Cert).
+    """
+    if platform.system().lower() != "darwin":
+        return
+    identity = os.environ.get("APPLE_SIGNING_IDENTITY", "").strip()
+    if not identity:
+        print("  [warn] APPLE_SIGNING_IDENTITY nicht gesetzt — Daemon bleibt unsigned. "
+              "Notarization wird das Bundle ablehnen.")
+        return
+    if not ENTITLEMENTS.exists():
+        raise SystemExit(f"Entitlements fehlen: {ENTITLEMENTS}")
+    cmd = [
+        "codesign",
+        "--force",
+        "--sign", identity,
+        "--options", "runtime",
+        "--timestamp",
+        "--entitlements", str(ENTITLEMENTS),
+        str(binary),
+    ]
+    print(f"[codesign] {' '.join(cmd)}")
+    subprocess.check_call(cmd)
 
 
 def smoke_test(binary: Path) -> None:

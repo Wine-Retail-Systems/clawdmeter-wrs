@@ -41,6 +41,7 @@ pub fn run() {
             daemon_proc::daemon_stop,
             daemon_proc::daemon_restart,
             daemon_proc::daemon_install_service,
+            daemon_proc::daemon_migrate_legacy,
             daemon_proc::daemon_tail_logs,
             // Flash
             ports::list_serial_ports,

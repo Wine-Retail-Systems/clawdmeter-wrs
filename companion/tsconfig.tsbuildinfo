@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/icon.tsx","./src/lib/ipc.ts","./src/lib/platform.ts","./src/lib/strings.de.ts","./src/routes/landing.tsx","./src/routes/flash/flashwizard.tsx","./src/routes/pair/pairscreen.tsx","./src/routes/setup/setupwizard.tsx","./src/routes/status/statusscreen.tsx"],"version":"5.9.3"}

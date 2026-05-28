@@ -6,9 +6,29 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
+use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
-const SERVICE_LABEL: &str = "de.jacques.clawdmeter.daemon";
+pub const SERVICE_LABEL: &str = "eu.wineretailsystems.clawdmeter.daemon";
+
+/// Frühere Labels, die wir beim ersten Start des neuen Companion finden und
+/// ablösen. Ergibt sich aus:
+///   * `com.clawdmeter.daemon`        — vom alten `install-mac.sh`-Skript
+///   * `de.jacques.clawdmeter.daemon` — frühere Companion-Beta
+///
+/// Die eigentliche Daemon-Konfiguration lebt label-agnostisch unter
+/// `~/.config/clawdmeter/` bzw. `%APPDATA%\clawdmeter\` — Migration heißt
+/// daher: LaunchAgent/Scheduled-Task austauschen, Config bleibt.
+pub const LEGACY_LABELS: &[&str] = &[
+    "com.clawdmeter.daemon",
+    "de.jacques.clawdmeter.daemon",
+];
+
+#[derive(Debug, Serialize, Clone)]
+pub struct LegacyInstall {
+    pub label: String,
+    pub running: bool,
+}
 
 /// Pfad zur gebündelten Daemon-Binary (plattformspezifisch).
 fn daemon_binary(app: &AppHandle) -> Result<PathBuf> {
@@ -26,6 +46,137 @@ fn daemon_binary(app: &AppHandle) -> Result<PathBuf> {
             tauri::path::BaseDirectory::Resource,
         )
         .context("Daemon-Binary nicht in resources/daemon/ gefunden")?)
+}
+
+/// Pfad zum LaunchAgent-Plist für ein beliebiges Label (macOS).
+#[cfg(target_os = "macos")]
+fn plist_path_for(label: &str) -> PathBuf {
+    dirs::home_dir()
+        .unwrap_or_else(|| PathBuf::from("/tmp"))
+        .join("Library/LaunchAgents")
+        .join(format!("{label}.plist"))
+}
+
+/// Ist der Companion-Daemon für das aktuelle Label registriert?
+#[cfg(target_os = "macos")]
+pub fn is_installed() -> bool {
+    plist_path_for(SERVICE_LABEL).exists()
+}
+
+#[cfg(target_os = "windows")]
+pub fn is_installed() -> bool {
+    std::process::Command::new("schtasks")
+        .args(["/Query", "/TN", SERVICE_LABEL])
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+}
+
+#[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
+pub fn is_installed() -> bool {
+    false
+}
+
+/// Sucht nach Plists/Tasks unter alten Labels, damit das UI eine Migration
+/// anbieten kann.
+#[cfg(target_os = "macos")]
+pub fn detect_legacy() -> Vec<LegacyInstall> {
+    LEGACY_LABELS
+        .iter()
+        .filter(|l| plist_path_for(l).exists())
+        .map(|l| LegacyInstall {
+            label: (*l).into(),
+            running: launchctl_label_loaded(l),
+        })
+        .collect()
+}
+
+#[cfg(target_os = "macos")]
+fn launchctl_label_loaded(label: &str) -> bool {
+    std::process::Command::new("launchctl")
+        .args(["list", label])
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+}
+
+#[cfg(target_os = "windows")]
+pub fn detect_legacy() -> Vec<LegacyInstall> {
+    LEGACY_LABELS
+        .iter()
+        .filter_map(|label| {
+            let out = std::process::Command::new("schtasks")
+                .args(["/Query", "/TN", label])
+                .output()
+                .ok()?;
+            if !out.status.success() {
+                return None;
+            }
+            Some(LegacyInstall {
+                label: (*label).into(),
+                running: true,
+            })
+        })
+        .collect()
+}
+
+#[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
+pub fn detect_legacy() -> Vec<LegacyInstall> {
+    Vec::new()
+}
+
+/// Entlädt einen alten LaunchAgent und löscht das Plist (macOS) bzw.
+/// löscht den Scheduled Task (Windows). Idempotent.
+#[cfg(target_os = "macos")]
+pub fn uninstall_label(label: &str) -> Result<()> {
+    let plist = plist_path_for(label);
+    if plist.exists() {
+        let _ = std::process::Command::new("launchctl")
+            .args(["unload", plist.to_str().unwrap_or_default()])
+            .status();
+        std::fs::remove_file(&plist)
+            .with_context(|| format!("Plist {} konnte nicht entfernt werden", plist.display()))?;
+    } else {
+        // Plist weg, aber falls noch im launchd-Speicher: explizit entladen.
+        let _ = std::process::Command::new("launchctl")
+            .args(["remove", label])
+            .status();
+    }
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+pub fn uninstall_label(label: &str) -> Result<()> {
+    let _ = std::process::Command::new("schtasks")
+        .args(["/End", "/TN", label])
+        .status();
+    let status = std::process::Command::new("schtasks")
+        .args(["/Delete", "/TN", label, "/F"])
+        .status()
+        .context("schtasks /Delete")?;
+    if !status.success() {
+        anyhow::bail!("schtasks /Delete exit {status}");
+    }
+    Ok(())
+}
+
+#[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
+pub fn uninstall_label(_label: &str) -> Result<()> {
+    Ok(())
+}
+
+/// Räumt alle bekannten Vorgänger-Installationen ab und installiert den
+/// aktuellen Companion-Daemon. Die Daemon-Konfiguration (~/.config/clawdmeter)
+/// wird bewusst nicht angefasst — sie ist label-agnostisch.
+pub fn migrate_from_legacy(app: &AppHandle) -> Result<()> {
+    for legacy in detect_legacy() {
+        // Best-effort: wir loggen Fehler, brechen aber nicht ab — sonst bleibt
+        // der User in einem halbmigrierten Zustand hängen.
+        if let Err(e) = uninstall_label(&legacy.label) {
+            log::warn!("Legacy-Label {} konnte nicht entfernt werden: {e:#}", legacy.label);
+        }
+    }
+    ensure_installed(app)
 }
 
 fn log_path() -> PathBuf {

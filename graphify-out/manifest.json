@@ -500,9 +500,9 @@
     "semantic_hash": "ef1b4eeeeda7b2fc28c5b746d03379c9"
   },
   "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/polling.py": {
-    "mtime": 1779658804.1928182,
-    "ast_hash": "736261e08f12088b7860d91a1b15fff3",
-    "semantic_hash": "736261e08f12088b7860d91a1b15fff3"
+    "mtime": 1779926132.0096138,
+    "ast_hash": "8ea4c34d913f814b41ec05244a20ebd8",
+    "semantic_hash": "8ea4c34d913f814b41ec05244a20ebd8"
   },
   "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/codex.py": {
     "mtime": 1779656675.4222808,
@@ -545,9 +545,9 @@
     "semantic_hash": "96c2c11e7a7dc5924fbc601fa4ceebf8"
   },
   "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/README.md": {
-    "mtime": 1779664004.2638278,
-    "ast_hash": "6d3599ee2040e6b3d85a07f85f998a87",
-    "semantic_hash": "6d3599ee2040e6b3d85a07f85f998a87"
+    "mtime": 1779923854.5340562,
+    "ast_hash": "ff14f6bd78c414d5bb3ff424cb9b1b16",
+    "semantic_hash": "ff14f6bd78c414d5bb3ff424cb9b1b16"
   },
   "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/AGENTS.md": {
     "mtime": 1779655980.9898074,
@@ -555,9 +555,9 @@
     "semantic_hash": "9b07c37f32cf51e82a2a99aa2f758afc"
   },
   "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/CLAUDE.md": {
-    "mtime": 1779663980.069958,
-    "ast_hash": "04023c5b4672137bf37e63543ea4473f",
-    "semantic_hash": "04023c5b4672137bf37e63543ea4473f"
+    "mtime": 1779922184.5123615,
+    "ast_hash": "eeb9e56601ee66f71b99f66ca4ffe224",
+    "semantic_hash": "eeb9e56601ee66f71b99f66ca4ffe224"
   },
   "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/README.md": {
     "mtime": 1779655998.480555,
@@ -758,5 +758,825 @@
     "mtime": 1779616364.8770654,
     "ast_hash": "7b731544088d8e651f5c67e9f2a83286",
     "semantic_hash": "7b731544088d8e651f5c67e9f2a83286"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/copy_firmware_to_companion.py": {
+    "mtime": 1779926353.9068503,
+    "ast_hash": "e31eb72e4a4282e0898c85a0ed52760f",
+    "semantic_hash": "e31eb72e4a4282e0898c85a0ed52760f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/build_daemon_bundle.py": {
+    "mtime": 1779923064.8805158,
+    "ast_hash": "8e24b4ce6f55f8fb31054d2621fea0bd",
+    "semantic_hash": "8e24b4ce6f55f8fb31054d2621fea0bd"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/release-companion.sh": {
+    "mtime": 1779926987.9023156,
+    "ast_hash": "90621c5d3c7adc931e58e6465623cdd0",
+    "semantic_hash": "90621c5d3c7adc931e58e6465623cdd0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/install_release_deps.sh": {
+    "mtime": 1779926975.8706737,
+    "ast_hash": "c4f56bbb0bf9326d1f45f6968b5a6316",
+    "semantic_hash": "c4f56bbb0bf9326d1f45f6968b5a6316"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/ipc_server.py": {
+    "mtime": 1779926104.865752,
+    "ast_hash": "88fe8085629302286a43ca8a8a6d0b32",
+    "semantic_hash": "88fe8085629302286a43ca8a8a6d0b32"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/package.json": {
+    "mtime": 1779922710.2416627,
+    "ast_hash": "62edfce807e3db65a783de9e1bfed604",
+    "semantic_hash": "62edfce807e3db65a783de9e1bfed604"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/tsconfig.json": {
+    "mtime": 1779922716.7780297,
+    "ast_hash": "3ffde558fa373061b2e5bf364a1a71e3",
+    "semantic_hash": "3ffde558fa373061b2e5bf364a1a71e3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/vite.config.ts": {
+    "mtime": 1779922713.262226,
+    "ast_hash": "3c0a3f711ef71904ad64791429bd9fe1",
+    "semantic_hash": "3c0a3f711ef71904ad64791429bd9fe1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/tauri.conf.json": {
+    "mtime": 1779947484.8419676,
+    "ast_hash": "a9a6dc36bf24023bbf32cd60872849b9",
+    "semantic_hash": "a9a6dc36bf24023bbf32cd60872849b9"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/build.rs": {
+    "mtime": 1779922851.5983598,
+    "ast_hash": "1be34a5c61c2c35365de3dab14298f0b",
+    "semantic_hash": "1be34a5c61c2c35365de3dab14298f0b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/capabilities/default.json": {
+    "mtime": 1779922864.7931995,
+    "ast_hash": "f14f59a221e7a394b8450ce93849e02b",
+    "semantic_hash": "f14f59a221e7a394b8450ce93849e02b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/gen/schemas/capabilities.json": {
+    "mtime": 1779926555.348832,
+    "ast_hash": "045c7a89aeeb808652943d8cecb7e8c4",
+    "semantic_hash": "045c7a89aeeb808652943d8cecb7e8c4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/gen/schemas/acl-manifests.json": {
+    "mtime": 1779926555.3395095,
+    "ast_hash": "5f0e6fe6c41c84b24df1fd9ca277ca08",
+    "semantic_hash": "5f0e6fe6c41c84b24df1fd9ca277ca08"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/gen/schemas/macOS-schema.json": {
+    "mtime": 1779926555.347965,
+    "ast_hash": "bd8375246441a658956b9b44e033c839",
+    "semantic_hash": "bd8375246441a658956b9b44e033c839"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/gen/schemas/desktop-schema.json": {
+    "mtime": 1779926555.347965,
+    "ast_hash": "bd8375246441a658956b9b44e033c839",
+    "semantic_hash": "bd8375246441a658956b9b44e033c839"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/updater.rs": {
+    "mtime": 1779922990.5890157,
+    "ast_hash": "38992bad72813084b0892e2df2c35107",
+    "semantic_hash": "38992bad72813084b0892e2df2c35107"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/ipc.rs": {
+    "mtime": 1779926907.9479666,
+    "ast_hash": "837e83c2a493029a75e983201c559ec5",
+    "semantic_hash": "837e83c2a493029a75e983201c559ec5"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/ports.rs": {
+    "mtime": 1779922893.453323,
+    "ast_hash": "e999bbfeb898403b4c331a138f820b41",
+    "semantic_hash": "e999bbfeb898403b4c331a138f820b41"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/crash.rs": {
+    "mtime": 1779922978.4351583,
+    "ast_hash": "207a51ebee318cc232c54970168de0a4",
+    "semantic_hash": "207a51ebee318cc232c54970168de0a4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/lib.rs": {
+    "mtime": 1779946323.9854743,
+    "ast_hash": "a6bcf12072b5ab24e7de0a4959ba6458",
+    "semantic_hash": "a6bcf12072b5ab24e7de0a4959ba6458"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/tray.rs": {
+    "mtime": 1779922986.4816322,
+    "ast_hash": "0393d70b34fd7e1049d6b4a534b2572d",
+    "semantic_hash": "0393d70b34fd7e1049d6b4a534b2572d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/service.rs": {
+    "mtime": 1779946290.236802,
+    "ast_hash": "e3d28a2a42a64357011fa5cecd2ba551",
+    "semantic_hash": "e3d28a2a42a64357011fa5cecd2ba551"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/daemon_proc.rs": {
+    "mtime": 1779946310.494302,
+    "ast_hash": "33055cc4e863cc4a6033dc7f5289b333",
+    "semantic_hash": "33055cc4e863cc4a6033dc7f5289b333"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/main.rs": {
+    "mtime": 1779922874.7836392,
+    "ast_hash": "e9ee1f2eccf202238bab603aab00c678",
+    "semantic_hash": "e9ee1f2eccf202238bab603aab00c678"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/ble_scan.rs": {
+    "mtime": 1779926887.1322637,
+    "ast_hash": "a98aeca82b9cab2acd0eb6449f20806f",
+    "semantic_hash": "a98aeca82b9cab2acd0eb6449f20806f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/src/flash.rs": {
+    "mtime": 1779927010.1347215,
+    "ast_hash": "59acce358328e7f4e18f1fe8b3649567",
+    "semantic_hash": "59acce358328e7f4e18f1fe8b3649567"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/App.tsx": {
+    "mtime": 1779947292.4638338,
+    "ast_hash": "afcfd0ac3d4e3b2961b83a083bd13e78",
+    "semantic_hash": "afcfd0ac3d4e3b2961b83a083bd13e78"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/main.tsx": {
+    "mtime": 1779922726.7856097,
+    "ast_hash": "59c6b4d74cd8f549f0711fe9507daa00",
+    "semantic_hash": "59c6b4d74cd8f549f0711fe9507daa00"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/components/Icon.tsx": {
+    "mtime": 1779947265.2927475,
+    "ast_hash": "8e892c74b59b724c255bc0453e715ffd",
+    "semantic_hash": "8e892c74b59b724c255bc0453e715ffd"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/lib/platform.ts": {
+    "mtime": 1779947245.7433121,
+    "ast_hash": "b7469daffa2730f02e943e5c44ce56d8",
+    "semantic_hash": "b7469daffa2730f02e943e5c44ce56d8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/lib/ipc.ts": {
+    "mtime": 1779946349.148158,
+    "ast_hash": "5c9bfa738511a64ec99c0ee0c632176c",
+    "semantic_hash": "5c9bfa738511a64ec99c0ee0c632176c"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/lib/strings.de.ts": {
+    "mtime": 1779946359.0337193,
+    "ast_hash": "43575bdfe1fca267268d7bd63085b6eb",
+    "semantic_hash": "43575bdfe1fca267268d7bd63085b6eb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/routes/Landing.tsx": {
+    "mtime": 1779947325.690779,
+    "ast_hash": "0c8a41bf5b4a72ca84d832b68e5a56c8",
+    "semantic_hash": "0c8a41bf5b4a72ca84d832b68e5a56c8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/routes/setup/SetupWizard.tsx": {
+    "mtime": 1779947397.8603988,
+    "ast_hash": "55643683991b9df2a28a92c0746ac5a1",
+    "semantic_hash": "55643683991b9df2a28a92c0746ac5a1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/routes/status/StatusScreen.tsx": {
+    "mtime": 1779947430.9000413,
+    "ast_hash": "7a12e01aef3065be96f7f5f466409b65",
+    "semantic_hash": "7a12e01aef3065be96f7f5f466409b65"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/routes/flash/FlashWizard.tsx": {
+    "mtime": 1779947511.1337938,
+    "ast_hash": "5b9da0e84dd693312c07f53e2fbe3df9",
+    "semantic_hash": "5b9da0e84dd693312c07f53e2fbe3df9"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src/routes/pair/PairScreen.tsx": {
+    "mtime": 1779947412.4769168,
+    "ast_hash": "6d06001b138f3659954d9b845be07463",
+    "semantic_hash": "6d06001b138f3659954d9b845be07463"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/.github/workflows/release-companion.yml": {
+    "mtime": 1779926379.305591,
+    "ast_hash": "97855d9de7f1e93c576abbb9d8205450",
+    "semantic_hash": "97855d9de7f1e93c576abbb9d8205450"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/companion-app/architecture.md": {
+    "mtime": 1779923747.951522,
+    "ast_hash": "fd4aabcb1ecf8630890a6b98e77dfdf4",
+    "semantic_hash": "fd4aabcb1ecf8630890a6b98e77dfdf4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/companion-app/ipc-protocol.md": {
+    "mtime": 1779923299.9003723,
+    "ast_hash": "f00f794853568fe7e1422f01469f2810",
+    "semantic_hash": "f00f794853568fe7e1422f01469f2810"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/companion-app/build-and-release.md": {
+    "mtime": 1779923778.6662965,
+    "ast_hash": "54e6c8955001d5a471e0530f078fc415",
+    "semantic_hash": "54e6c8955001d5a471e0530f078fc415"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/companion-app/local-build.md": {
+    "mtime": 1779926949.3087096,
+    "ast_hash": "31ceba63879ee61bec171b174b01ac61",
+    "semantic_hash": "31ceba63879ee61bec171b174b01ac61"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/companion-app/PROGRESS.md": {
+    "mtime": 1779923820.8160589,
+    "ast_hash": "e04ced1f0afb5fedd76c7f5fddfc8e97",
+    "semantic_hash": "e04ced1f0afb5fedd76c7f5fddfc8e97"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/companion-app/PLAN.md": {
+    "mtime": 1779922505.9439116,
+    "ast_hash": "152e4b0881e12856b60faddf1c58b747",
+    "semantic_hash": "152e4b0881e12856b60faddf1c58b747"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/index.html": {
+    "mtime": 1779922718.7839406,
+    "ast_hash": "ddf0109e25425976844cbcae1750413e",
+    "semantic_hash": "ddf0109e25425976844cbcae1750413e"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/README.md": {
+    "mtime": 1779957582.6990652,
+    "ast_hash": "d4817b6603fa45a5772c16555b71a334",
+    "semantic_hash": "d4817b6603fa45a5772c16555b71a334"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/README.md": {
+    "mtime": 1779923020.5737014,
+    "ast_hash": "f052ceb9cf6ccd9d4282a37ed5193979",
+    "semantic_hash": "f052ceb9cf6ccd9d4282a37ed5193979"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_still.png": {
+    "mtime": 1779629355.840046,
+    "ast_hash": "cd970cf8433e3e6259b58268711b2664",
+    "semantic_hash": "cd970cf8433e3e6259b58268711b2664"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_still.png": {
+    "mtime": 1779629061.3168135,
+    "ast_hash": "928b7ee2a66986744c963bccb7e76544",
+    "semantic_hash": "928b7ee2a66986744c963bccb7e76544"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_still.png": {
+    "mtime": 1779629060.9876592,
+    "ast_hash": "2eda937355285536386384218b945df2",
+    "semantic_hash": "2eda937355285536386384218b945df2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/4.png": {
+    "mtime": 1779629685.9128845,
+    "ast_hash": "97be64085d30812c6a4d15d461732a79",
+    "semantic_hash": "97be64085d30812c6a4d15d461732a79"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/5.png": {
+    "mtime": 1779629686.2346876,
+    "ast_hash": "f2dedc7e01245e9fdaa42a7c904f441b",
+    "semantic_hash": "f2dedc7e01245e9fdaa42a7c904f441b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/6.png": {
+    "mtime": 1779629686.7834108,
+    "ast_hash": "419a36ba8c3127c503a5b911ffe66742",
+    "semantic_hash": "419a36ba8c3127c503a5b911ffe66742"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/2.png": {
+    "mtime": 1779629685.1397974,
+    "ast_hash": "b903de1e3e1daa5913ca2e1f690d8109",
+    "semantic_hash": "b903de1e3e1daa5913ca2e1f690d8109"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/3.png": {
+    "mtime": 1779629685.5827906,
+    "ast_hash": "e23fef0443826f1e29ac63d4622925cf",
+    "semantic_hash": "e23fef0443826f1e29ac63d4622925cf"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/1.png": {
+    "mtime": 1779629684.7940192,
+    "ast_hash": "c0d6261c22572b63998bd3bb9dcf4fb1",
+    "semantic_hash": "c0d6261c22572b63998bd3bb9dcf4fb1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/bottle_anim/0.png": {
+    "mtime": 1779629684.5109644,
+    "ast_hash": "2eda937355285536386384218b945df2",
+    "semantic_hash": "2eda937355285536386384218b945df2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/4.png": {
+    "mtime": 1779629975.156307,
+    "ast_hash": "80fa4a3a3e69374b7279e0d3ded48a0b",
+    "semantic_hash": "80fa4a3a3e69374b7279e0d3ded48a0b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/5.png": {
+    "mtime": 1779629975.5440931,
+    "ast_hash": "7588beb316a448916f8a882c02dd6e02",
+    "semantic_hash": "7588beb316a448916f8a882c02dd6e02"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/6.png": {
+    "mtime": 1779629975.8924081,
+    "ast_hash": "93991acdd677a9873676aa826b21d5a8",
+    "semantic_hash": "93991acdd677a9873676aa826b21d5a8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/2.png": {
+    "mtime": 1779629973.860211,
+    "ast_hash": "99796f8083791a71c9f218b8d80a6a99",
+    "semantic_hash": "99796f8083791a71c9f218b8d80a6a99"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/3.png": {
+    "mtime": 1779629974.610199,
+    "ast_hash": "e5e52406d06ca5a7bf671c18794abe1d",
+    "semantic_hash": "e5e52406d06ca5a7bf671c18794abe1d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/1.png": {
+    "mtime": 1779629973.5619946,
+    "ast_hash": "d0e8487c78c33784994f5c9df1856786",
+    "semantic_hash": "d0e8487c78c33784994f5c9df1856786"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/glass_anim/0.png": {
+    "mtime": 1779629973.197012,
+    "ast_hash": "cd970cf8433e3e6259b58268711b2664",
+    "semantic_hash": "cd970cf8433e3e6259b58268711b2664"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/4.png": {
+    "mtime": 1779629688.7857077,
+    "ast_hash": "f9c7e959c295d86852b85812c222f76c",
+    "semantic_hash": "f9c7e959c295d86852b85812c222f76c"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/5.png": {
+    "mtime": 1779629689.1520674,
+    "ast_hash": "d161def291e18d17aebe882c492839ff",
+    "semantic_hash": "d161def291e18d17aebe882c492839ff"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/6.png": {
+    "mtime": 1779629689.612825,
+    "ast_hash": "38a9168fc90984660344be354975a218",
+    "semantic_hash": "38a9168fc90984660344be354975a218"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/2.png": {
+    "mtime": 1779629687.8041177,
+    "ast_hash": "38971c9bc3b50b8d101ea4c029f77ea8",
+    "semantic_hash": "38971c9bc3b50b8d101ea4c029f77ea8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/3.png": {
+    "mtime": 1779629688.2940228,
+    "ast_hash": "daeab0894869392dc932bd203c52ef6f",
+    "semantic_hash": "daeab0894869392dc932bd203c52ef6f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/1.png": {
+    "mtime": 1779629687.472812,
+    "ast_hash": "653c21257a45de4e97ff66f31f8ff4e9",
+    "semantic_hash": "653c21257a45de4e97ff66f31f8ff4e9"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/pixellab/grapes_anim/0.png": {
+    "mtime": 1779629687.0623155,
+    "ast_hash": "928b7ee2a66986744c963bccb7e76544",
+    "semantic_hash": "928b7ee2a66986744c963bccb7e76544"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-003018_opencode_v5.png": {
+    "mtime": 1779661820.6328685,
+    "ast_hash": "546e7c19a9f75211ef18b037a1aafa3a",
+    "semantic_hash": "546e7c19a9f75211ef18b037a1aafa3a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-002703_opencode_v2.png": {
+    "mtime": 1779661625.5553632,
+    "ast_hash": "cc99bb8155131c757e15e65d0e024951",
+    "semantic_hash": "cc99bb8155131c757e15e65d0e024951"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-000250_screenshot.png": {
+    "mtime": 1779660172.2154875,
+    "ast_hash": "9021a93a47e03c8e8569f932e25d83d7",
+    "semantic_hash": "9021a93a47e03c8e8569f932e25d83d7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-002746_opencode_v3.png": {
+    "mtime": 1779661668.4158185,
+    "ast_hash": "546e7c19a9f75211ef18b037a1aafa3a",
+    "semantic_hash": "546e7c19a9f75211ef18b037a1aafa3a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-002831_opencode_v4.png": {
+    "mtime": 1779661713.429902,
+    "ast_hash": "2eec219fa3ddd86f3d84f0381709d539",
+    "semantic_hash": "2eec219fa3ddd86f3d84f0381709d539"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-003313_opencode_v7.png": {
+    "mtime": 1779661995.434299,
+    "ast_hash": "546e7c19a9f75211ef18b037a1aafa3a",
+    "semantic_hash": "546e7c19a9f75211ef18b037a1aafa3a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-003144_opencode_v6.png": {
+    "mtime": 1779661906.8695405,
+    "ast_hash": "546e7c19a9f75211ef18b037a1aafa3a",
+    "semantic_hash": "546e7c19a9f75211ef18b037a1aafa3a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-002550_opencode_v1.png": {
+    "mtime": 1779661552.8431146,
+    "ast_hash": "e06fc80bebbf3fa75a449c8557aafffc",
+    "semantic_hash": "e06fc80bebbf3fa75a449c8557aafffc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_bluetooth.svg": {
+    "mtime": 1779616364.885302,
+    "ast_hash": "cf3fc6a58d14e3492cffe3ee86294563",
+    "semantic_hash": "cf3fc6a58d14e3492cffe3ee86294563"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-low.png": {
+    "mtime": 1779616364.8846405,
+    "ast_hash": "eb7c6fd665b930b4a48e3fa0e4e8e1d2",
+    "semantic_hash": "eb7c6fd665b930b4a48e3fa0e4e8e1d2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_hand_40.png": {
+    "mtime": 1779616364.8857787,
+    "ast_hash": "f132829efe05cc986174ea140a89fff5",
+    "semantic_hash": "f132829efe05cc986174ea140a89fff5"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-full.png": {
+    "mtime": 1779616364.8844082,
+    "ast_hash": "72ea1f7453a47608c1ffa135332b6127",
+    "semantic_hash": "72ea1f7453a47608c1ffa135332b6127"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-medium_48.png": {
+    "mtime": 1779616364.884971,
+    "ast_hash": "c0501376f1f306dc6eeb0e17b68bb1ee",
+    "semantic_hash": "c0501376f1f306dc6eeb0e17b68bb1ee"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_arrow-right_48.png": {
+    "mtime": 1779616364.8841307,
+    "ast_hash": "e5d0422ad1178b63722ef903bfc04d83",
+    "semantic_hash": "e5d0422ad1178b63722ef903bfc04d83"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-charging.png": {
+    "mtime": 1779616364.8842018,
+    "ast_hash": "a8e99a879ef08276a20fbfe0462d0a8a",
+    "semantic_hash": "a8e99a879ef08276a20fbfe0462d0a8a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery_48.png": {
+    "mtime": 1779616364.8851748,
+    "ast_hash": "487aa5c3193f857247f1827eee151402",
+    "semantic_hash": "487aa5c3193f857247f1827eee151402"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-medium.svg": {
+    "mtime": 1779616364.8848977,
+    "ast_hash": "7daf3c2e7ae15b635fb886d262b452d3",
+    "semantic_hash": "7daf3c2e7ae15b635fb886d262b452d3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-medium.png": {
+    "mtime": 1779616364.8848355,
+    "ast_hash": "29b1bb015efe33bc35cdc7b0beb10c68",
+    "semantic_hash": "29b1bb015efe33bc35cdc7b0beb10c68"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-charging.svg": {
+    "mtime": 1779616364.8842776,
+    "ast_hash": "064f5d0a42bd62adfbb783beee9126fb",
+    "semantic_hash": "064f5d0a42bd62adfbb783beee9126fb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-full_48.png": {
+    "mtime": 1779616364.8845708,
+    "ast_hash": "93594cc9f0e68a630a157cab3912ca94",
+    "semantic_hash": "93594cc9f0e68a630a157cab3912ca94"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-charging_48.png": {
+    "mtime": 1779616364.8843465,
+    "ast_hash": "f65a071a36e8f9c8d5ccfcdef53ec785",
+    "semantic_hash": "f65a071a36e8f9c8d5ccfcdef53ec785"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-full.svg": {
+    "mtime": 1779616364.884489,
+    "ast_hash": "3a5e3d037e3c8763bb71db49c3ddc17d",
+    "semantic_hash": "3a5e3d037e3c8763bb71db49c3ddc17d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/demo.jpeg": {
+    "mtime": 1779616364.8831983,
+    "ast_hash": "2b8fe2a16b1c1b9af6a8f7bc57e17dd8",
+    "semantic_hash": "2b8fe2a16b1c1b9af6a8f7bc57e17dd8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-low.svg": {
+    "mtime": 1779616364.8847086,
+    "ast_hash": "2ab6a8bed80dca6a28e67479208b03d7",
+    "semantic_hash": "2ab6a8bed80dca6a28e67479208b03d7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_trash2_48.png": {
+    "mtime": 1779616364.8859584,
+    "ast_hash": "90fe5514781ca2995a9fb6b1b0a5880a",
+    "semantic_hash": "90fe5514781ca2995a9fb6b1b0a5880a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_bluetooth.png": {
+    "mtime": 1779616364.88524,
+    "ast_hash": "28aecb532b94dc2c1278d97fce240b2d",
+    "semantic_hash": "28aecb532b94dc2c1278d97fce240b2d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_trash2.svg": {
+    "mtime": 1779616364.885899,
+    "ast_hash": "1f06755fcb5a7c7295edd24287087048",
+    "semantic_hash": "1f06755fcb5a7c7295edd24287087048"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery-low_48.png": {
+    "mtime": 1779616364.8847747,
+    "ast_hash": "a1005626365b13b27a3a66f6a97a986d",
+    "semantic_hash": "a1005626365b13b27a3a66f6a97a986d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery.png": {
+    "mtime": 1779616364.8850462,
+    "ast_hash": "741543ef898a293ccb82edca244ffff3",
+    "semantic_hash": "741543ef898a293ccb82edca244ffff3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_bluetooth_48.png": {
+    "mtime": 1779616364.88537,
+    "ast_hash": "1e41671a7371c1c7ee89281d74c0daa2",
+    "semantic_hash": "1e41671a7371c1c7ee89281d74c0daa2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_hand.png": {
+    "mtime": 1779616364.885722,
+    "ast_hash": "e08fcb80aa48d7653e4ade08c24d9416",
+    "semantic_hash": "e08fcb80aa48d7653e4ade08c24d9416"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_arrow-left.png": {
+    "mtime": 1779616364.8839204,
+    "ast_hash": "0e5868682d0b88ba2db95e1f745a0d3c",
+    "semantic_hash": "0e5868682d0b88ba2db95e1f745a0d3c"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_escape.png": {
+    "mtime": 1779616364.8855817,
+    "ast_hash": "943ffb1ac87379c9b41f375b72e46bf8",
+    "semantic_hash": "943ffb1ac87379c9b41f375b72e46bf8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_arrow-left_48.png": {
+    "mtime": 1779616364.8839996,
+    "ast_hash": "599d46ae6cddb7a8a9854bd5cbce2fd6",
+    "semantic_hash": "599d46ae6cddb7a8a9854bd5cbce2fd6"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_escape_48.png": {
+    "mtime": 1779616364.885656,
+    "ast_hash": "7e8e1c921bc80dc3c03f332dc23e8e8d",
+    "semantic_hash": "7e8e1c921bc80dc3c03f332dc23e8e8d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_battery.svg": {
+    "mtime": 1779616364.8851078,
+    "ast_hash": "a4996443d2dce1a9a3d0cce59b015bc6",
+    "semantic_hash": "a4996443d2dce1a9a3d0cce59b015bc6"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_arrow-right.png": {
+    "mtime": 1779616364.8840687,
+    "ast_hash": "ad48e0f04e68e9208086f9946e8c0721",
+    "semantic_hash": "ad48e0f04e68e9208086f9946e8c0721"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_delete_48.png": {
+    "mtime": 1779616364.8855085,
+    "ast_hash": "e17e97d0cc16588a2926ae349d8bb507",
+    "semantic_hash": "e17e97d0cc16588a2926ae349d8bb507"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_delete.png": {
+    "mtime": 1779616364.8854425,
+    "ast_hash": "8af46142edf8b83e01450b3cb20653f7",
+    "semantic_hash": "8af46142edf8b83e01450b3cb20653f7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/demo.gif": {
+    "mtime": 1779616364.882452,
+    "ast_hash": "2f7f731e73b2a70377d3be4d32413ac7",
+    "semantic_hash": "2f7f731e73b2a70377d3be4d32413ac7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/icon_trash2.png": {
+    "mtime": 1779616364.885838,
+    "ast_hash": "763484b74ac502e88c0221c2d255673e",
+    "semantic_hash": "763484b74ac502e88c0221c2d255673e"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/icon.png": {
+    "mtime": 1779926279.2867177,
+    "ast_hash": "a7121601dd347df16f68abefb763af5d",
+    "semantic_hash": "a7121601dd347df16f68abefb763af5d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square30x30Logo.png": {
+    "mtime": 1779926278.9020486,
+    "ast_hash": "ba58013499da6feefae6966d2eb9d89f",
+    "semantic_hash": "ba58013499da6feefae6966d2eb9d89f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square150x150Logo.png": {
+    "mtime": 1779926278.9731696,
+    "ast_hash": "504713f922e3b67ed3d54369b9e51eda",
+    "semantic_hash": "504713f922e3b67ed3d54369b9e51eda"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/StoreLogo.png": {
+    "mtime": 1779926278.8926315,
+    "ast_hash": "1b9e7b129b9991aa2d736b1eb35cf229",
+    "semantic_hash": "1b9e7b129b9991aa2d736b1eb35cf229"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/tray-error.png": {
+    "mtime": 1779926271.546517,
+    "ast_hash": "8f5acad56e133f75c008bfcfc855532b",
+    "semantic_hash": "8f5acad56e133f75c008bfcfc855532b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square107x107Logo.png": {
+    "mtime": 1779926278.946775,
+    "ast_hash": "8e2ebbe2b9a11625edb04ca5e0ce4b43",
+    "semantic_hash": "8e2ebbe2b9a11625edb04ca5e0ce4b43"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square89x89Logo.png": {
+    "mtime": 1779926278.9347634,
+    "ast_hash": "525269093b7931d06481ae10fb6d6975",
+    "semantic_hash": "525269093b7931d06481ae10fb6d6975"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/tray-ok.png": {
+    "mtime": 1779926271.545471,
+    "ast_hash": "099e5d09666d8f8573e5e08a3cb7503a",
+    "semantic_hash": "099e5d09666d8f8573e5e08a3cb7503a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square310x310Logo.png": {
+    "mtime": 1779926279.0063083,
+    "ast_hash": "586297709cee908edff1f271c446e03f",
+    "semantic_hash": "586297709cee908edff1f271c446e03f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/tray-warn.png": {
+    "mtime": 1779926271.5460787,
+    "ast_hash": "3f531c7de785446ec840cb74d99520a0",
+    "semantic_hash": "3f531c7de785446ec840cb74d99520a0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square142x142Logo.png": {
+    "mtime": 1779926278.95967,
+    "ast_hash": "d30d0f8647f2ab4385bec42a89d0255b",
+    "semantic_hash": "d30d0f8647f2ab4385bec42a89d0255b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/128x128.png": {
+    "mtime": 1779926279.2539346,
+    "ast_hash": "f210ece4117290af2bd550e53e1b801e",
+    "semantic_hash": "f210ece4117290af2bd550e53e1b801e"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square284x284Logo.png": {
+    "mtime": 1779926278.989079,
+    "ast_hash": "a8e4a805eddbb46deea10159db9bba83",
+    "semantic_hash": "a8e4a805eddbb46deea10159db9bba83"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/32x32.png": {
+    "mtime": 1779926279.2308776,
+    "ast_hash": "7f148319e04223bcbe5088aed77fb6ea",
+    "semantic_hash": "7f148319e04223bcbe5088aed77fb6ea"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square44x44Logo.png": {
+    "mtime": 1779926278.9123194,
+    "ast_hash": "c30eacc047ccaa4e140871f887cc8f17",
+    "semantic_hash": "c30eacc047ccaa4e140871f887cc8f17"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/Square71x71Logo.png": {
+    "mtime": 1779926278.9230976,
+    "ast_hash": "fc29be6621a76b91ca8e6ac06fe131c1",
+    "semantic_hash": "fc29be6621a76b91ca8e6ac06fe131c1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/128x128@2x.png": {
+    "mtime": 1779926279.267176,
+    "ast_hash": "0da528923fac5faa73870eeabf46aec3",
+    "semantic_hash": "0da528923fac5faa73870eeabf46aec3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/64x64.png": {
+    "mtime": 1779926279.2417696,
+    "ast_hash": "a536424d67fd65a444c8970a51e3a464",
+    "semantic_hash": "a536424d67fd65a444c8970a51e3a464"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-20x20@3x.png": {
+    "mtime": 1779926279.32997,
+    "ast_hash": "69ae4b5202e12e84ae8c27c3c31b5dfe",
+    "semantic_hash": "69ae4b5202e12e84ae8c27c3c31b5dfe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-512@2x.png": {
+    "mtime": 1779926279.5185506,
+    "ast_hash": "35cc9e91787419a6ce8340f96511c9e4",
+    "semantic_hash": "35cc9e91787419a6ce8340f96511c9e4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-83.5x83.5@2x.png": {
+    "mtime": 1779926279.4874213,
+    "ast_hash": "2fd90dae31138493ea27fc89a225952f",
+    "semantic_hash": "2fd90dae31138493ea27fc89a225952f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-20x20@2x.png": {
+    "mtime": 1779926279.318865,
+    "ast_hash": "cd95df62321ac20626324a607ea0ddab",
+    "semantic_hash": "cd95df62321ac20626324a607ea0ddab"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-29x29@3x.png": {
+    "mtime": 1779926279.3748734,
+    "ast_hash": "affc36692b53138400c140270fdc79ce",
+    "semantic_hash": "affc36692b53138400c140270fdc79ce"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-40x40@2x.png": {
+    "mtime": 1779926279.409133,
+    "ast_hash": "7bcdb68aa640154c5aca43bb75b1dccb",
+    "semantic_hash": "7bcdb68aa640154c5aca43bb75b1dccb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-60x60@3x.png": {
+    "mtime": 1779926279.4499857,
+    "ast_hash": "b7ef6bbba5f198ea53ece1474d03fb07",
+    "semantic_hash": "b7ef6bbba5f198ea53ece1474d03fb07"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-40x40@2x-1.png": {
+    "mtime": 1779926279.3865762,
+    "ast_hash": "7bcdb68aa640154c5aca43bb75b1dccb",
+    "semantic_hash": "7bcdb68aa640154c5aca43bb75b1dccb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-20x20@2x-1.png": {
+    "mtime": 1779926279.298061,
+    "ast_hash": "cd95df62321ac20626324a607ea0ddab",
+    "semantic_hash": "cd95df62321ac20626324a607ea0ddab"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-60x60@2x.png": {
+    "mtime": 1779926279.4356499,
+    "ast_hash": "e22421a63c23f83244c2ca2c81d61659",
+    "semantic_hash": "e22421a63c23f83244c2ca2c81d61659"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-76x76@1x.png": {
+    "mtime": 1779926279.460947,
+    "ast_hash": "752d399706269a26628a36ab2ead25ae",
+    "semantic_hash": "752d399706269a26628a36ab2ead25ae"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-40x40@3x.png": {
+    "mtime": 1779926279.4222722,
+    "ast_hash": "e22421a63c23f83244c2ca2c81d61659",
+    "semantic_hash": "e22421a63c23f83244c2ca2c81d61659"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-29x29@2x.png": {
+    "mtime": 1779926279.3618457,
+    "ast_hash": "51c9f060d36163e9f5e11bdda1b17569",
+    "semantic_hash": "51c9f060d36163e9f5e11bdda1b17569"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-76x76@2x.png": {
+    "mtime": 1779926279.4744585,
+    "ast_hash": "03d0be91dded61cb289a02a8f609f7e4",
+    "semantic_hash": "03d0be91dded61cb289a02a8f609f7e4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-29x29@1x.png": {
+    "mtime": 1779926279.3513632,
+    "ast_hash": "d5de85d922b77558f422155bd6b0d1ab",
+    "semantic_hash": "d5de85d922b77558f422155bd6b0d1ab"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-40x40@1x.png": {
+    "mtime": 1779926279.3972769,
+    "ast_hash": "cd95df62321ac20626324a607ea0ddab",
+    "semantic_hash": "cd95df62321ac20626324a607ea0ddab"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-20x20@1x.png": {
+    "mtime": 1779926279.3087692,
+    "ast_hash": "acd3102ef4cc8880dc28cec19a10c891",
+    "semantic_hash": "acd3102ef4cc8880dc28cec19a10c891"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/ios/AppIcon-29x29@2x-1.png": {
+    "mtime": 1779926279.3409698,
+    "ast_hash": "51c9f060d36163e9f5e11bdda1b17569",
+    "semantic_hash": "51c9f060d36163e9f5e11bdda1b17569"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-mdpi/ic_launcher_foreground.png": {
+    "mtime": 1779926279.5453963,
+    "ast_hash": "aa03beea39f8e38831a6ced9b4e33459",
+    "semantic_hash": "aa03beea39f8e38831a6ced9b4e33459"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1779926279.6415164,
+    "ast_hash": "d3bb5bbbfefd0af688d7310a8a9a8cc0",
+    "semantic_hash": "d3bb5bbbfefd0af688d7310a8a9a8cc0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-mdpi/ic_launcher_round.png": {
+    "mtime": 1779926279.6300905,
+    "ast_hash": "735357a94f545b3c5d312465ee250fbb",
+    "semantic_hash": "735357a94f545b3c5d312465ee250fbb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-hdpi/ic_launcher_foreground.png": {
+    "mtime": 1779926279.5326202,
+    "ast_hash": "060038e826ff5f7f415e1e82df4ccd2a",
+    "semantic_hash": "060038e826ff5f7f415e1e82df4ccd2a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1779926279.6190238,
+    "ast_hash": "3eecd8488c34f86810c44caf762c9b53",
+    "semantic_hash": "3eecd8488c34f86810c44caf762c9b53"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-hdpi/ic_launcher_round.png": {
+    "mtime": 1779926279.6065087,
+    "ast_hash": "47a692398df0c2ba8b88ae4e8abcf667",
+    "semantic_hash": "47a692398df0c2ba8b88ae4e8abcf667"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_foreground.png": {
+    "mtime": 1779926279.59598,
+    "ast_hash": "f56cc1e95482b3b5dd7ae7999ee25313",
+    "semantic_hash": "f56cc1e95482b3b5dd7ae7999ee25313"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1779926279.7247105,
+    "ast_hash": "dc8fed17e4122a3ffcd4f0f042b26465",
+    "semantic_hash": "dc8fed17e4122a3ffcd4f0f042b26465"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_round.png": {
+    "mtime": 1779926279.7107513,
+    "ast_hash": "6b47e37317461b9d8f4cb314c6118675",
+    "semantic_hash": "6b47e37317461b9d8f4cb314c6118675"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_foreground.png": {
+    "mtime": 1779926279.577203,
+    "ast_hash": "9669f802dc91015992f70c99f1ee230d",
+    "semantic_hash": "9669f802dc91015992f70c99f1ee230d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1779926279.6960404,
+    "ast_hash": "39b81f3c62e83ee2fea61afaeeee6ef8",
+    "semantic_hash": "39b81f3c62e83ee2fea61afaeeee6ef8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_round.png": {
+    "mtime": 1779926279.6818566,
+    "ast_hash": "16320750cf8ce977703b93625214a464",
+    "semantic_hash": "16320750cf8ce977703b93625214a464"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xhdpi/ic_launcher_foreground.png": {
+    "mtime": 1779926279.560264,
+    "ast_hash": "033eb4e692084ea0ea012535a4dad17b",
+    "semantic_hash": "033eb4e692084ea0ea012535a4dad17b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1779926279.666526,
+    "ast_hash": "6e10721958bce36a81624f4a6b43f6fe",
+    "semantic_hash": "6e10721958bce36a81624f4a6b43f6fe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/companion/src-tauri/icons/android/mipmap-xhdpi/ic_launcher_round.png": {
+    "mtime": 1779926279.6543336,
+    "ast_hash": "71d96256692e6acde9b9bc362a31f22c",
+    "semantic_hash": "71d96256692e6acde9b9bc362a31f22c"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/demo.mp4": {
+    "mtime": 1779616364.8837645,
+    "ast_hash": "dd9b20b1497d45e2019a43146eda22b6",
+    "semantic_hash": "dd9b20b1497d45e2019a43146eda22b6"
   }
 }

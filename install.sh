@@ -20,7 +20,8 @@ echo "  OK"
 echo ""
 
 echo "[2/5] Creating Python virtualenv at daemon/.venv ..."
-if [ ! -d "$VENV_DIR" ]; then
+if [ ! -d "$VENV_DIR" ] || ! "$VENV_DIR/bin/python" -c '' 2>/dev/null; then
+    rm -rf "$VENV_DIR"
     python3 -m venv "$VENV_DIR"
 fi
 "$VENV_DIR/bin/pip" install --quiet --upgrade pip

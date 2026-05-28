@@ -8,6 +8,11 @@ import {
   listSerialPorts,
 } from "../../lib/ipc";
 import { STRINGS } from "../../lib/strings.de";
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconRefresh,
+} from "../../components/Icon";
 
 type Props = { onDone: () => void };
 type Step = "board" | "port" | "flash";
@@ -68,65 +73,98 @@ export function FlashWizard({ onDone }: Props) {
   }
 
   return (
-    <main>
-      <h2>{STRINGS.flash.title}</h2>
+    <>
+      <div className="subheader">
+        <button
+          type="button"
+          className="subheader__back"
+          onClick={onDone}
+        >
+          <IconArrowLeft size={14} /> Zurück
+        </button>
+      </div>
+
+      <header className="page-heading">
+        <h2>{STRINGS.flash.title}</h2>
+        <p>Schritt {stepIndex(step)} von 3</p>
+      </header>
 
       {step === "board" && (
         <div className="card">
-          <strong>{STRINGS.flash.stepBoard}</strong>
-          <label>
-            <input
-              type="radio"
+          <p className="card__label">{STRINGS.flash.stepBoard}</p>
+          <h3 className="card__heading">Welches Gerät hast du?</h3>
+          <div className="option-list">
+            <BoardOption
               checked={board === "wine-216"}
-              onChange={() => setBoard("wine-216")}
-            />{" "}
-            {STRINGS.flash.boardWine}
-          </label>
-          <label>
-            <input
-              type="radio"
+              onClick={() => setBoard("wine-216")}
+              label={STRINGS.flash.boardWine}
+              meta="wine-216"
+            />
+            <BoardOption
               checked={board === "standard-216"}
-              onChange={() => setBoard("standard-216")}
-            />{" "}
-            {STRINGS.flash.boardStandard216}
-          </label>
-          <label>
-            <input
-              type="radio"
+              onClick={() => setBoard("standard-216")}
+              label={STRINGS.flash.boardStandard216}
+              meta="standard-216"
+            />
+            <BoardOption
               checked={board === "standard-180"}
-              onChange={() => setBoard("standard-180")}
-            />{" "}
-            {STRINGS.flash.boardStandard180}
-          </label>
-          <button className="cta" onClick={() => setStep("port")}>
-            {STRINGS.setup.next}
-          </button>
+              onClick={() => setBoard("standard-180")}
+              label={STRINGS.flash.boardStandard180}
+              meta="standard-180"
+            />
+          </div>
+          <div className="button-row">
+            <button
+              type="button"
+              className="cta"
+              onClick={() => setStep("port")}
+            >
+              {STRINGS.setup.next}
+            </button>
+          </div>
         </div>
       )}
 
       {step === "port" && (
         <div className="card">
-          <strong>{STRINGS.flash.stepPort}</strong>
+          <p className="card__label">{STRINGS.flash.stepPort}</p>
+          <h3 className="card__heading">USB-Port wählen</h3>
           {ports.length === 0 && (
-            <p style={{ color: "var(--fg-muted)" }}>
+            <p className="card__body">
               Kein ESP32-S3 erkannt. USB-Kabel prüfen, dann „Ports neu suchen".
             </p>
           )}
-          {ports.map((p) => (
-            <label key={p.path}>
-              <input
-                type="radio"
-                checked={selectedPort === p.path}
-                onChange={() => setSelectedPort(p.path)}
-              />{" "}
-              {p.path} {p.is_esp32s3 ? "(ESP32-S3)" : ""}
-            </label>
-          ))}
-          <div style={{ display: "flex", gap: 8 }}>
-            <button className="cta cta--ghost" onClick={refreshPorts}>
-              {STRINGS.flash.refreshPorts}
+          <div className="option-list">
+            {ports.map((p) => (
+              <label
+                key={p.path}
+                className={
+                  selectedPort === p.path ? "option option--active" : "option"
+                }
+              >
+                <input
+                  type="radio"
+                  checked={selectedPort === p.path}
+                  onChange={() => setSelectedPort(p.path)}
+                />
+                <span className="option__label">
+                  {p.path}
+                  {p.is_esp32s3 ? " (ESP32-S3)" : ""}
+                </span>
+                {p.product && <span className="option__meta">{p.product}</span>}
+              </label>
+            ))}
+          </div>
+          <div className="button-row">
+            <button
+              type="button"
+              className="cta cta--ghost"
+              onClick={refreshPorts}
+            >
+              <IconRefresh size={14} /> {STRINGS.flash.refreshPorts}
             </button>
             <button
+              type="button"
               className="cta"
               onClick={() => setStep("flash")}
               disabled={!selectedPort}
@@ -139,33 +177,68 @@ export function FlashWizard({ onDone }: Props) {
 
       {step === "flash" && (
         <div className="card">
-          <strong>{STRINGS.flash.stepFlash}</strong>
-          <p>
+          <p className="card__label">{STRINGS.flash.stepFlash}</p>
+          <h3 className="card__heading">Firmware übertragen</h3>
+          <p className="card__body">
             Board: <code>{board}</code> · Port: <code>{selectedPort}</code>
           </p>
           {!done && !flashing && (
-            <button className="cta" onClick={doFlash}>
-              {STRINGS.flash.startFlash}
-            </button>
+            <div className="button-row">
+              <button type="button" className="cta" onClick={doFlash}>
+                {STRINGS.flash.startFlash}
+              </button>
+            </div>
           )}
           {flashing && (
             <>
-              <p>{STRINGS.flash.flashing}</p>
+              <p className="card__body">{STRINGS.flash.flashing}</p>
               <FlashProgressBar progress={progress} />
             </>
           )}
           {done && (
             <>
-              <p style={{ color: "var(--ok)" }}>{STRINGS.flash.flashOk}</p>
-              <button className="cta" onClick={onDone}>
-                Fertig
-              </button>
+              <p className="alert alert--ok">
+                <IconCheck size={16} /> {STRINGS.flash.flashOk}
+              </p>
+              <div className="button-row">
+                <button type="button" className="cta" onClick={onDone}>
+                  Fertig
+                </button>
+              </div>
             </>
           )}
-          {error && <p style={{ color: "var(--danger)" }}>{error}</p>}
+          {error && (
+            <p className="alert alert--error">{error}</p>
+          )}
         </div>
       )}
-    </main>
+    </>
+  );
+}
+
+function stepIndex(step: Step): number {
+  if (step === "board") return 1;
+  if (step === "port") return 2;
+  return 3;
+}
+
+function BoardOption({
+  checked,
+  onClick,
+  label,
+  meta,
+}: {
+  checked: boolean;
+  onClick: () => void;
+  label: string;
+  meta: string;
+}) {
+  return (
+    <label className={checked ? "option option--active" : "option"}>
+      <input type="radio" checked={checked} onChange={onClick} />
+      <span className="option__label">{label}</span>
+      <span className="option__meta">{meta}</span>
+    </label>
   );
 }
 
@@ -180,28 +253,15 @@ function FlashProgressBar({ progress }: { progress: FlashProgress | null }) {
       : 0;
   return (
     <div>
-      <small style={{ color: "var(--fg-muted)" }}>
+      <small className="progress__meta">
         {progress.phase}
-        {progress.message ? ` — ${progress.message}` : ""}
+        {progress.message ? ` — ${progress.message}` : ""} · {pct}%
       </small>
       <div
-        style={{
-          width: "100%",
-          height: 8,
-          background: "var(--border)",
-          borderRadius: 4,
-          marginTop: 4,
-          overflow: "hidden",
-        }}
+        className="progress"
+        style={{ ["--progress" as string]: `${pct}%` }}
       >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: "100%",
-            background: "var(--accent)",
-            transition: "width 200ms ease-out",
-          }}
-        />
+        <div className="progress__bar" />
       </div>
     </div>
   );

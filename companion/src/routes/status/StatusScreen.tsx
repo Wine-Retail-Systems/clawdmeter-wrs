@@ -9,6 +9,7 @@ import {
   tailDaemonLogs,
 } from "../../lib/ipc";
 import { STRINGS } from "../../lib/strings.de";
+import { IconArrowLeft, IconRefresh } from "../../components/Icon";
 
 type Props = {
   status: DaemonStatus | null;
@@ -51,69 +52,74 @@ export function StatusScreen({ status, onDone }: Props) {
     }
   }
 
+  const stateText = status?.running
+    ? STRINGS.daemon.running
+    : status?.reachable
+      ? STRINGS.daemon.stopped
+      : STRINGS.daemon.unknown;
+  const dotClass = status?.running
+    ? "status-dot--ok status-dot--pulse"
+    : status?.reachable
+      ? "status-dot--warn"
+      : "status-dot--unknown";
+
   return (
-    <main>
-      <h2>{STRINGS.status.title}</h2>
+    <>
+      <div className="subheader">
+        <button
+          type="button"
+          className="subheader__back"
+          onClick={onDone}
+        >
+          <IconArrowLeft size={14} /> Zurück
+        </button>
+      </div>
+
+      <header className="page-heading">
+        <h2>{STRINGS.status.title}</h2>
+        <p>Daemon-Lifecycle und Diagnose.</p>
+      </header>
 
       <div className="card">
-        <strong>{STRINGS.status.daemonHeading}</strong>
-        <p>
-          {status?.running
-            ? STRINGS.daemon.running
-            : status?.reachable
-              ? STRINGS.daemon.stopped
-              : STRINGS.daemon.unknown}
-        </p>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="cta cta--ghost" onClick={startDaemon}>
+        <p className="card__label">{STRINGS.status.daemonHeading}</p>
+        <h3 className="card__heading">
+          <span className={`status-dot ${dotClass}`} />
+          {stateText}
+        </h3>
+        <div className="button-row">
+          <button type="button" className="cta cta--ghost" onClick={startDaemon}>
             {STRINGS.status.start}
           </button>
-          <button className="cta cta--ghost" onClick={stopDaemon}>
+          <button type="button" className="cta cta--ghost" onClick={stopDaemon}>
             {STRINGS.status.stop}
           </button>
-          <button className="cta cta--ghost" onClick={restartDaemon}>
-            {STRINGS.status.restart}
+          <button type="button" className="cta cta--ghost" onClick={restartDaemon}>
+            <IconRefresh size={14} /> {STRINGS.status.restart}
           </button>
         </div>
       </div>
 
       <div className="card">
-        <strong>{STRINGS.status.logsHeading}</strong>
-        <pre
-          style={{
-            background: "var(--bg)",
-            border: "1px solid var(--border)",
-            borderRadius: 6,
-            padding: 12,
-            maxHeight: 320,
-            overflow: "auto",
-            fontSize: 12,
-            lineHeight: 1.4,
-            margin: 0,
-          }}
-        >
+        <p className="card__label">{STRINGS.status.logsHeading}</p>
+        <h3 className="card__heading">Live-Ausgabe</h3>
+        <pre className="logview">
           {logs.join("\n") || "(keine Logs)"}
         </pre>
       </div>
 
       <div className="card">
-        <strong>{STRINGS.status.bugReport}</strong>
-        <p style={{ color: "var(--fg-muted)" }}>
-          {STRINGS.status.bugReportHelp}
-        </p>
-        <button className="cta cta--ghost" onClick={onBugReport}>
-          {STRINGS.status.bugReport}
-        </button>
+        <p className="card__label">Diagnose</p>
+        <h3 className="card__heading">{STRINGS.status.bugReport}</h3>
+        <p className="card__body">{STRINGS.status.bugReportHelp}</p>
+        <div className="button-row">
+          <button type="button" className="cta" onClick={onBugReport}>
+            {STRINGS.status.bugReport}
+          </button>
+        </div>
         {bundlePath && (
-          <small style={{ color: "var(--fg-muted)" }}>
-            Bundle gespeichert: <code>{bundlePath}</code>
-          </small>
+          <p className="card__hint-mono">{bundlePath}</p>
         )}
       </div>
-
-      <button className="cta" onClick={onDone}>
-        Fertig
-      </button>
-    </main>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import {
   saveProvider,
 } from "../../lib/ipc";
 import { STRINGS } from "../../lib/strings.de";
+import { IconArrowLeft } from "../../components/Icon";
 
 type Props = { onDone: () => void };
 
@@ -52,26 +53,46 @@ export function SetupWizard({ onDone }: Props) {
   }
 
   return (
-    <main>
-      <h2>{STRINGS.setup.title}</h2>
-      <p style={{ color: "var(--fg-muted)" }}>{STRINGS.setup.intro}</p>
+    <>
+      <div className="subheader">
+        <button
+          type="button"
+          className="subheader__back"
+          onClick={onDone}
+        >
+          <IconArrowLeft size={14} /> Zurück
+        </button>
+      </div>
+
+      <header className="page-heading">
+        <h2>{STRINGS.setup.title}</h2>
+        <p>{STRINGS.setup.intro}</p>
+      </header>
 
       <div className="card">
-        <strong>{STRINGS.setup.providers[current]}</strong>
-        <small style={{ color: "var(--fg-muted)" }}>
+        <p className="card__label">
           Schritt {step + 1} von {ORDER.length}
-        </small>
+        </p>
+        <h3 className="card__heading">{STRINGS.setup.providers[current]}</h3>
 
         {!status || status === "pending" ? (
-          <p>{STRINGS.setup.detecting}</p>
+          <p className="card__body">
+            <span className="status-dot status-dot--unknown status-dot--pulse" />
+            {STRINGS.setup.detecting}
+          </p>
         ) : status.detected ? (
-          <p>
+          <p className="card__body">
             <span className="status-dot status-dot--ok" />
             {STRINGS.setup.detected}
-            {status.source && <> — <code>{status.source}</code></>}
+            {status.source && (
+              <>
+                {" — "}
+                <code>{status.source}</code>
+              </>
+            )}
           </p>
         ) : (
-          <p>
+          <p className="card__body">
             <span className="status-dot status-dot--warn" />
             {STRINGS.setup.notDetected}
             {status.notes && (
@@ -83,22 +104,23 @@ export function SetupWizard({ onDone }: Props) {
           </p>
         )}
 
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="button-row">
           {step > 0 && (
             <button
+              type="button"
               className="cta cta--ghost"
               onClick={() => setStep(step - 1)}
             >
-              {STRINGS.setup.back}
+              <IconArrowLeft size={14} /> {STRINGS.setup.back}
             </button>
           )}
-          <button className="cta" onClick={saveAndAdvance}>
+          <button type="button" className="cta" onClick={saveAndAdvance}>
             {step + 1 < ORDER.length
               ? STRINGS.setup.next
               : STRINGS.setup.save}
           </button>
         </div>
       </div>
-    </main>
+    </>
   );
 }

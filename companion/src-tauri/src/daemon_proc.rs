@@ -7,6 +7,7 @@
 use serde::Serialize;
 
 use crate::ipc;
+use crate::service;
 
 #[derive(Debug, Serialize, Clone, Default)]
 pub struct DaemonStatus {
@@ -16,10 +17,20 @@ pub struct DaemonStatus {
     pub last_poll_at: Option<String>,
     pub active_provider: Option<String>,
     pub message: Option<String>,
+    /// LaunchAgent/Scheduled Task für das aktuelle Companion-Label registriert?
+    pub installed: bool,
+    /// Frühere Installationen (anderes Label), die das UI als Migration anbieten kann.
+    pub legacy_labels: Vec<String>,
 }
 
 #[tauri::command]
 pub async fn daemon_status() -> Result<DaemonStatus, String> {
+    let installed = service::is_installed();
+    let legacy_labels = service::detect_legacy()
+        .into_iter()
+        .map(|l| l.label)
+        .collect();
+
     // Versuche IPC; bei Fehler liefert wir „unreachable", damit das UI das
     // sauber anzeigen kann.
     match ipc::request("status", serde_json::json!({})).await {
@@ -33,13 +44,22 @@ pub async fn daemon_status() -> Result<DaemonStatus, String> {
                 last_poll_at: reply.last_poll_at,
                 active_provider: reply.active_provider,
                 message: reply.message,
+                installed,
+                legacy_labels,
             })
         }
         Err(_) => Ok(DaemonStatus {
             reachable: false,
+            installed,
+            legacy_labels,
             ..Default::default()
         }),
     }
+}
+
+#[tauri::command]
+pub fn daemon_migrate_legacy(app: tauri::AppHandle) -> Result<(), String> {
+    service::migrate_from_legacy(&app).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
