@@ -61,6 +61,8 @@ rechts der **Akku- bzw. USB-Status**. Unten am Bildschirmrand läuft ein
 - [Wie es funktioniert](#wie-es-funktioniert)
 - [Hardware](#hardware)
 - [Installation](#installation)
+  - [Companion-App (empfohlen)](#empfohlen-companion-app-macos--windows)
+  - [Power-User-Pfad (Shell-Skripte)](#power-user-pfad-shell-skripte)
 - [Konfiguration](#konfiguration)
 - [Provider im Detail](#provider-im-detail)
 - [BLE-Protokoll](#ble-protokoll)
@@ -118,7 +120,32 @@ in [`docs/porting/hal-contract.md`](docs/porting/hal-contract.md).
 
 ## Installation
 
-### Voraussetzungen
+### Empfohlen: Companion-App (macOS & Windows)
+
+Seit 2026-05-28 gibt es eine native Desktop-App, die Flashen, Daemon-
+Installation, Provider-Setup und Status-Monitoring in einem Fenster
+bündelt. Endanwender müssen weder PlatformIO noch Python noch eine
+Shell anfassen.
+
+- **macOS**: `.dmg` herunterladen, App in `/Applications` ziehen, beim ersten
+  Start dem Bluetooth-Permission-Dialog zustimmen. Apple-notarized, keine
+  Gatekeeper-Warnung.
+- **Windows**: `.msi` herunterladen, doppelklicken. Per-User-Installation
+  (kein UAC). Solange das Code-Signing-Cert noch nicht beschafft ist,
+  zeigt SmartScreen eine Warnung, die weggeklickt werden muss.
+
+Architektur & Bauanleitung der Companion-App:
+[`feature-documentation/companion-app/`](feature-documentation/companion-app/).
+Source: [`companion/`](companion/).
+
+### Power-User-Pfad: Shell-Skripte
+
+Die folgenden Installer / Flash-Skripte bleiben unverändert bestehen und
+sind weiterhin der schnellste Weg, wenn man PlatformIO + Python ohnehin
+auf der Maschine hat. Die Companion-App ist nur ein Wrapper um genau
+diese Bausteine.
+
+### Voraussetzungen (Shell-Pfad)
 
 - macOS / Linux / Windows 10+
 - [PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html) zum Flashen

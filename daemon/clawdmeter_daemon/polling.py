@@ -18,7 +18,7 @@ from typing import Optional
 from bleak import BleakClient
 from bleak.exc import BleakError
 
-from . import ble, paths, secrets
+from . import ble, ipc_server, paths, secrets
 from .config import Config, load_config
 from .providers import Provider, Snapshot, create
 
@@ -101,8 +101,36 @@ async def run_cycle(session: ble.Session, states: list[ProviderState], force_all
     return await session.send_cycle(payloads)
 
 
-async def connect_and_run(address: str, cfg: Config, states: list[ProviderState],
-                          stop_event: asyncio.Event) -> bool:
+async def _wait_any_event(events: list[asyncio.Event], timeout: float) -> None:
+    """Wartet, bis irgendein Event feuert oder ``timeout`` abläuft.
+
+    Anders als ``asyncio.wait_for(event.wait(), ...)`` lässt sich hier auf
+    mehrere Events parallel warten, ohne dass sie nacheinander gepollt werden
+    müssten. Wir verzichten bewusst auf einen Rückgabewert: der Aufrufer
+    inspiziert ``event.is_set()`` selbst, weil mehrere Events gleichzeitig
+    feuern können.
+    """
+
+    tasks = [asyncio.create_task(e.wait()) for e in events]
+    try:
+        await asyncio.wait(
+            tasks, timeout=timeout, return_when=asyncio.FIRST_COMPLETED
+        )
+    finally:
+        for t in tasks:
+            if not t.done():
+                t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+
+async def connect_and_run(
+    address: str,
+    cfg: Config,
+    states: list[ProviderState],
+    stop_event: asyncio.Event,
+    refresh_event: asyncio.Event,
+    reload_event: asyncio.Event,
+) -> bool:
     ble.log(f"Connecting to {address}...")
     client = BleakClient(address)
     try:
@@ -123,6 +151,13 @@ async def connect_and_run(address: str, cfg: Config, states: list[ProviderState]
         # Force a full cycle on connect so the firmware leaves the empty state.
         force = True
         while client.is_connected and not stop_event.is_set():
+            # IPC-``reload-config`` / ``provider-save`` während aktiver BLE-Session:
+            # main_loop besitzt den Reload-Pfad — wir trennen die Session, lassen
+            # uns vom äußeren Loop reconnecten, und behalten den Address-Cache.
+            if reload_event.is_set():
+                ble.log("Reload requested — disconnecting to apply new config")
+                used_successfully = True
+                break
             if await run_cycle(session, states, force_all=force):
                 used_successfully = True
             force = False
@@ -130,10 +165,20 @@ async def connect_and_run(address: str, cfg: Config, states: list[ProviderState]
                 session.refresh_requested.clear()
                 force = True
                 continue
-            try:
-                await asyncio.wait_for(session.refresh_requested.wait(), timeout=TICK)
-            except asyncio.TimeoutError:
-                pass
+            # IPC-``trigger-poll`` während aktiver BLE-Session: sofortiger Vollpoll.
+            if refresh_event.is_set():
+                refresh_event.clear()
+                force = True
+                continue
+            await _wait_any_event(
+                [
+                    session.refresh_requested,
+                    refresh_event,
+                    reload_event,
+                    stop_event,
+                ],
+                timeout=TICK,
+            )
     finally:
         try:
             await client.disconnect()
@@ -168,6 +213,8 @@ async def main_loop() -> None:
     ble.log(f"Address cache: {paths.address_cache_file()}")
 
     stop_event = asyncio.Event()
+    refresh_event = asyncio.Event()
+    reload_event = asyncio.Event()
     loop = asyncio.get_running_loop()
 
     def _stop(*_args: object) -> None:
@@ -180,8 +227,30 @@ async def main_loop() -> None:
         except NotImplementedError:
             signal.signal(sig, _stop)
 
+    ipc_state = ipc_server.ServerState(
+        stop_event=stop_event,
+        refresh_event=refresh_event,
+        reload_event=reload_event,
+        provider_states_ref=states,
+    )
+    ipc_srv = await ipc_server.start(ipc_state)
+
     backoff = 1
     while not stop_event.is_set():
+        if reload_event.is_set():
+            reload_event.clear()
+            try:
+                cfg = load_config()
+                new_states = build_provider_states(cfg)
+                states.clear()
+                states.extend(new_states)
+                ipc_state.provider_states_ref = states
+                ble.log(f"Config neu geladen — {len(states)} Provider aktiv")
+                await ipc_server.emit_event(
+                    ipc_state, "config-changed", {"providers": len(states)}
+                )
+            except Exception as exc:  # noqa: BLE001
+                ble.log(f"Reload-Fehler: {exc}")
         address = ble.load_cached_address()
         if not address:
             address = await ble.scan_for_device(cfg)
@@ -196,7 +265,15 @@ async def main_loop() -> None:
                 backoff = min(backoff * 2, 60)
                 continue
 
-        ok = await connect_and_run(address, cfg, states, stop_event)
+        await ipc_server.emit_event(
+            ipc_state, "device-connecting", {"address": address}
+        )
+        ok = await connect_and_run(
+            address, cfg, states, stop_event, refresh_event, reload_event
+        )
+        await ipc_server.emit_event(
+            ipc_state, "device-disconnected", {"address": address, "clean": ok}
+        )
         if not ok:
             ble.log("Invalidating cached address")
             ble.invalidate_address()
@@ -207,6 +284,8 @@ async def main_loop() -> None:
             backoff = min(backoff * 2, 60)
         else:
             backoff = 1
+
+    await ipc_server.stop(ipc_srv)
 
 
 def run() -> None:

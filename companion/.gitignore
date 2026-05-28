@@ -1,0 +1,27 @@
+node_modules
+dist
+dist-ssr
+*.local
+
+# PyInstaller-Build (aus tools/build_daemon_bundle.py)
+build/
+
+# Tauri
+src-tauri/target
+src-tauri/gen
+src-tauri/WixTools
+
+# eingebettete Build-Artefakte — werden von tools/build_companion.py vor dem
+# Tauri-Bundle hier hereingelegt; im Repo nicht eingecheckt
+resources/firmware/*.bin
+resources/daemon/clawdmeter-daemon-*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

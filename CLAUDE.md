@@ -21,6 +21,51 @@ Connects to a host daemon over BLE; daemon polls Anthropic API for usage data. T
 - **Feature-Dokumentation:** Im Ordner `feature-documentation/` müssen alle neuen Funktionen und Features sowie deren Anpassungen in einzelnen `.md`-Dateien im Markdown-Format dokumentiert werden. Pro Funktion und Markdown eine Datei. Sollte ein Feature aus mehreren Funktionen bestehen, dürfen Unterordner pro Feature angelegt werden. Diese Dokumentation dient vor allem anderen KI-Coding-Agenten zum besseren Verständnis der Codebase.
 - **Entwicklungsfortschritt:** Der aktuelle Entwicklungsfortschritt ist fortlaufend neben dem PRD zu dokumentieren — z. B. in einer `PROGRESS.md` neben dem PRD. Dort wird festgehalten, welche MVP-Features bereits umgesetzt sind, welche in Arbeit sind und welche noch ausstehen. So haben alle Beteiligten (Mensch und KI-Agent) jederzeit einen aktuellen Überblick über den Stand der Entwicklung.
 
+## Graphify — Codebase Knowledge Graph
+
+Dieses Projekt nutzt [Graphify](https://github.com/safishamsi/graphify/tree/v8)
+zur strukturierten Codebase-Analyse.
+
+### Setup (einmalig pro Repo)
+
+Wenn `graphify-out/` nicht existiert oder `graphify-out/graph.json` fehlt:
+
+1. Prüfe, ob `graphify` als CLI verfügbar ist (`graphify --version`).
+   Falls nicht: `uv tool install graphifyy`
+2. Prüfe, ob der Graphify-Skill registriert ist (`~/.claude/skills/graphify/`).
+   Falls nicht: `graphify install`
+3. Erkenne relevante Dateitypen im Repo und installiere passende Extras:
+   - `.pdf` vorhanden → `uv tool install "graphifyy[pdf]"`
+   - `.docx` / `.xlsx` vorhanden → `uv tool install "graphifyy[office]"`
+   - `.sql` vorhanden → `uv tool install "graphifyy[sql]"`
+   - `.mp4` / `.mov` / `.mp3` vorhanden → `uv tool install "graphifyy[video]"`
+   - Im Zweifel: `uv tool install "graphifyy[all]"`
+4. Baue den Graphen: `/graphify .`
+5. Registriere im Global Graph: `graphify global add graphify-out/graph.json <repo-name>`
+   Verwende den Verzeichnisnamen als `<repo-name>`.
+6. Generiere die Architekturübersicht: `graphify export callflow-html`
+7. Registriere Graphify für dieses Repo: `graphify claude install`
+8. **Nur nach expliziter Freigabe durch den Benutzer:**
+   Schlage `graphify hook install` vor (auto-rebuild bei git commit).
+   Erkläre kurz, was der Hook tut, und warte auf Bestätigung.
+
+### Nutzung
+
+- Lies `graphify-out/GRAPH_REPORT.md` bevor du Architektur- oder
+  Abhängigkeitsfragen beantwortest.
+- Nutze `graphify query "<frage>"` für Strukturfragen, bevor du
+  manuell Dateien durchsuchst.
+- Nutze `graphify explain "<Knoten>"` um einzelne Konzepte zu verstehen.
+- Nutze `graphify path "<A>" "<B>"` um Verbindungen zwischen
+  Komponenten zu finden.
+- Bei `AMBIGUOUS`-Kanten im Graphen: Quellcode gegenchecken.
+
+### Aktualisierung
+
+- Nach größeren Refactorings: `/graphify . --force`
+- Nach Änderungen an Docs/PDFs: `/graphify . --update`
+- Callflow-Export aktualisieren: `graphify export callflow-html`
+
 ## Hardware (critical pins)
 
 ### AMOLED-2.16 (original)

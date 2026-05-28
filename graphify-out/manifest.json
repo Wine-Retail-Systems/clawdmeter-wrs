@@ -1,0 +1,762 @@
+{
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/flash.sh": {
+    "mtime": 1779655438.8768044,
+    "ast_hash": "d58af2887d98d4cf4eca8f6422adf7f2",
+    "semantic_hash": "d58af2887d98d4cf4eca8f6422adf7f2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/flash-mac.sh": {
+    "mtime": 1779655418.9824562,
+    "ast_hash": "c7552df9d83329253edb5287ad806c16",
+    "semantic_hash": "c7552df9d83329253edb5287ad806c16"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/install.sh": {
+    "mtime": 1779657087.0266366,
+    "ast_hash": "df3c9d42e92fc2c5d68e81bc09d3cf72",
+    "semantic_hash": "df3c9d42e92fc2c5d68e81bc09d3cf72"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshot.sh": {
+    "mtime": 1779659160.2360723,
+    "ast_hash": "fb959e354c445b2f18bc5953c48f8ae1",
+    "semantic_hash": "fb959e354c445b2f18bc5953c48f8ae1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/install-windows.ps1": {
+    "mtime": 1779657091.1313112,
+    "ast_hash": "8113e6ce2607060c4b896b8510cc6a5b",
+    "semantic_hash": "8113e6ce2607060c4b896b8510cc6a5b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/install-mac.sh": {
+    "mtime": 1779657083.3830957,
+    "ast_hash": "cc887f3aab04415e5edf95b86d35db71",
+    "semantic_hash": "cc887f3aab04415e5edf95b86d35db71"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_16.c": {
+    "mtime": 1779660793.016055,
+    "ast_hash": "7c654cb89ae738ed5dc56d94bc7a5a44",
+    "semantic_hash": "7c654cb89ae738ed5dc56d94bc7a5a44"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/ui.cpp": {
+    "mtime": 1779662368.2793741,
+    "ast_hash": "f8a6418cf98e7fee9b3b1e68251f7475",
+    "semantic_hash": "f8a6418cf98e7fee9b3b1e68251f7475"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/theme.h": {
+    "mtime": 1779627271.2464755,
+    "ast_hash": "abb2e82f03173cd12eb00ab25993ade2",
+    "semantic_hash": "abb2e82f03173cd12eb00ab25993ade2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/ble.cpp": {
+    "mtime": 1779652437.0164156,
+    "ast_hash": "cdff56aa764bb59cbb12a0c16cf36c45",
+    "semantic_hash": "cdff56aa764bb59cbb12a0c16cf36c45"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_12.c": {
+    "mtime": 1779660791.9440136,
+    "ast_hash": "f3598354161f85e40b8a0f15726b43bf",
+    "semantic_hash": "f3598354161f85e40b8a0f15726b43bf"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/ble.h": {
+    "mtime": 1779616364.8872237,
+    "ast_hash": "1e2907594e665ccd5fd7cdfc4b5f5bad",
+    "semantic_hash": "1e2907594e665ccd5fd7cdfc4b5f5bad"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_tiempos_34.c": {
+    "mtime": 1779660795.7051036,
+    "ast_hash": "90ab15b861c1724da1075b4a37501433",
+    "semantic_hash": "90ab15b861c1724da1075b4a37501433"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/splash_animations_wine.h": {
+    "mtime": 1779655946.7084608,
+    "ast_hash": "df33abfe43dda45fa31607c06c0f18c4",
+    "semantic_hash": "df33abfe43dda45fa31607c06c0f18c4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/ui.h": {
+    "mtime": 1779652379.9434547,
+    "ast_hash": "ca42871451e488b4f13d811d4c6f0679",
+    "semantic_hash": "ca42871451e488b4f13d811d4c6f0679"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_48.c": {
+    "mtime": 1779660795.1584358,
+    "ast_hash": "289cc435641e61d9b3f1b23ac1d433c5",
+    "semantic_hash": "289cc435641e61d9b3f1b23ac1d433c5"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/logo.h": {
+    "mtime": 1779616364.8930733,
+    "ast_hash": "ab2be3842ef2f29daeaefc8bb8e671f4",
+    "semantic_hash": "ab2be3842ef2f29daeaefc8bb8e671f4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_mono_32.c": {
+    "mtime": 1779660797.3202689,
+    "ast_hash": "0696a541e69cf2357bbba0b74bf4b017",
+    "semantic_hash": "0696a541e69cf2357bbba0b74bf4b017"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/data.h": {
+    "mtime": 1779661030.3870382,
+    "ast_hash": "b4dbae8fcfc972a84d051670b21496ec",
+    "semantic_hash": "b4dbae8fcfc972a84d051670b21496ec"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/idle.h": {
+    "mtime": 1779616364.892901,
+    "ast_hash": "718cdbf57a8b9d337357dea66cbf4d46",
+    "semantic_hash": "718cdbf57a8b9d337357dea66cbf4d46"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/icons.h": {
+    "mtime": 1779616364.892751,
+    "ast_hash": "478db100ae75a226c64ce27c7f6e71e3",
+    "semantic_hash": "478db100ae75a226c64ce27c7f6e71e3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/splash.cpp": {
+    "mtime": 1779655939.6078315,
+    "ast_hash": "15c4ce2130f803fcfc21de9f13b323a8",
+    "semantic_hash": "15c4ce2130f803fcfc21de9f13b323a8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/idle_cfg.h": {
+    "mtime": 1779616364.8929555,
+    "ast_hash": "b411e61297d700e20d69f1ac019a24f4",
+    "semantic_hash": "b411e61297d700e20d69f1ac019a24f4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_tiempos_56.c": {
+    "mtime": 1779660796.2376907,
+    "ast_hash": "4a0a6f2ba13d47d9b3af91b44986fdcb",
+    "semantic_hash": "4a0a6f2ba13d47d9b3af91b44986fdcb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_24.c": {
+    "mtime": 1779660794.099328,
+    "ast_hash": "63c2dd079932211822686224dc90f8df",
+    "semantic_hash": "63c2dd079932211822686224dc90f8df"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_20.c": {
+    "mtime": 1779660793.56432,
+    "ast_hash": "5913eaff27b43bf3aa28d3ea86ad06c4",
+    "semantic_hash": "5913eaff27b43bf3aa28d3ea86ad06c4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/splash.h": {
+    "mtime": 1779616364.893369,
+    "ast_hash": "1e68e35b4b7381cc5ba667b7ab887fa6",
+    "semantic_hash": "1e68e35b4b7381cc5ba667b7ab887fa6"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_14.c": {
+    "mtime": 1779660792.4834492,
+    "ast_hash": "0c4ff173d764e5aed8f93ba5d05b5994",
+    "semantic_hash": "0c4ff173d764e5aed8f93ba5d05b5994"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/idle.cpp": {
+    "mtime": 1779616364.8928382,
+    "ast_hash": "f0762f6c691418da63df614b6b80ad30",
+    "semantic_hash": "f0762f6c691418da63df614b6b80ad30"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_mono_18.c": {
+    "mtime": 1779660796.775979,
+    "ast_hash": "f7adc7956dbc83cd8965ea39a67b30fd",
+    "semantic_hash": "f7adc7956dbc83cd8965ea39a67b30fd"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/usage_rate.h": {
+    "mtime": 1779616364.8938787,
+    "ast_hash": "ed6bb2dfa052e942bc7a0524ff611feb",
+    "semantic_hash": "ed6bb2dfa052e942bc7a0524ff611feb"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/usage_rate.cpp": {
+    "mtime": 1779616364.893819,
+    "ast_hash": "edfae4f20983159b72b9495718f1121f",
+    "semantic_hash": "edfae4f20983159b72b9495718f1121f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/logo_wine.h": {
+    "mtime": 1779625754.8147101,
+    "ast_hash": "6756679a1ce92977c65da91fae3ff8c1",
+    "semantic_hash": "6756679a1ce92977c65da91fae3ff8c1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/main.cpp": {
+    "mtime": 1779663596.7177994,
+    "ast_hash": "7bf0c06466e90b62dd0b542ffc884566",
+    "semantic_hash": "7bf0c06466e90b62dd0b542ffc884566"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/splash_animations.h": {
+    "mtime": 1779628515.6699421,
+    "ast_hash": "d561e978f965919dcc0d753518211fd4",
+    "semantic_hash": "d561e978f965919dcc0d753518211fd4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/font_styrene_28.c": {
+    "mtime": 1779660794.6317332,
+    "ast_hash": "412c54754fc3b0059cf8100aa36b1bcf",
+    "semantic_hash": "412c54754fc3b0059cf8100aa36b1bcf"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/hal/power_hal.h": {
+    "mtime": 1779616364.8924873,
+    "ast_hash": "8dfdc57bb754dbc31e591a85625ab3f9",
+    "semantic_hash": "8dfdc57bb754dbc31e591a85625ab3f9"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/hal/imu_hal.h": {
+    "mtime": 1779616364.8923717,
+    "ast_hash": "872f079ad05afe4065ba68e8f9938ac2",
+    "semantic_hash": "872f079ad05afe4065ba68e8f9938ac2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/hal/display_hal.h": {
+    "mtime": 1779616364.8923125,
+    "ast_hash": "10bdae6a26e3783a5d9e70404c0b59b5",
+    "semantic_hash": "10bdae6a26e3783a5d9e70404c0b59b5"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/hal/board_caps.h": {
+    "mtime": 1779616364.8922465,
+    "ast_hash": "8b3f795c37ad1b0d9e816cfd895f0fb8",
+    "semantic_hash": "8b3f795c37ad1b0d9e816cfd895f0fb8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/hal/input_hal.h": {
+    "mtime": 1779616364.89243,
+    "ast_hash": "dadf9a899a9ae6043a0115e32006326c",
+    "semantic_hash": "dadf9a899a9ae6043a0115e32006326c"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/hal/touch_hal.h": {
+    "mtime": 1779616364.8925438,
+    "ast_hash": "fb7686a79248da0ce84050f7fed99fb5",
+    "semantic_hash": "fb7686a79248da0ce84050f7fed99fb5"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/caps.cpp": {
+    "mtime": 1779616364.888933,
+    "ast_hash": "4582a379b3ecf2f140f10e7d93505048",
+    "semantic_hash": "4582a379b3ecf2f140f10e7d93505048"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/input.cpp": {
+    "mtime": 1779616364.8891337,
+    "ast_hash": "0963f3165e1417d95bd5eeef42fde9ad",
+    "semantic_hash": "0963f3165e1417d95bd5eeef42fde9ad"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/display.cpp": {
+    "mtime": 1779616364.8890154,
+    "ast_hash": "8afa19345aef04dff6bc93ce2a72a669",
+    "semantic_hash": "8afa19345aef04dff6bc93ce2a72a669"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/imu.cpp": {
+    "mtime": 1779616364.8890822,
+    "ast_hash": "07726de29bb26e4a2c2bc567d87639a2",
+    "semantic_hash": "07726de29bb26e4a2c2bc567d87639a2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/power.cpp": {
+    "mtime": 1779616364.8892093,
+    "ast_hash": "660ff134fbb08598692248a43705a045",
+    "semantic_hash": "660ff134fbb08598692248a43705a045"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/board.h": {
+    "mtime": 1779616364.8887994,
+    "ast_hash": "509d5f22961e77d359c0f29f78c30c90",
+    "semantic_hash": "509d5f22961e77d359c0f29f78c30c90"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/board_init.cpp": {
+    "mtime": 1779616364.8888707,
+    "ast_hash": "d3fe608d88c16ac35ddca1596890858f",
+    "semantic_hash": "d3fe608d88c16ac35ddca1596890858f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_216/touch.cpp": {
+    "mtime": 1779616364.889301,
+    "ast_hash": "90d7d2577f42d9ccb24dbf9de9f4c049",
+    "semantic_hash": "90d7d2577f42d9ccb24dbf9de9f4c049"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/caps.cpp": {
+    "mtime": 1779616364.8881137,
+    "ast_hash": "d008adb1b680cef3fb328aed03df2fc3",
+    "semantic_hash": "d008adb1b680cef3fb328aed03df2fc3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/input.cpp": {
+    "mtime": 1779616364.888323,
+    "ast_hash": "621db583185ad8f0de53398e3434b896",
+    "semantic_hash": "621db583185ad8f0de53398e3434b896"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/display.cpp": {
+    "mtime": 1779616364.8881924,
+    "ast_hash": "427349c2b2b9732843fa62cfc5957154",
+    "semantic_hash": "427349c2b2b9732843fa62cfc5957154"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/imu.cpp": {
+    "mtime": 1779616364.8882537,
+    "ast_hash": "ee68299670cc4041f1fb18edfaebe018",
+    "semantic_hash": "ee68299670cc4041f1fb18edfaebe018"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/power.cpp": {
+    "mtime": 1779616364.8885744,
+    "ast_hash": "1be449c4129331938c11d6dae45d1ba0",
+    "semantic_hash": "1be449c4129331938c11d6dae45d1ba0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/io_expander.h": {
+    "mtime": 1779616364.8884726,
+    "ast_hash": "61a7f0ded87b3b4811d5de518fb85487",
+    "semantic_hash": "61a7f0ded87b3b4811d5de518fb85487"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/board.h": {
+    "mtime": 1779616364.887981,
+    "ast_hash": "b6493ea11a930a23858e8dde2b4cd4f8",
+    "semantic_hash": "b6493ea11a930a23858e8dde2b4cd4f8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/board_init.cpp": {
+    "mtime": 1779616364.8880498,
+    "ast_hash": "47254e715acd47722ea1e4f5dab560c2",
+    "semantic_hash": "47254e715acd47722ea1e4f5dab560c2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/touch.cpp": {
+    "mtime": 1779616364.8886516,
+    "ast_hash": "05456246e62f40d2729202f64782d30a",
+    "semantic_hash": "05456246e62f40d2729202f64782d30a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/waveshare_amoled_18/io_expander.cpp": {
+    "mtime": 1779616364.8883953,
+    "ast_hash": "aa6a499e0ba4fd9352bb02fa8966dabe",
+    "semantic_hash": "aa6a499e0ba4fd9352bb02fa8966dabe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/caps.cpp": {
+    "mtime": 1779616364.8875098,
+    "ast_hash": "3405651d2cd44b7a9fa0715cf1df4151",
+    "semantic_hash": "3405651d2cd44b7a9fa0715cf1df4151"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/input.cpp": {
+    "mtime": 1779616364.8877063,
+    "ast_hash": "ecff241cf6c3c1968f01b86cac25bc18",
+    "semantic_hash": "ecff241cf6c3c1968f01b86cac25bc18"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/display.cpp": {
+    "mtime": 1779616364.887573,
+    "ast_hash": "f88122bb0c773c44da85577b3cb07d6f",
+    "semantic_hash": "f88122bb0c773c44da85577b3cb07d6f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/imu.cpp": {
+    "mtime": 1779616364.8876355,
+    "ast_hash": "e2905bc4c3a8ba5144518d3643fe9016",
+    "semantic_hash": "e2905bc4c3a8ba5144518d3643fe9016"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/power.cpp": {
+    "mtime": 1779616364.8877835,
+    "ast_hash": "0d127b2c67d7f539441c85b87f49785e",
+    "semantic_hash": "0d127b2c67d7f539441c85b87f49785e"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/board.h": {
+    "mtime": 1779616364.8873832,
+    "ast_hash": "fc2086881427a1e64d6957ba18bc5ae8",
+    "semantic_hash": "fc2086881427a1e64d6957ba18bc5ae8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/board_init.cpp": {
+    "mtime": 1779616364.887448,
+    "ast_hash": "73f451adaee995dc203044c0201195d2",
+    "semantic_hash": "73f451adaee995dc203044c0201195d2"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/firmware/src/boards/template/touch.cpp": {
+    "mtime": 1779616364.8878598,
+    "ast_hash": "df036a539aecb7f108a1fdf36b89d320",
+    "semantic_hash": "df036a539aecb7f108a1fdf36b89d320"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/scrape_claudepix.js": {
+    "mtime": 1779616364.8967996,
+    "ast_hash": "e3e04ec2267568bb24856d7bb2424da0",
+    "semantic_hash": "e3e04ec2267568bb24856d7bb2424da0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/convert_to_c.js": {
+    "mtime": 1779628438.088868,
+    "ast_hash": "8e0016bf0d914e4127043465906afd8a",
+    "semantic_hash": "8e0016bf0d914e4127043465906afd8a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/pixellab_to_claudepix.py": {
+    "mtime": 1779630840.5185485,
+    "ast_hash": "ef26383f0465e50a924a3a4197c7ff71",
+    "semantic_hash": "ef26383f0465e50a924a3a4197c7ff71"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/build_wine_logo.py": {
+    "mtime": 1779625749.971486,
+    "ast_hash": "6331ba3f1ace46961a74848cfac8b21d",
+    "semantic_hash": "6331ba3f1ace46961a74848cfac8b21d"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/build_fonts.py": {
+    "mtime": 1779660780.7352285,
+    "ast_hash": "e8e1f0ce7ba228728d4b7bab267fd6f0",
+    "semantic_hash": "e8e1f0ce7ba228728d4b7bab267fd6f0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/png_to_lvgl.js": {
+    "mtime": 1779616364.896716,
+    "ast_hash": "1faa688e733b71d97983206788e408a8",
+    "semantic_hash": "1faa688e733b71d97983206788e408a8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/dance_djmix.json": {
+    "mtime": 1779616364.895387,
+    "ast_hash": "df851f3c50144ad1424b21e7fcfaae62",
+    "semantic_hash": "df851f3c50144ad1424b21e7fcfaae62"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/idle_blink.json": {
+    "mtime": 1779616364.8960311,
+    "ast_hash": "8117507000702b2c056279f1d63e7b0f",
+    "semantic_hash": "8117507000702b2c056279f1d63e7b0f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/dance_bounce_dj.json": {
+    "mtime": 1779616364.8952897,
+    "ast_hash": "16d597597f163f380c2c715dabbd83fc",
+    "semantic_hash": "16d597597f163f380c2c715dabbd83fc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/idle_breathe.json": {
+    "mtime": 1779616364.8961287,
+    "ast_hash": "1973ec6f0b2bf3fe0f32f53d81455a21",
+    "semantic_hash": "1973ec6f0b2bf3fe0f32f53d81455a21"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/dance_sway_dj.json": {
+    "mtime": 1779616364.8955762,
+    "ast_hash": "a68bdf45612abe087d125deb09f8b927",
+    "semantic_hash": "a68bdf45612abe087d125deb09f8b927"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/expression_sleep.json": {
+    "mtime": 1779616364.895711,
+    "ast_hash": "b3fa0504c7bcc25da0c1af622c2dd756",
+    "semantic_hash": "b3fa0504c7bcc25da0c1af622c2dd756"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/dance_bounce.json": {
+    "mtime": 1779616364.8951735,
+    "ast_hash": "767d263f57b0f889fe69833bc5ecc9aa",
+    "semantic_hash": "767d263f57b0f889fe69833bc5ecc9aa"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/idle_look_around.json": {
+    "mtime": 1779616364.8962576,
+    "ast_hash": "0abefcb44671a0dba1ce17b4f04fb8cf",
+    "semantic_hash": "0abefcb44671a0dba1ce17b4f04fb8cf"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/work_coding.json": {
+    "mtime": 1779616364.8964157,
+    "ast_hash": "c080a0597ad5e1a6f7e5d9666e73777b",
+    "semantic_hash": "c080a0597ad5e1a6f7e5d9666e73777b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/expression_wink.json": {
+    "mtime": 1779616364.8958993,
+    "ast_hash": "2f5fb0dbfe5d57e70773014ea525cc7b",
+    "semantic_hash": "2f5fb0dbfe5d57e70773014ea525cc7b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/work_think.json": {
+    "mtime": 1779616364.8965442,
+    "ast_hash": "d3409a4a1a4b4ed303629f6f5e141bf8",
+    "semantic_hash": "d3409a4a1a4b4ed303629f6f5e141bf8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/_index.json": {
+    "mtime": 1779616364.895026,
+    "ast_hash": "e29a3a52cf7132600d5f91683375fb83",
+    "semantic_hash": "e29a3a52cf7132600d5f91683375fb83"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/expression_surprise.json": {
+    "mtime": 1779616364.8958142,
+    "ast_hash": "414a9f73d2dbb3d9f21b88e86f5ef01e",
+    "semantic_hash": "414a9f73d2dbb3d9f21b88e86f5ef01e"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/claudepix_data/dance_sway.json": {
+    "mtime": 1779616364.895487,
+    "ast_hash": "8c18faedf13280d1fc49f00458170512",
+    "semantic_hash": "8c18faedf13280d1fc49f00458170512"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/legacy/build_wine_sprites.py": {
+    "mtime": 1779630805.9934585,
+    "ast_hash": "743a5d465e47e683242d1672ac697f56",
+    "semantic_hash": "743a5d465e47e683242d1672ac697f56"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/wine_glass_red.json": {
+    "mtime": 1779629975.9844189,
+    "ast_hash": "ad6fb458a7fe5d693416f10394e0f013",
+    "semantic_hash": "ad6fb458a7fe5d693416f10394e0f013"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/wine_grapes.json": {
+    "mtime": 1779629756.8993378,
+    "ast_hash": "eed7f5948b023a18539c74ed7a3a21c7",
+    "semantic_hash": "eed7f5948b023a18539c74ed7a3a21c7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/_index.json": {
+    "mtime": 1779655923.0090444,
+    "ast_hash": "08e83517dc7945cb3a7b84b4194925a7",
+    "semantic_hash": "08e83517dc7945cb3a7b84b4194925a7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/wine_data/wine_bottle_bordeaux.json": {
+    "mtime": 1779629756.829238,
+    "ast_hash": "61760641ec10a406643baab91d2c14a7",
+    "semantic_hash": "61760641ec10a406643baab91d2c14a7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon.py": {
+    "mtime": 1779652305.4685493,
+    "ast_hash": "2e1c79f049f6405db8187ef3c27c1e24",
+    "semantic_hash": "2e1c79f049f6405db8187ef3c27c1e24"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/ble.py": {
+    "mtime": 1779652194.6552112,
+    "ast_hash": "456dac1b2705545cc17c6b4cc2d0f537",
+    "semantic_hash": "456dac1b2705545cc17c6b4cc2d0f537"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/config.py": {
+    "mtime": 1779658835.443846,
+    "ast_hash": "42bc031c1e1921182277f63ffa3458cd",
+    "semantic_hash": "42bc031c1e1921182277f63ffa3458cd"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/paths.py": {
+    "mtime": 1779658739.1867259,
+    "ast_hash": "072010e3fe8429eb4b7373e407273dfd",
+    "semantic_hash": "072010e3fe8429eb4b7373e407273dfd"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/__init__.py": {
+    "mtime": 1779651902.7436135,
+    "ast_hash": "e3cec9229d968b1054bb230d71706cda",
+    "semantic_hash": "e3cec9229d968b1054bb230d71706cda"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/setup_wizard.py": {
+    "mtime": 1779658827.79204,
+    "ast_hash": "9876ae090d58e2806c6fa6224f36d5e8",
+    "semantic_hash": "9876ae090d58e2806c6fa6224f36d5e8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/cli.py": {
+    "mtime": 1779658819.47359,
+    "ast_hash": "ef1b4eeeeda7b2fc28c5b746d03379c9",
+    "semantic_hash": "ef1b4eeeeda7b2fc28c5b746d03379c9"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/polling.py": {
+    "mtime": 1779658804.1928182,
+    "ast_hash": "736261e08f12088b7860d91a1b15fff3",
+    "semantic_hash": "736261e08f12088b7860d91a1b15fff3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/codex.py": {
+    "mtime": 1779656675.4222808,
+    "ast_hash": "8fcc49dc25ed4dc66552f65d3d10555a",
+    "semantic_hash": "8fcc49dc25ed4dc66552f65d3d10555a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/__init__.py": {
+    "mtime": 1779656690.524024,
+    "ast_hash": "c15961cb12722599533086006de88c46",
+    "semantic_hash": "c15961cb12722599533086006de88c46"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/opencode.py": {
+    "mtime": 1779660995.7143648,
+    "ast_hash": "2525e318209c72d881da3d6fbc891e84",
+    "semantic_hash": "2525e318209c72d881da3d6fbc891e84"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/anthropic.py": {
+    "mtime": 1779652022.441757,
+    "ast_hash": "fd7cbd78237ed98055c2387aed75362f",
+    "semantic_hash": "fd7cbd78237ed98055c2387aed75362f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/langdock.py": {
+    "mtime": 1779658271.2742145,
+    "ast_hash": "81203f170a53b63f3e52942ff49c7024",
+    "semantic_hash": "81203f170a53b63f3e52942ff49c7024"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/base.py": {
+    "mtime": 1779660940.3780615,
+    "ast_hash": "8b51e3c6debfa64928ee9d4cd5d41e35",
+    "semantic_hash": "8b51e3c6debfa64928ee9d4cd5d41e35"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/daemon/clawdmeter_daemon/providers/bedrock.py": {
+    "mtime": 1779652157.4841342,
+    "ast_hash": "8e8ad34b591f316fb5d798c59ff06b48",
+    "semantic_hash": "8e8ad34b591f316fb5d798c59ff06b48"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/PROGRESS.md": {
+    "mtime": 1779658395.5181653,
+    "ast_hash": "96c2c11e7a7dc5924fbc601fa4ceebf8",
+    "semantic_hash": "96c2c11e7a7dc5924fbc601fa4ceebf8"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/README.md": {
+    "mtime": 1779664004.2638278,
+    "ast_hash": "6d3599ee2040e6b3d85a07f85f998a87",
+    "semantic_hash": "6d3599ee2040e6b3d85a07f85f998a87"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/AGENTS.md": {
+    "mtime": 1779655980.9898074,
+    "ast_hash": "9b07c37f32cf51e82a2a99aa2f758afc",
+    "semantic_hash": "9b07c37f32cf51e82a2a99aa2f758afc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/CLAUDE.md": {
+    "mtime": 1779663980.069958,
+    "ast_hash": "04023c5b4672137bf37e63543ea4473f",
+    "semantic_hash": "04023c5b4672137bf37e63543ea4473f"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/tools/README.md": {
+    "mtime": 1779655998.480555,
+    "ast_hash": "fc6772dfd64a328b92404551964dd0e4",
+    "semantic_hash": "fc6772dfd64a328b92404551964dd0e4"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/docs/porting/capability-flags.md": {
+    "mtime": 1779616364.8867712,
+    "ast_hash": "4e7a9b1aeed1aea1f0a844b942f55654",
+    "semantic_hash": "4e7a9b1aeed1aea1f0a844b942f55654"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/docs/porting/adding-a-board.md": {
+    "mtime": 1779616364.8866928,
+    "ast_hash": "e32e2f108b369f2d6ec7afa796fb60fe",
+    "semantic_hash": "e32e2f108b369f2d6ec7afa796fb60fe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/docs/porting/hal-contract.md": {
+    "mtime": 1779631451.1909995,
+    "ast_hash": "e92c7505dc59d0b9884e79691b21b117",
+    "semantic_hash": "e92c7505dc59d0b9884e79691b21b117"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/windows-daemon.md": {
+    "mtime": 1779632567.6341977,
+    "ast_hash": "f4d7565305779f9d973d9cd83b8834ce",
+    "semantic_hash": "f4d7565305779f9d973d9cd83b8834ce"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/research/codexbar-reference.md": {
+    "mtime": 1779650169.9911356,
+    "ast_hash": "fe989f31b1920ede34f96eba08b4afff",
+    "semantic_hash": "fe989f31b1920ede34f96eba08b4afff"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/multi-provider/ble-protocol.md": {
+    "mtime": 1779657265.9350474,
+    "ast_hash": "8439d3174a4baeff8e48731f5a076ffa",
+    "semantic_hash": "8439d3174a4baeff8e48731f5a076ffa"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/multi-provider/kind-layouts.md": {
+    "mtime": 1779657275.905841,
+    "ast_hash": "c2a0f252ff9272130b79f5b1a7f99675",
+    "semantic_hash": "c2a0f252ff9272130b79f5b1a7f99675"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/multi-provider/data-flow.md": {
+    "mtime": 1779657313.9658606,
+    "ast_hash": "3a8b2fa45c0e402f1d47151aacfaf3a1",
+    "semantic_hash": "3a8b2fa45c0e402f1d47151aacfaf3a1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/multi-provider/config-toml.md": {
+    "mtime": 1779657271.7231636,
+    "ast_hash": "d433248b9f9b9880a18c08ffa53b5dcc",
+    "semantic_hash": "d433248b9f9b9880a18c08ffa53b5dcc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/providers/bedrock.md": {
+    "mtime": 1779657171.6951406,
+    "ast_hash": "3f3d7595cb05602f4aa805a8998fcc92",
+    "semantic_hash": "3f3d7595cb05602f4aa805a8998fcc92"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/providers/langdock.md": {
+    "mtime": 1779658382.889666,
+    "ast_hash": "87dd8ddce20e1ca033807b207f91ec27",
+    "semantic_hash": "87dd8ddce20e1ca033807b207f91ec27"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/providers/codex.md": {
+    "mtime": 1779656827.3006425,
+    "ast_hash": "a641cd1a24c749e31cceb0a25e77a453",
+    "semantic_hash": "a641cd1a24c749e31cceb0a25e77a453"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/feature-documentation/providers/opencode.md": {
+    "mtime": 1779649005.278044,
+    "ast_hash": "5d910229fa48aae6f63747540988a176",
+    "semantic_hash": "5d910229fa48aae6f63747540988a176"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshot.png": {
+    "mtime": 1779659075.5427017,
+    "ast_hash": "9f41939bccae85bc803e799f382e7d9c",
+    "semantic_hash": "9f41939bccae85bc803e799f382e7d9c"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/bluetooth.png": {
+    "mtime": 1779663780.6641057,
+    "ast_hash": "3ad2e791912ebd99ef3d34f244680052",
+    "semantic_hash": "3ad2e791912ebd99ef3d34f244680052"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-000300_screenshot.png": {
+    "mtime": 1779660182.8384337,
+    "ast_hash": "55c89d6b38c13c370220514d0e2e9cb1",
+    "semantic_hash": "55c89d6b38c13c370220514d0e2e9cb1"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-010118_splash_wine.png": {
+    "mtime": 1779663680.5415788,
+    "ast_hash": "9a4fc73063ca50a6ced19823a45c34fe",
+    "semantic_hash": "9a4fc73063ca50a6ced19823a45c34fe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/opencode_demo_oneshot.png": {
+    "mtime": 1779662037.9446335,
+    "ast_hash": "546e7c19a9f75211ef18b037a1aafa3a",
+    "semantic_hash": "546e7c19a9f75211ef18b037a1aafa3a"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-010134_slot0.png": {
+    "mtime": 1779663696.5317297,
+    "ast_hash": "73654731e1712fa0ed8508466f7e1a62",
+    "semantic_hash": "73654731e1712fa0ed8508466f7e1a62"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-010148_slot1.png": {
+    "mtime": 1779663710.3354764,
+    "ast_hash": "0d5d45b0aafdad6d45d007712574bbdc",
+    "semantic_hash": "0d5d45b0aafdad6d45d007712574bbdc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-000305_screenshot.png": {
+    "mtime": 1779660187.440312,
+    "ast_hash": "61e3e1e4ed13e5eb2ff19818fbff4f0b",
+    "semantic_hash": "61e3e1e4ed13e5eb2ff19818fbff4f0b"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/splash.png": {
+    "mtime": 1779663780.651744,
+    "ast_hash": "9a4fc73063ca50a6ced19823a45c34fe",
+    "semantic_hash": "9a4fc73063ca50a6ced19823a45c34fe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-010203_slot2.png": {
+    "mtime": 1779663725.2419088,
+    "ast_hash": "0b38495a634535ff4e201079ade91956",
+    "semantic_hash": "0b38495a634535ff4e201079ade91956"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/usage.png": {
+    "mtime": 1779616364.8948116,
+    "ast_hash": "914e9387fc16290bc4630275412bb563",
+    "semantic_hash": "914e9387fc16290bc4630275412bb563"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/opencode_demo_final.png": {
+    "mtime": 1779662161.1280322,
+    "ast_hash": "a175d7db3aee8835906bf07968e9e9a7",
+    "semantic_hash": "a175d7db3aee8835906bf07968e9e9a7"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-005933_current_state.png": {
+    "mtime": 1779663575.4197044,
+    "ast_hash": "9fd3dc00f0f3be4e62dbfca01640fae0",
+    "semantic_hash": "9fd3dc00f0f3be4e62dbfca01640fae0"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-010217_bluetooth_wine.png": {
+    "mtime": 1779663739.292516,
+    "ast_hash": "3ad2e791912ebd99ef3d34f244680052",
+    "semantic_hash": "3ad2e791912ebd99ef3d34f244680052"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/anthropic.png": {
+    "mtime": 1779663780.6545238,
+    "ast_hash": "73654731e1712fa0ed8508466f7e1a62",
+    "semantic_hash": "73654731e1712fa0ed8508466f7e1a62"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/langdock.png": {
+    "mtime": 1779663780.6597424,
+    "ast_hash": "0b38495a634535ff4e201079ade91956",
+    "semantic_hash": "0b38495a634535ff4e201079ade91956"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/opencode.png": {
+    "mtime": 1779663780.6618726,
+    "ast_hash": "79acf520821d46e84959cffe38fd2f19",
+    "semantic_hash": "79acf520821d46e84959cffe38fd2f19"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/codex.png": {
+    "mtime": 1779663780.657407,
+    "ast_hash": "0d5d45b0aafdad6d45d007712574bbdc",
+    "semantic_hash": "0d5d45b0aafdad6d45d007712574bbdc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-002429_opencode_demo.png": {
+    "mtime": 1779661471.2898602,
+    "ast_hash": "1249320c5c62c646c5d49c7ca3187fd3",
+    "semantic_hash": "1249320c5c62c646c5d49c7ca3187fd3"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/opencode_demo_v2.png": {
+    "mtime": 1779662440.7789683,
+    "ast_hash": "79acf520821d46e84959cffe38fd2f19",
+    "semantic_hash": "79acf520821d46e84959cffe38fd2f19"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/20260525-002216_clawd_after_flash.png": {
+    "mtime": 1779661338.0376644,
+    "ast_hash": "b7bb42450ef443c96b88efe64465f7cc",
+    "semantic_hash": "b7bb42450ef443c96b88efe64465f7cc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/amoled_18/bluetooth.png": {
+    "mtime": 1779616364.8943355,
+    "ast_hash": "0e7f792baae1aa1bc222134b1942740e",
+    "semantic_hash": "0e7f792baae1aa1bc222134b1942740e"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/amoled_18/splash.png": {
+    "mtime": 1779616364.894427,
+    "ast_hash": "3c89ac4e4bd0f8c2724846222e95d7fe",
+    "semantic_hash": "3c89ac4e4bd0f8c2724846222e95d7fe"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/screenshots/amoled_18/usage.png": {
+    "mtime": 1779616364.8945367,
+    "ast_hash": "120d389b758d4d446bd88c56dd23fadc",
+    "semantic_hash": "120d389b758d4d446bd88c56dd23fadc"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/logo_80.png": {
+    "mtime": 1779616364.8860168,
+    "ast_hash": "14c3785dcf4e86396b0457170a647847",
+    "semantic_hash": "14c3785dcf4e86396b0457170a647847"
+  },
+  "/Users/saschakrinke/Documents/JAC Entwicklung/clawdmeter/Clawdmeter/assets/Claude Code Logo.png": {
+    "mtime": 1779616364.8770654,
+    "ast_hash": "7b731544088d8e651f5c67e9f2a83286",
+    "semantic_hash": "7b731544088d8e651f5c67e9f2a83286"
+  }
+}

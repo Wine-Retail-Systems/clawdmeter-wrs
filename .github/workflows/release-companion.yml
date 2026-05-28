@@ -1,0 +1,186 @@
+# Build- und Release-Pipeline für die Clawdmeter Companion-App.
+#
+# Trigger:
+#   * Tag wie v* → Vollrelease mit Signing/Notarization (macOS) und unsigned MSI (Windows)
+#   * workflow_dispatch → manueller Smoketest-Build pro Plattform
+#
+# Erwartet folgende Repository-Secrets:
+#   APPLE_CERTIFICATE              .p12 (base64) — Developer-ID Application
+#   APPLE_CERTIFICATE_PASSWORD     Passwort für das .p12
+#   APPLE_SIGNING_IDENTITY         z. B. "Developer ID Application: Jacques Krinke (TEAMID)"
+#   APPLE_ID                       Apple-ID-E-Mail
+#   APPLE_PASSWORD                 App-spezifisches Passwort
+#   APPLE_TEAM_ID                  10-stellige Team-ID
+#   TAURI_SIGNING_PRIVATE_KEY      Tauri-Updater-Privatkey (Phase 8)
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+#   GITHUB_TOKEN                   automatisch verfügbar
+
+name: release-companion
+
+on:
+  push:
+    tags:
+      - 'companion-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-daemon-bundles:
+    name: Bundle daemon (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            artifact: clawdmeter-daemon-macos-arm64
+          - os: windows-latest
+            artifact: clawdmeter-daemon-win-x64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build daemon bundle
+        run: python tools/build_daemon_bundle.py --skip-smoke
+
+      - name: Upload daemon binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: daemon-${{ matrix.artifact }}
+          path: companion/resources/daemon/${{ matrix.artifact }}
+          if-no-files-found: error
+
+  build-firmware:
+    name: Build firmware (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [wine-216, standard-216, standard-180]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Build ${{ matrix.env }}
+        run: pio run -d firmware -e ${{ matrix.env }}
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.env }}
+          # Wir laden die Factory-Variante hoch (Bootloader + Partitions + App
+          # gemergt). Die Companion-App flasht damit an Offset 0x0 — siehe
+          # tools/copy_firmware_to_companion.py.
+          path: firmware/.pio/build/${{ matrix.env }}/firmware.factory.bin
+          if-no-files-found: error
+
+  build-companion:
+    name: Build companion (${{ matrix.os }})
+    needs: [build-daemon-bundles, build-firmware]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            target: aarch64-apple-darwin
+            artifact_glob: 'companion/src-tauri/target/release/bundle/dmg/*.dmg'
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_glob: 'companion/src-tauri/target/release/bundle/msi/*.msi'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull daemon binary (macOS arm64)
+        if: matrix.os == 'macos-14'
+        uses: actions/download-artifact@v4
+        with:
+          name: daemon-clawdmeter-daemon-macos-arm64
+          path: companion/resources/daemon
+
+      - name: Pull daemon binary (Windows x64)
+        if: matrix.os == 'windows-latest'
+        uses: actions/download-artifact@v4
+        with:
+          name: daemon-clawdmeter-daemon-win-x64.exe
+          path: companion/resources/daemon
+
+      - name: Pull firmware binaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: firmware-*
+          path: companion/resources/firmware
+          merge-multiple: false
+
+      - name: Flatten firmware directory
+        shell: bash
+        run: |
+          set -e
+          cd companion/resources/firmware
+          for d in firmware-*; do
+            env="${d#firmware-}"
+            mv "$d/firmware.factory.bin" "${env}.bin"
+            rmdir "$d"
+          done
+          ls -la
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Tauri System-Deps (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install JS deps
+        working-directory: companion
+        run: npm ci
+
+      - name: Build (signed on macOS, unsigned on Windows)
+        working-directory: companion
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npx @tauri-apps/cli build --target ${{ matrix.target }}
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-${{ matrix.os }}
+          path: ${{ matrix.artifact_glob }}
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: build-companion
+    if: startsWith(github.ref, 'refs/tags/companion-v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: List artifacts
+        run: find artifacts -type f
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/companion-macos-14/*
+            artifacts/companion-windows-latest/*
+          generate_release_notes: true

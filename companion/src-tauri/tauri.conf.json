@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Clawdmeter",
+  "version": "0.1.0",
+  "identifier": "de.jacques.clawdmeter.companion",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Clawdmeter",
+        "width": 880,
+        "height": 700,
+        "minWidth": 720,
+        "minHeight": 540,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    },
+    "trayIcon": {
+      "iconPath": "icons/tray-ok.png",
+      "iconAsTemplate": true,
+      "menuOnLeftClick": false
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [
+      "../resources/firmware/*.bin",
+      "../resources/daemon/clawdmeter-daemon-*"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "Clawdmeter Companion",
+    "longDescription": "Onboarding, Flashen und Daemon-Lifecycle für das Clawdmeter-Desktop-Gerät.",
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "11.0",
+      "entitlements": "macos/entitlements.plist"
+    },
+    "windows": {
+      "wix": {
+        "language": "de-DE"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/jacques-de/clawdmeter/releases/latest/download/latest.json"
+      ],
+      "dialog": true,
+      "pubkey": "REPLACE_WITH_TAURI_PUBKEY_AT_PHASE_8"
+    }
+  }
+}
