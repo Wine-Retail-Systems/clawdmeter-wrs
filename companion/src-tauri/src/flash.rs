@@ -120,9 +120,11 @@ fn do_flash(
 ) -> Result<(), String> {
     use espflash::{
         connection::reset::{ResetAfterOperation, ResetBeforeOperation},
+        elf::RomSegment,
         flasher::{Flasher, ProgressCallbacks},
         targets::Chip,
     };
+    use std::borrow::Cow;
 
     // Wir öffnen den seriellen Port mit 115200 — espflash handelt das
     // Hochsetzen auf 460800 nach dem Handshake selbst.
@@ -200,24 +202,37 @@ fn do_flash(
         cur: Arc::new(Mutex::new(0)),
     };
 
-    // Zwei-Chunk-Write: alles VOR der NVS-Partition an 0x0, alles
+    // Zwei-Segment-Write: alles VOR der NVS-Partition an 0x0, alles
     // DANACH ab `NVS_END`. Auf einem frisch ausgepackten Gerät ist die
     // NVS-Region ohnehin 0xFF (= erased); wir lassen sie schlicht in
     // Ruhe. Bei einem Re-Flash bleibt das gespeicherte BLE-Bonding so
     // erhalten und macOS muss sich nicht neu pairen.
+    //
+    // WICHTIG: Beide Segmente MÜSSEN über einen einzigen
+    // `write_bins_to_flash`-Aufruf laufen. `write_bin_to_flash` ruft
+    // intern `target.finish(connection, reboot=true)` auf und rebootet
+    // damit den Chip aus dem Stub heraus — ein zweiter Aufruf liefe
+    // gegen einen normal gebooteten ESP32 und failt mit
+    // "Communication error while flashing device".
     if data.len() <= NVS_START {
         return Err(format!(
             "Image kleiner als NVS-Start (0x{NVS_START:x}) — Layout unerwartet"
         ));
     }
-    flasher
-        .write_bin_to_flash(0x0, &data[..NVS_START], Some(&mut cb))
-        .map_err(|e| format!("Flash-Write (Bootloader/Partitions): {e}"))?;
+    let mut segments: Vec<RomSegment> = Vec::with_capacity(2);
+    segments.push(RomSegment {
+        addr: 0,
+        data: Cow::Borrowed(&data[..NVS_START]),
+    });
     if data.len() > NVS_END {
-        flasher
-            .write_bin_to_flash(NVS_END as u32, &data[NVS_END..], Some(&mut cb))
-            .map_err(|e| format!("Flash-Write (App): {e}"))?;
+        segments.push(RomSegment {
+            addr: NVS_END as u32,
+            data: Cow::Borrowed(&data[NVS_END..]),
+        });
     }
+    flasher
+        .write_bins_to_flash(&segments, Some(&mut cb))
+        .map_err(|e| format!("Flash-Write: {e}"))?;
 
     Ok(())
 }

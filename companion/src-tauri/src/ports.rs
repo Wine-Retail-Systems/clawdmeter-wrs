@@ -40,6 +40,29 @@ pub fn list_serial_ports() -> Result<Vec<SerialPortInfo>, String> {
             is_esp32s3,
         });
     }
+
+    // macOS legt jedes USB-Serial-Gerät doppelt an: /dev/cu.X (call-up,
+    // non-blocking — zum Flashen) und /dev/tty.X (incoming, blockiert
+    // auf DCD). Nur cu.* ist zum Flashen brauchbar. Wenn beide Varianten
+    // desselben Geräts vorhanden sind, werfen wir tty.* raus, damit die
+    // Liste nicht doppelt erscheint und der Nutzer nicht versehentlich
+    // den blockierenden tty-Node wählt.
+    #[cfg(target_os = "macos")]
+    {
+        use std::collections::HashSet;
+        let cu_suffixes: HashSet<String> = out
+            .iter()
+            .filter_map(|p| p.path.strip_prefix("/dev/cu.").map(String::from))
+            .collect();
+        out.retain(|p| {
+            if let Some(suffix) = p.path.strip_prefix("/dev/tty.") {
+                !cu_suffixes.contains(suffix)
+            } else {
+                true
+            }
+        });
+    }
+
     // ESP32-S3 zuerst, dann der Rest — UI kann die Standardauswahl direkt
     // übernehmen.
     out.sort_by(|a, b| b.is_esp32s3.cmp(&a.is_esp32s3));
