@@ -3,7 +3,12 @@
 # the jacques.de Wine-Edition build. The art is described as a 20×20 logical
 # grid which is then nearest-neighbour scaled 4× to 80×80 so it shares the
 # blocky pixel-art language of the splash sprites.
+#
+# Optional second output: with `--png <path> [--png-size N]` the same grid is
+# also rendered as a high-resolution PNG (default 1024×1024) for the Tauri
+# companion-app icon. Single source of truth for the wine-glass artwork.
 
+import argparse
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -119,5 +124,40 @@ def main():
     print(f"  wrote {out_path}  ({W}×{H}, {len(all_bytes)} bytes)")
 
 
+def render_png(png_path, png_size, padding_pct):
+    from PIL import Image
+
+    # Reserve a transparent margin so the icon sits nicely in the macOS dock.
+    pad = int(round(png_size * padding_pct))
+    inner = png_size - 2 * pad
+    cell = inner // W_LOGICAL
+    inner = cell * W_LOGICAL  # snap to integer cell pitch for crisp NN scaling
+    origin = (png_size - inner) // 2
+
+    img = Image.new("RGBA", (png_size, png_size), (0, 0, 0, 0))
+    px = img.load()
+    for ly in range(H_LOGICAL):
+        for lx in range(W_LOGICAL):
+            r, g, b, a = lookup(ART[ly][lx])
+            if a == 0:
+                continue
+            x0 = origin + lx * cell
+            y0 = origin + ly * cell
+            for dy in range(cell):
+                for dx in range(cell):
+                    px[x0 + dx, y0 + dy] = (r, g, b, a)
+
+    os.makedirs(os.path.dirname(os.path.abspath(png_path)), exist_ok=True)
+    img.save(png_path, "PNG")
+    print(f"  wrote {os.path.abspath(png_path)}  ({png_size}×{png_size} PNG, cell={cell}px)")
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Build wine-glass logo (firmware header + optional PNG).")
+    parser.add_argument("--png", metavar="PATH", help="Also render the logo as PNG at PATH.")
+    parser.add_argument("--png-size", type=int, default=1024, help="PNG edge length in pixels (default 1024).")
+    parser.add_argument("--png-padding", type=float, default=0.08, help="Transparent margin as fraction of edge (default 0.08).")
+    args = parser.parse_args()
     main()
+    if args.png:
+        render_png(args.png, args.png_size, args.png_padding)
