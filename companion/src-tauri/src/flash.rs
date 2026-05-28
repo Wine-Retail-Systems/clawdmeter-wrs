@@ -29,14 +29,24 @@ fn firmware_path(app: &AppHandle, board: &str) -> Result<PathBuf, String> {
         return Err(format!("Unbekanntes Board: {board}"));
     }
     // ``{board}.bin`` ist die ``firmware.factory.bin`` aus PlatformIO —
-    // gemergtes Image (Bootloader @ 0x0 + Partitions @ 0x8000 + App @ 0x10000),
-    // flashbar als single-blob an Offset 0x0. Siehe
-    // ``tools/copy_firmware_to_companion.py``.
+    // gemergtes Image (Bootloader @ 0x0 + Partitions @ 0x8000 +
+    // boot_app0 @ 0xe000 + App @ 0x10000). Wir flashen es in zwei
+    // Chunks (0x0..NVS_START und NVS_END..end), damit die NVS-Partition
+    // (0x9000..0xe000, 20 KB) bei einem Re-Flash NICHT überschrieben
+    // wird. Dort liegen BLE-Bonding-Schlüssel; sie zu killen führt zu
+    // CBError Code 14 „Peer removed pairing information" beim nächsten
+    // Connect von macOS, weil dessen Bond-Eintrag dann inkonsistent
+    // wird. Siehe ``tools/copy_firmware_to_companion.py``.
     let rel = format!("resources/firmware/{board}.bin");
     app.path()
         .resolve(&rel, tauri::path::BaseDirectory::Resource)
         .map_err(|e| format!("Firmware {rel} nicht gefunden: {e}"))
 }
+
+/// Partitions-Layout. Muss mit `firmware/partitions.csv` übereinstimmen.
+/// Falls die NVS-Größe je geändert wird, hier mit-anpassen.
+const NVS_START: usize = 0x9000;
+const NVS_END: usize = 0xe000;
 
 #[tauri::command]
 pub async fn flash_firmware(
@@ -190,9 +200,24 @@ fn do_flash(
         cur: Arc::new(Mutex::new(0)),
     };
 
+    // Zwei-Chunk-Write: alles VOR der NVS-Partition an 0x0, alles
+    // DANACH ab `NVS_END`. Auf einem frisch ausgepackten Gerät ist die
+    // NVS-Region ohnehin 0xFF (= erased); wir lassen sie schlicht in
+    // Ruhe. Bei einem Re-Flash bleibt das gespeicherte BLE-Bonding so
+    // erhalten und macOS muss sich nicht neu pairen.
+    if data.len() <= NVS_START {
+        return Err(format!(
+            "Image kleiner als NVS-Start (0x{NVS_START:x}) — Layout unerwartet"
+        ));
+    }
     flasher
-        .write_bin_to_flash(0x0, &data, Some(&mut cb))
-        .map_err(|e| format!("Flash-Write: {e}"))?;
+        .write_bin_to_flash(0x0, &data[..NVS_START], Some(&mut cb))
+        .map_err(|e| format!("Flash-Write (Bootloader/Partitions): {e}"))?;
+    if data.len() > NVS_END {
+        flasher
+            .write_bin_to_flash(NVS_END as u32, &data[NVS_END..], Some(&mut cb))
+            .map_err(|e| format!("Flash-Write (App): {e}"))?;
+    }
 
     Ok(())
 }

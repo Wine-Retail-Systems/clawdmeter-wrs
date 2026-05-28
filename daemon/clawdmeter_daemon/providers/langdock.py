@@ -2,27 +2,30 @@
 
 Langdock has no realtime usage endpoint; we POST to /export/users, follow the
 signed downloadUrl in the response, and aggregate the CSV for the current
-calendar month. The /export/users endpoint covers all three workspace shapes
-in one call:
+calendar month. Two distinct workspace shapes are observed in the wild:
 
-  * Pure BYOK     → token + per-million pricing columns are populated for
-                    every row. We compute EUR spend.
-  * Hybrid        → standard models (managed) and BYOK keys coexist in the
-                    same workspace (see docs.langdock.com/settings/models/
-                    adding-models). Some rows expose pricing, some don't.
-                    We still emit cost_budget — the spent number is the
-                    "BYOK-attributable" portion.
-  * Pure managed  → no pricing data at all. Fall back to a tokens_abs
-                    snapshot whose m1 is the workspace's message count for
-                    the month, since that's the only meaningful signal.
+  * Pure managed  → /export/users carries no token/cost columns at all (the
+                    pricing API is BYOK-only). We surface activity counts
+                    instead: messages_total + action_messages as the main
+                    number, with a donut breakdown of chat / workflows /
+                    assistants / projects. This is the jacques.de shape.
+  * BYOK / hybrid → token + per-million pricing columns are populated. We
+                    compute EUR spend as before. Untested against a live
+                    BYOK workspace post-refactor — guard rails are in place
+                    but the cost code path is forward-looking.
 
-CSV column names are NOT enumerated in the Langdock docs, so we look up each
-piece of data via a list of plausible aliases (`_first_match`). When the live
-test against jacques.de runs, real column names get logged once via
-`_log_unknown_columns` so we can tighten the list.
+`user_email` (optional config) filters to a single workspace member's row.
+Without it we sum every row in the org, which is rarely what you want — the
+setup wizard should prompt for it.
 
-See feature-documentation/providers/langdock.md for the full reverse-engineering
-notes. Polling cadence default is 10 minutes — anything tighter just wastes
+Two non-obvious wire-protocol facts the validator enforces but the docs
+don't spell out:
+  1. ISO-8601 datetimes MUST use the `Z` suffix; `+00:00` fails validation.
+  2. The request body uses nested `{date,timezone}` objects, not flat ISO
+     strings (matches docs.langdock.com).
+
+See feature-documentation/providers/langdock.md for the full schema reference.
+Polling cadence default is 10 minutes — anything tighter just wastes
 roundtrips since the export job itself takes ~30 s to materialize.
 """
 
@@ -58,7 +61,13 @@ PRICE_OUT_KEYS = (
 )
 COST_USD_KEYS = ("cost_usd", "total_cost_usd", "usd_cost")
 COST_EUR_KEYS = ("cost_eur", "total_cost_eur", "eur_cost")
-MESSAGE_KEYS = ("message_count", "messages", "messages_sent", "total_messages")
+# Real Langdock /export/users columns first; older guesses kept for forward-compat.
+MESSAGE_KEYS = ("messages_total", "message_count", "messages", "messages_sent", "total_messages")
+CHAT_MESSAGES_KEYS = ("messages_chat",)
+ASSISTANT_MESSAGES_KEYS = ("messages_assistants",)
+PROJECT_MESSAGES_KEYS = ("messages_projects",)
+ACTION_MESSAGES_KEYS = ("action_messages", "messages_actions")
+EMAIL_KEYS = ("email", "user_email")
 
 
 def _seconds_to_month_end() -> int:
@@ -68,13 +77,18 @@ def _seconds_to_month_end() -> int:
     return int((end - now).total_seconds())
 
 
+# Langdock's /export/* validator rejects `+00:00` offsets — only the `Z`
+# suffix matches its ISO-8601 regex. Stick to a fixed-shape strftime.
+_LANGDOCK_DT_FMT = "%Y-%m-%dT%H:%M:%S.000Z"
+
+
 def _month_start_iso() -> str:
     now = datetime.now(timezone.utc)
-    return datetime(now.year, now.month, 1, tzinfo=timezone.utc).isoformat()
+    return datetime(now.year, now.month, 1, tzinfo=timezone.utc).strftime(_LANGDOCK_DT_FMT)
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(timezone.utc).strftime(_LANGDOCK_DT_FMT)
 
 
 def _coerce_int(v: Any) -> int:
@@ -105,25 +119,57 @@ def _first_match(row_lc: dict[str, str], keys: tuple[str, ...]) -> str:
 
 
 class LangdockParseResult:
-    __slots__ = ("spent_eur", "tokens", "messages", "rows_with_cost", "rows_total", "first_row_columns")
+    __slots__ = (
+        "spent_eur", "tokens", "messages", "rows_with_cost", "rows_total",
+        "first_row_columns", "chat", "assistants", "projects", "actions",
+        "rows_matched",
+    )
 
     def __init__(self) -> None:
         self.spent_eur: float = 0.0
         self.tokens: int = 0
         self.messages: int = 0
+        self.chat: int = 0
+        self.assistants: int = 0
+        self.projects: int = 0
+        self.actions: int = 0
         self.rows_with_cost: int = 0
         self.rows_total: int = 0
+        self.rows_matched: int = 0   # rows actually counted (after email filter)
         self.first_row_columns: list[str] = []
 
     @property
     def mode(self) -> str:
-        if self.rows_total == 0:
+        if self.rows_matched == 0:
             return "empty"
         if self.rows_with_cost == 0:
             return "managed"
-        if self.rows_with_cost == self.rows_total:
+        if self.rows_with_cost == self.rows_matched:
             return "BYOK"
         return "hybrid"
+
+    @property
+    def total_activity(self) -> int:
+        """messages_total covers chat+assistants+projects; action_messages is
+        a disjoint workflow/tool-call count, so they sum without overlap."""
+        return self.messages + self.actions
+
+    def shares(self) -> list[dict]:
+        total = self.total_activity
+        if total <= 0:
+            return []
+        breakdown = [
+            ("Workfl.", self.actions),
+            ("Chat", self.chat),
+            ("Projekt", self.projects),
+            ("Assist.", self.assistants),
+        ]
+        out = []
+        for slug, count in breakdown:
+            if count <= 0:
+                continue
+            out.append({"slug": slug, "pct": round(100 * count / total)})
+        return out
 
 
 class LangdockProvider(ProviderBase):
@@ -180,8 +226,12 @@ class LangdockProvider(ProviderBase):
             self.log(f"Export fetch failed: {e}")
             return self._stale_snapshot(budget, currency)
 
-        result = self._parse_csv(csv_text, usd_to_eur)
+        user_email = str(self.cfg.get("user_email", "")).strip().lower()
+        result = self._parse_csv(csv_text, usd_to_eur, user_email)
         self._log_unknown_columns_once(result.first_row_columns)
+        if user_email and result.rows_matched == 0:
+            self.log(f"user_email={user_email!r} not found in /export/users — falling back to org-wide aggregation")
+            result = self._parse_csv(csv_text, usd_to_eur, "")
         self._update_burn_state(result.spent_eur, result.messages)
 
         return self._snapshot_from(result, budget, currency)
@@ -200,7 +250,7 @@ class LangdockProvider(ProviderBase):
         flat = payload.get("downloadUrl") or payload.get("url")
         return flat if isinstance(flat, str) and flat else None
 
-    def _parse_csv(self, text: str, usd_to_eur: float) -> LangdockParseResult:
+    def _parse_csv(self, text: str, usd_to_eur: float, user_email: str = "") -> LangdockParseResult:
         result = LangdockParseResult()
         reader = csv.DictReader(io.StringIO(text))
         spent_usd = 0.0
@@ -211,10 +261,20 @@ class LangdockProvider(ProviderBase):
                 result.first_row_columns = list(row_lc.keys())
             result.rows_total += 1
 
+            if user_email:
+                row_email = _first_match(row_lc, EMAIL_KEYS).lower()
+                if row_email != user_email:
+                    continue
+            result.rows_matched += 1
+
             t_in = _coerce_int(_first_match(row_lc, TOKEN_IN_KEYS))
             t_out = _coerce_int(_first_match(row_lc, TOKEN_OUT_KEYS))
             result.tokens += t_in + t_out
             result.messages += _coerce_int(_first_match(row_lc, MESSAGE_KEYS))
+            result.chat += _coerce_int(_first_match(row_lc, CHAT_MESSAGES_KEYS))
+            result.assistants += _coerce_int(_first_match(row_lc, ASSISTANT_MESSAGES_KEYS))
+            result.projects += _coerce_int(_first_match(row_lc, PROJECT_MESSAGES_KEYS))
+            result.actions += _coerce_int(_first_match(row_lc, ACTION_MESSAGES_KEYS))
 
             in_price = _coerce_float(_first_match(row_lc, PRICE_IN_KEYS))
             out_price = _coerce_float(_first_match(row_lc, PRICE_OUT_KEYS))
@@ -243,24 +303,33 @@ class LangdockProvider(ProviderBase):
         return result
 
     def _snapshot_from(self, result: LangdockParseResult, budget: float, currency: str) -> Snapshot:
-        # Pure-managed workspaces with zero pricing data emit tokens_abs so
-        # the user at least sees their monthly message count; everything else
-        # uses cost_budget (BYOK + hybrid).
+        # Pure-managed workspaces with zero pricing data emit tokens_abs. The
+        # main number is the user's combined activity (chat+assistants+projects
+        # rolled into messages_total, plus the disjoint workflow/action count);
+        # shares break it down into Workflow / Chat / Projekt / Assistent so
+        # the donut tells the "what kind of activity" story.
         if result.mode == "managed" and result.spent_eur == 0:
-            note = self.cfg.display_note or "managed"
+            note = self.cfg.display_note or "Aktivität"
             return Snapshot(
                 slot_id=self.slot_id,
                 display_name=self.cfg.display_name or "Langdock",
                 note=note[:16],
                 kind=KIND_TOKENS_ABS,
-                m1=float(result.messages),
+                m1=float(result.total_activity),
                 m2=0.0,
                 m3=None,
                 r1=0,
                 r2=_seconds_to_month_end(),
                 status="ok",
                 ok=True,
-                extra={"mode": result.mode, "rows": result.rows_total},
+                extra={
+                    "mode": result.mode,
+                    "rows": result.rows_total,
+                    "rows_matched": result.rows_matched,
+                    "messages": result.messages,
+                    "actions": result.actions,
+                    "shares": result.shares(),
+                },
             )
 
         note = self.cfg.display_note or {"BYOK": "BYOK", "hybrid": "hybrid", "empty": "managed"}.get(result.mode, "")
@@ -327,18 +396,29 @@ class LangdockProvider(ProviderBase):
         self._last_seen_at = time.time()
 
     def _log_unknown_columns_once(self, columns: list[str]) -> None:
-        """One-shot diagnostic on the first successful poll: print every CSV
-        column we received that didn't match any of our alias lists. Makes
-        the first live test against a real workspace self-documenting."""
+        """One-shot forward-compat probe: warn about CSV columns that look
+        usage-shaped (token/cost/message/price) but didn't match any alias
+        list. Metadata columns (period_*, org_id, *_rank, ...) are expected
+        and ignored. If Langdock ships a new pricing column we want to know."""
         if self._logged_columns_once or not columns:
             return
         self._logged_columns_once = True
         known: set[str] = set()
         for group in (TOKEN_IN_KEYS, TOKEN_OUT_KEYS, PRICE_IN_KEYS, PRICE_OUT_KEYS,
-                      COST_USD_KEYS, COST_EUR_KEYS, MESSAGE_KEYS):
+                      COST_USD_KEYS, COST_EUR_KEYS, MESSAGE_KEYS,
+                      CHAT_MESSAGES_KEYS, ASSISTANT_MESSAGES_KEYS,
+                      PROJECT_MESSAGES_KEYS, ACTION_MESSAGES_KEYS, EMAIL_KEYS):
             known.update(group)
-        unmapped = [c for c in columns if c not in known]
-        self.log(f"CSV columns: {len(columns)} total, unmapped={unmapped}")
+        # Only flag truly new pricing/token signals — message-derived rank
+        # and aggregate columns (messages_*_rank, *_to_messages, …) are
+        # known noise we deliberately don't aggregate.
+        pricing_hints = ("token", "cost", "price", "spend", "billed")
+        suspicious = [
+            c for c in columns
+            if c not in known and any(h in c for h in pricing_hints)
+        ]
+        if suspicious:
+            self.log(f"Unmapped usage-shaped CSV columns (may indicate new schema): {suspicious}")
 
 
 register("langdock", LangdockProvider)

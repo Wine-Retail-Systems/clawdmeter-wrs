@@ -109,6 +109,24 @@ Args: `{"id": "...", "fields": {...}}`. Schreibt einen Provider-Eintrag in
 `{"saved": false, "reason": "..."}`, weil die Setup-Wizard-Logik noch
 interaktiv ist und auf Headless umgebaut wird.
 
+### `secret-write`
+
+Args: `{"key": "LANGDOCK_API_KEY", "value": "lk_..."}`.
+
+Persistiert einen API-Key/Secret in `~/.config/clawdmeter/secrets.env`
+(chmod 600). `value=""` löscht den Eintrag. Zusätzlich wird `os.environ[key]`
+im laufenden Daemon-Prozess gesetzt, damit der Polling-Loop ohne Neustart
+greift; anschließend wird `reload-config` ausgelöst.
+
+Response-`result`:
+
+```json
+{ "saved": true, "path": "~/.config/clawdmeter/secrets.env", "masked": "lk_…1234" }
+```
+
+Bei Fehler: `{ "saved": false, "reason": "..." }` — Gründe sind „key fehlt"
+oder Schreibfehler (z. B. Berechtigungen).
+
 ### `list-providers`
 
 Antwort: `{ "providers": [{"slot_id": "...", "kind": "...", "poll_seconds": 60}, ...] }`.

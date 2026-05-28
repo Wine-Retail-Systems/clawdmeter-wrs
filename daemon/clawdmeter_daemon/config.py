@@ -82,6 +82,10 @@ monthly_budget_eur = 0
 # returns pricing in USD per 1M tokens which we convert at usd_to_eur.
 currency = "EUR"
 usd_to_eur = 0.92
+# Optional email filter. /export/users returns one row per workspace member;
+# without this filter the daemon sums the whole org. Set this to your login
+# email to scope the slot to your personal usage.
+# user_email = "you@example.com"
 
 # ---- OpenCode (sst/opencode local CLI) ----
 [[provider]]

@@ -149,6 +149,16 @@ export async function saveProvider(
   await invoke("provider_save", { id, fields });
 }
 
+/**
+ * Schreibt einen API-Key in die Daemon-eigene `secrets.env`. Der Wert geht
+ * NICHT durch config.toml und wird im laufenden Daemon-Prozess live
+ * übernommen. Leerer `value` löscht den Eintrag.
+ */
+export async function saveSecret(key: string, value: string): Promise<void> {
+  if (MOCK) return;
+  await invoke("provider_save_secret", { key, value });
+}
+
 // ---------- BLE ----------
 
 export async function scanBleDevices(timeoutMs: number): Promise<BleDevice[]> {

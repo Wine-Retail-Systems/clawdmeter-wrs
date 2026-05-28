@@ -49,6 +49,7 @@ pub fn run() {
             // Provider-Setup (über Daemon-IPC)
             ipc::provider_detect,
             ipc::provider_save,
+            ipc::provider_save_secret,
             // BLE
             ble_scan::ble_scan,
             // Bug-Report

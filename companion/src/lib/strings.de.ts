@@ -63,9 +63,24 @@ export const STRINGS = {
     next: "Weiter",
     back: "Zurück",
     save: "Speichern",
+    skip: "Überspringen",
     detecting: "Erkenne vorhandene Anmeldedaten …",
     detected: "Anmeldedaten erkannt",
     notDetected: "Keine Anmeldedaten gefunden",
+    langdock: {
+      apiKeyLabel: "Langdock API-Key",
+      apiKeyPlaceholder: "lk_…",
+      apiKeyHelp:
+        "Bekommst du in app.langdock.com → Settings → API Keys (Admin-Rolle nötig).",
+      apiKeyExists: "Aktuell hinterlegt:",
+      apiKeyKeep: "Leer lassen, um den vorhandenen Wert zu behalten.",
+      emailLabel: "Deine Workspace-E-Mail (optional)",
+      emailPlaceholder: "you@firma.de",
+      emailHelp:
+        "Filtert die Aktivitätsanzeige auf einen User. Ohne Eintrag summiert der Slot alle Workspace-Mitglieder.",
+      saved: "Gespeichert",
+      saveError: "Speichern fehlgeschlagen",
+    },
   },
 
   pair: {

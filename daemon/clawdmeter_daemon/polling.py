@@ -123,6 +123,19 @@ async def _wait_any_event(events: list[asyncio.Event], timeout: float) -> None:
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
+def _is_stale_pairing_error(exc: BaseException) -> bool:
+    """CoreBluetooth Code 14 ("Peer removed pairing information") tritt auf,
+    wenn das Gerät via Re-Flash sein NVS verloren hat, der Mac aber den
+    alten Bond-Eintrag noch in Erinnerung hat. Wir matchen tolerant gegen
+    den Nachrichtentext, weil bleak die Error-Codes nicht typed exposed."""
+    msg = str(exc).lower()
+    return (
+        "code=14" in msg
+        or "peer removed pairing" in msg
+        or "pairing information" in msg
+    )
+
+
 async def connect_and_run(
     address: str,
     cfg: Config,
@@ -130,6 +143,7 @@ async def connect_and_run(
     stop_event: asyncio.Event,
     refresh_event: asyncio.Event,
     reload_event: asyncio.Event,
+    ipc_state: "ipc_server.ServerState | None" = None,
 ) -> bool:
     ble.log(f"Connecting to {address}...")
     client = BleakClient(address)
@@ -137,6 +151,20 @@ async def connect_and_run(
         await client.connect()
     except (BleakError, asyncio.TimeoutError) as e:
         ble.log(f"Connection failed: {e}")
+        if _is_stale_pairing_error(e):
+            ble.log(
+                "Hinweis: macOS hält einen veralteten Bond für dieses Gerät. "
+                "Bluetooth-Modul zurücksetzen (Option+Shift+Klick auf das "
+                "BT-Symbol → 'Bluetooth-Modul zurücksetzen') oder das Gerät "
+                "in Systemeinstellungen → Bluetooth vergessen. Danach baut "
+                "der Daemon das Bonding neu auf."
+            )
+            if ipc_state is not None:
+                await ipc_server.emit_event(
+                    ipc_state,
+                    "device-pairing-stale",
+                    {"address": address, "error": str(e)},
+                )
         return False
     if not client.is_connected:
         ble.log("Connection failed (no error but not connected)")
@@ -269,7 +297,8 @@ async def main_loop() -> None:
             ipc_state, "device-connecting", {"address": address}
         )
         ok = await connect_and_run(
-            address, cfg, states, stop_event, refresh_event, reload_event
+            address, cfg, states, stop_event, refresh_event, reload_event,
+            ipc_state=ipc_state,
         )
         await ipc_server.emit_event(
             ipc_state, "device-disconnected", {"address": address, "clean": ok}

@@ -21,6 +21,7 @@ Aktuell unterstützte Commands:
 * ``shutdown``         — Daemon stoppen
 * ``provider-detect``  — Auto-Detect-Hinweise pro Provider
 * ``provider-save``    — Provider-Eintrag in config.toml schreiben
+* ``secret-write``     — Wert in secrets.env persistieren (für API-Keys)
 * ``list-providers``   — alle aktuell konfigurierten Provider
 * ``subscribe-events`` — diese Verbindung erhält künftige Events
 """
@@ -239,6 +240,47 @@ async def _provider_save(
     written = cfg_mod.write_config_dict(data)
     state.reload_event.set()
     return {"saved": True, "path": str(written)}
+
+
+@command("secret-write")
+async def _secret_write(
+    state: ServerState, args: dict[str, Any]
+) -> dict[str, Any]:
+    """Persistiert einen API-Key/Secret in ``secrets.env``.
+
+    Args:
+        key   — Env-Var-Name (z. B. ``LANGDOCK_API_KEY``)
+        value — Klartext-Wert; leer = Eintrag löschen.
+
+    Side-effects:
+      * Schreibt ``~/.config/clawdmeter/secrets.env`` (chmod 600).
+      * Setzt zusätzlich ``os.environ[key]``, damit der laufende
+        Daemon-Prozess den Wert sofort sieht (sonst greift er erst nach
+        einem Neustart).
+      * Triggert ``reload-config``, damit der Polling-Loop den Provider
+        bei nächster Chance frisch initialisiert.
+    """
+    from . import secrets as secrets_mod
+
+    key = str(args.get("key") or "").strip()
+    value = str(args.get("value") or "")
+    if not key:
+        return {"saved": False, "reason": "key fehlt"}
+
+    try:
+        path = secrets_mod.write(key, value)
+    except OSError as e:
+        return {"saved": False, "reason": f"secrets.env nicht schreibbar: {e}"}
+
+    # In-Process-Env aktualisieren, sonst sieht der Polling-Loop den neuen
+    # Wert erst nach Daemon-Restart (load_into_env läuft nur beim Start).
+    if value:
+        os.environ[key] = value
+    else:
+        os.environ.pop(key, None)
+
+    state.reload_event.set()
+    return {"saved": True, "path": str(path), "masked": secrets_mod.mask(value)}
 
 
 @command("list-providers")

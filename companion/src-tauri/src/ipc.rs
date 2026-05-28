@@ -156,3 +156,21 @@ pub async fn provider_save(
     .map(|_| ())
     .map_err(|e| e.to_string())
 }
+
+/// Schreibt einen API-Key/Secret in die Daemon-eigene `secrets.env`.
+/// Der Wert landet NICHT in `config.toml` und wird vom Daemon live in seinen
+/// `os.environ` übernommen — kein Neustart nötig. Leerer `value` löscht den
+/// Eintrag.
+#[tauri::command]
+pub async fn provider_save_secret(
+    key: String,
+    value: String,
+) -> Result<(), String> {
+    request(
+        "secret-write",
+        serde_json::json!({ "key": key, "value": value }),
+    )
+    .await
+    .map(|_| ())
+    .map_err(|e| e.to_string())
+}
