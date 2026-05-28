@@ -42,17 +42,20 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [
-      "../resources/firmware/*.bin",
-      "../resources/daemon/clawdmeter-daemon-*"
-    ],
+    "resources": {
+      "../resources/daemon/clawdmeter-daemon-macos-arm64": "resources/daemon/clawdmeter-daemon-macos-arm64",
+      "../resources/firmware/standard-216.bin": "resources/firmware/standard-216.bin",
+      "../resources/firmware/standard-180.bin": "resources/firmware/standard-180.bin",
+      "../resources/firmware/wine-216.bin": "resources/firmware/wine-216.bin"
+    },
     "category": "DeveloperTool",
     "shortDescription": "Clawdmeter Companion",
     "longDescription": "Onboarding, Flashen und Daemon-Lifecycle für das Clawdmeter-Desktop-Gerät.",
     "macOS": {
       "frameworks": [],
       "minimumSystemVersion": "11.0",
-      "entitlements": "macos/entitlements.plist"
+      "entitlements": "macos/entitlements.plist",
+      "infoPlist": "macos/Info.plist"
     },
     "windows": {
       "wix": {
