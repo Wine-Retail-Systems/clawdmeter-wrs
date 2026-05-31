@@ -43,7 +43,6 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "../resources/daemon/clawdmeter-daemon-macos-arm64": "resources/daemon/clawdmeter-daemon-macos-arm64",
       "../resources/firmware/standard-216.bin": "resources/firmware/standard-216.bin",
       "../resources/firmware/standard-180.bin": "resources/firmware/standard-180.bin",
       "../resources/firmware/wine-216.bin": "resources/firmware/wine-216.bin"
