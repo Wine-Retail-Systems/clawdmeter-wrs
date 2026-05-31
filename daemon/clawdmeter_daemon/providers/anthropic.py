@@ -144,10 +144,24 @@ class AnthropicProvider(ProviderBase):
                 return 0.0
 
         session_pct = pct(hdr("anthropic-ratelimit-unified-5h-utilization"))
-        weekly_pct = pct(hdr("anthropic-ratelimit-unified-7d-utilization"))
         session_reset_s = reset_seconds(hdr("anthropic-ratelimit-unified-5h-reset"))
-        weekly_reset_s = reset_seconds(hdr("anthropic-ratelimit-unified-7d-reset"))
         status = hdr("anthropic-ratelimit-unified-5h-status", "ok")
+
+        # Pro/Max Subscriptions haben zwei 7-Tage-Fenster: unified (alle Modelle)
+        # und Opus-spezifisch. Claude Code zeigt im /status das jeweils
+        # bindende Limit; bei Opus-lastiger Nutzung ist das fast immer die
+        # Opus-Quote. Wir spiegeln dieses Verhalten, indem wir das knappere
+        # der beiden Fenster anzeigen.
+        weekly_all_pct = pct(hdr("anthropic-ratelimit-unified-7d-utilization"))
+        weekly_all_reset_s = reset_seconds(hdr("anthropic-ratelimit-unified-7d-reset"))
+        weekly_opus_pct = pct(hdr("anthropic-ratelimit-unified-7d-opus-utilization"))
+        weekly_opus_reset_s = reset_seconds(hdr("anthropic-ratelimit-unified-7d-opus-reset"))
+        if weekly_opus_pct > weekly_all_pct:
+            weekly_pct = weekly_opus_pct
+            weekly_reset_s = weekly_opus_reset_s
+        else:
+            weekly_pct = weekly_all_pct
+            weekly_reset_s = weekly_all_reset_s
 
         pace = self._estimate_pace(session_pct, session_reset_s)
         regen = self._estimate_regen(session_pct)
