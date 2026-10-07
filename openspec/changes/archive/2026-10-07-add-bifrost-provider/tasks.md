@@ -48,3 +48,9 @@
 - [x] 8.1 `feature-documentation/providers/bifrost.md` anlegen (Endpunkt, Auth, Mapping, Familien, Grenzen, geprüfte Bifrost-Version) und `providers/opencode.md` löschen. Verifikation: Datei vorhanden, Links aus README funktionieren
 - [x] 8.2 `feature-documentation/multi-provider/*` (BLE-Beispielpayload, `config-toml.md`, `data-flow.md`, `kind-layouts.md` mit Segmentbalken) und `companion-app/*` aktualisieren. Verifikation: `grep -ri opencode feature-documentation` nur noch in `research/`
 - [x] 8.3 `README.md` (Provider-Tabelle, Screenshot), `PROGRESS.md`, `PRODUCT.md`, `CLAUDE.md`/`AGENTS.md`, `.claude/agents/ble-daemon-protocol-expert.md` anpassen; OpenCode-Screenshots aus `screenshots/` entfernen und den neuen Bifrost-Screenshot als `screenshots/bifrost.png` ablegen. Verifikation: `grep -rli opencode --exclude-dir=node_modules --exclude-dir=research --exclude-dir=openspec .` ohne Treffer außerhalb der Change-Artefakte
+
+## Archivvermerk (2026-10-07)
+
+Archiviert mit zwei offenen Tasks, mit Zustimmung des Nutzers:
+- 3.4: `clawdmeter doctor` mit gültigem Key nicht vorgeführt. Der Live-Poll gegen das Gateway (HTTP 200) ist über den laufenden Daemon belegt.
+- 6.2: Der Bifrost-Schritt im Setup-Wizard der Companion-App wurde nicht in der Oberfläche durchgeklickt. Der App-Build mit Bifrost-Daemon ist installiert und liefert den Screen.
