@@ -34,6 +34,8 @@ Der Adapter nutzt ausschließlich `/api/governance/virtual-keys/quota` mit dem V
 
 ### D2 Gemeinsamer Budget-Helfer `providers/_budget.py`
 Er enthält rein funktionale Bausteine ohne I/O: Reset-Dauer parsen (`30s`, `5m`, `1h`, `1d`, `1w`, `1M`, `1Q`), nächsten Reset berechnen, Pace aus Verbrauchsanteil gegen Fensteranteil, Status-Schwellen. `1M` und `1Q` rechnen in Kalendermonaten ab `last_reset`. Liegt der errechnete Reset in der Vergangenheit (verspäteter Reset im Gateway), wird so lange um eine Periode weitergezählt, bis er in der Zukunft liegt. Langdocks `_estimate_pace` wird auf den Helfer umgestellt; sein Verhalten bleibt gleich, weil es ein `1M`-Fenster ab Monatsanfang ist.
+
+*Nachtrag aus der Umsetzung:* Die Pace-Schwellen sind parametrisiert. Langdock behält seine bisherigen Stufen (±5/15/25 Prozentpunkte, per Äquivalenztest belegt). Bifrost nutzt feinere Stufen (±2/10/20) und misst gegen den tatsächlich verstrichenen Anteil des Reset-Fensters. Sonst ergäbe das Spec-Szenario (25 % Verbrauch nach 22,6 % des Monats) keine positive Pace.
 *Alternative:* Logik in `bifrost.py` duplizieren. Verworfen, weil Pace und Status bei zwei Kostenprovidern auseinanderlaufen würden.
 
 ### D3 Maßgebliches Budget = geringster Rest
@@ -62,6 +64,14 @@ Segmentpalette: eine Helligkeitsrampe aus `THEME_TEXT` (warmes Weiß) in abgestu
 
 ### D7 Sparkline-Strecke ersatzlos entfernen
 `spark[]`, `spark_set`, das Parsing von `sp`, das `lv_chart` in `tokens_abs`, die Zeile „vs. gestern", `extra["spark"]` in `to_payload()` und `correlate_backend_quota` entfallen. Der `tokens_abs`-Screen rückt den Donut nach oben. Das Feld `m3` bleibt im Protokoll, weil `cost_budget` und `tpm_rpm` es nutzen.
+
+### D8 Kopfzeile des Budget-Screens entzerren (nachträglich aufgenommen)
+Bei fünfstelligen Budgets überlagert das Pace-Dreieck den Text „von $15000", und überzogene Beträge (`$16500.00`) stoßen an „von". Das Problem bestand schon vorher, tritt beim Gateway-Budget aber immer auf. Die Pace wandert in die untere Zeile neben „N % Budget". Beträge ab 10.000 werden ohne Nachkommastellen und mit Tausenderpunkt angezeigt, darunter weiter mit zwei Nachkommastellen. Vom Nutzer am 2026-10-07 freigegeben.
+*Alternative:* kleinere Schrift für große Beträge. Verworfen, weil der Hauptwert aus Schreibtischdistanz lesbar bleiben soll.
+
+### D9 BLE-Empfang als Warteschlange (nachträglich aufgenommen)
+Beim Ende-zu-Ende-Test kam der Bifrost-Payload nie auf dem Gerät an, obwohl der Daemon ihn in jedem Zyklus sendete. Ursache: `ble.cpp` hält genau einen Empfangspuffer, den jedes `onWrite` überschreibt. Die Hauptschleife verarbeitet pro Durchlauf eine Nachricht. Dauert ein Durchlauf länger als der Sendeabstand von 80 ms, überschreibt der nächste Payload, meist der Zyklusende-Marker, den vorherigen. Danach verwirft die Firmware am Zyklusende alle nicht empfangenen Provider. Lösung: ein Ringpuffer mit 8 Einträgen zu je 512 Byte, gefüllt im NimBLE-Callback und in der Schleife vollständig geleert. Läuft er über, wird der älteste Eintrag verworfen und seriell geloggt. Vom Nutzer am 2026-10-07 freigegeben.
+*Alternative:* Sendeabstand im Daemon auf ca. 250 ms erhöhen. Verworfen: verschiebt die Grenze nur und verlängert jeden Zyklus.
 
 ## Risks / Trade-offs
 
