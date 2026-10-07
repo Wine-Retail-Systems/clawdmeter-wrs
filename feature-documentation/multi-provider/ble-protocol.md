@@ -1,6 +1,6 @@
 # BLE-Protokoll v2 — Multi-Provider
 
-Stand 2026-05-24. Ablöst das alte Single-Provider-Schema mit `s/sr/w/wr/st/ok`.
+Stand 2026-10-07. Ablöst das alte Single-Provider-Schema mit `s/sr/w/wr/st/ok`.
 
 > ⏸️ **Bedrock-Hinweis**: Der Bedrock-Adapter ist aktuell pausiert (siehe
 > [providers/bedrock.md](../providers/bedrock.md)). Die `bedrock-*`-Beispiele
@@ -33,6 +33,16 @@ N × Provider-Payload   (eine Zeile pro aktiver Provider-Slot)
 
 Zwischen den Writes liegt ein konstanter 80 ms-Delay — kürzer und NimBLE
 auf dem ESP32 verschluckt Pakete.
+
+Die Firmware puffert empfangene Writes in einem Ringpuffer mit 8 Einträgen
+à 512 Byte (`ble.cpp`, geschützt per `portMUX_TYPE`) und arbeitet pro
+Schleifendurchlauf alle wartenden Nachrichten ab. Vorher gab es nur einen
+Puffer: Dauerte ein Durchlauf länger als 80 ms, überschrieb der nächste
+Payload (meist `{"end":1}`) den vorherigen, und das EOC-Pruning löschte den
+verlorenen Provider. Läuft der Ringpuffer über, wird der älteste Eintrag
+verworfen und seriell `ble: rx overflow, dropped oldest` geloggt. Pro EOC
+meldet die Firmware seriell `rx: cycle N payloads`, das hilft bei der
+Fehlersuche ohne BLE-Sniffer.
 
 ## Provider-Payload
 
@@ -71,7 +81,7 @@ Beispiele für die vier Kinds — alle echte Bytes-Größen unter 220 B:
 
 {"p":"langdock","n":"Langdock","note":"BYOK","k":"cost_budget","m1":87.40,"m2":250.0,"r2":1209600,"pace":-1,"cur":"EUR","st":"ok","ok":true}
 
-{"p":"opencode","n":"OpenCode","note":"amazon-bedrock","k":"tokens_abs","m1":420000,"m2":52.3,"m3":380000,"r2":54000,"st":"ok","ok":true}
+{"p":"bifrost","n":"LLM Gateway","note":"sascha.krinke","k":"cost_budget","m1":3769.16,"m2":15000.0,"r2":2116800,"pace":1,"cur":"USD","sh":[{"slug":"Opus","pct":74},{"slug":"Sonnet","pct":26}],"st":"ok","ok":true}
 
 {"p":"bedrock-s45","n":"Bedrock","note":"Sonnet 4.5","k":"tpm_rpm","m1":42.0,"m2":18.5,"m3":12500000,"r2":2592000,"pace":2,"cur":"USD","st":"ok","ok":true}
 ```

@@ -41,13 +41,17 @@ export type ProviderId =
   | "bedrock"
   | "codex"
   | "langdock"
-  | "opencode";
+  | "bifrost";
 
 export type ProviderDetectResult = {
   id: ProviderId;
   detected: boolean;
   source: string | null;
   notes: string | null;
+  /** Nur Bifrost: maskierter Key (nie Klartext). */
+  masked?: string | null;
+  /** Nur Bifrost: aus ANTHROPIC_BASE_URL abgeleitete Gateway-URL. */
+  base_url?: string | null;
 };
 
 export type BleDevice = {
@@ -145,6 +149,8 @@ export async function saveProvider(
   id: ProviderId,
   fields: Record<string, string>,
 ): Promise<void> {
+  // `fields.source = "claude-settings"` (nur Bifrost): Der Daemon übernimmt
+  // den erkannten Key selbst, der Klartext läuft nie durch die UI.
   if (MOCK) return;
   await invoke("provider_save", { id, fields });
 }

@@ -31,7 +31,6 @@ roundtrips since the export job itself takes ~30 s to materialize.
 
 from __future__ import annotations
 
-import calendar
 import csv
 import io
 import os
@@ -42,7 +41,7 @@ from typing import Any, Optional
 import httpx
 
 from ..config import ProviderConfig
-from . import register
+from . import _budget, register
 from .base import KIND_COST_BUDGET, KIND_TOKENS_ABS, ProviderBase, Snapshot
 
 API_BASE = "https://api.langdock.com"
@@ -71,10 +70,7 @@ EMAIL_KEYS = ("email", "user_email")
 
 
 def _seconds_to_month_end() -> int:
-    now = datetime.now(timezone.utc)
-    last_day = calendar.monthrange(now.year, now.month)[1]
-    end = datetime(now.year, now.month, last_day, 23, 59, 59, tzinfo=timezone.utc)
-    return int((end - now).total_seconds())
+    return _budget.seconds_to_month_end(datetime.now(timezone.utc))
 
 
 # Langdock's /export/* validator rejects `+00:00` offsets — only the `Z`
@@ -335,12 +331,7 @@ class LangdockProvider(ProviderBase):
         note = self.cfg.display_note or {"BYOK": "BYOK", "hybrid": "hybrid", "empty": "managed"}.get(result.mode, "")
         pace = self._estimate_pace(result.spent_eur, budget)
 
-        status = "ok"
-        if budget > 0:
-            if result.spent_eur >= budget:
-                status = "over-budget"
-            elif result.spent_eur >= 0.9 * budget:
-                status = "near-limit"
+        status = _budget.status_for(result.spent_eur, budget)
 
         return Snapshot(
             slot_id=self.slot_id,
@@ -374,21 +365,7 @@ class LangdockProvider(ProviderBase):
         )
 
     def _estimate_pace(self, spent: float, budget: float) -> Optional[int]:
-        if budget <= 0:
-            return None
-        now = datetime.now(timezone.utc)
-        days_in_month = calendar.monthrange(now.year, now.month)[1]
-        day_of_month = now.day + (now.hour / 24.0)
-        expected_pct = (day_of_month / days_in_month) * 100.0
-        actual_pct = (spent / budget) * 100.0
-        delta = actual_pct - expected_pct
-        if delta <= -25: return -3
-        if delta <= -15: return -2
-        if delta <= -5:  return -1
-        if delta < 5:    return 0
-        if delta < 15:   return 1
-        if delta < 25:   return 2
-        return 3
+        return _budget.month_pace(spent, budget, datetime.now(timezone.utc))
 
     def _update_burn_state(self, spent: float, messages: int) -> None:
         self._last_spent = spent

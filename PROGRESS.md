@@ -1,13 +1,13 @@
 # Clawdmeter — Entwicklungsfortschritt
 
-Stand: 2026-05-24. Lebende Datei — pro Meilenstein hier aktualisieren.
+Stand: 2026-10-07. Lebende Datei — pro Meilenstein hier aktualisieren.
 
-## Aktueller Meilenstein: Multi-Provider 2.0
+## Aktueller Meilenstein: Multi-Provider 2.1
 
-Vom reinen Anthropic-Claude-Monitor zum generischen LLM-Provider-Dashboard.
-Ziel: mehrere Provider-Familien (Anthropic, Codex, Langdock, OpenCode —
-plus AWS Bedrock als pausierter Adapter) parallel auf einem Gerät, opt-in
-pro Provider, mit pace + currency + regen als optionalen Metadaten.
+Weiterentwicklung des generischen LLM-Provider-Dashboards: Bifrost-Gateway-
+Integration mit Modell-Mix-Segmentierung, Sparkline-Entfernung aus
+`tokens_abs`, OpenCode-Adapter-Entfernung (BREAKING). Provider-Familie:
+Anthropic, Codex, Bifrost, Langdock — plus AWS Bedrock weiterhin pausiert.
 
 > **AWS Bedrock pausiert (Stand 2026-05-24)**: Adapter-Code ist im Repo,
 > wird aber vom Setup-Wizard nicht angeboten und vom Daemon nicht gepollt.
@@ -18,15 +18,16 @@ pro Provider, mit pace + currency + regen als optionalen Metadaten.
 
 ### Erledigt ✅
 
-- **Discovery-Phase** für Langdock, OpenCode, Bedrock + Referenz-Analyse von
+- **Discovery-Phase** für Langdock, Bifrost, Bedrock + Referenz-Analyse von
   CodexBar — vollständig in [feature-documentation/providers/](feature-documentation/providers/)
   und [feature-documentation/research/](feature-documentation/research/).
+  OpenCode-Discovery archiviert / entfernt.
 - **Daemon-Refactor** zum Plugin-System:
-  - Neues Package `daemon/clawdmeter_daemon/` mit `providers/` (anthropic,
-    codex, langdock, opencode, bedrock), `config.py` (TOML), `ble.py`
-    (Multi-Send + EOC-Marker), `polling.py` (Per-Provider TTL + Backend-
-    Quota-Korrelation), `setup_wizard.py` (Auto-Detect + interaktiv),
-    `cli.py` (`run`/`setup`/`doctor`/`config`).
+  - Package `daemon/clawdmeter_daemon/` mit `providers/` (anthropic,
+    codex, langdock, bifrost, bedrock), `config.py` (TOML), `ble.py`
+    (Multi-Send + EOC-Marker), `polling.py` (Per-Provider TTL), `setup_wizard.py`
+    (Auto-Detect + interaktiv), `cli.py` (`run`/`setup`/`doctor`/`config`).
+  - OpenCode-Adapter entfernt; Sparkline-Strecke aus Daemon+Firmware gelöscht.
   - Bestehende Anthropic-Logik 1:1 als `providers/anthropic.py` migriert.
   - Config-Schema unter `~/.config/clawdmeter/config.toml` mit `[[provider]]`-
     Blöcken; jedes Provider opt-in über `enabled = true`.
@@ -49,28 +50,22 @@ pro Provider, mit pace + currency + regen als optionalen Metadaten.
 
 ### In Arbeit 🔧
 
-- Feature-Dokumentation der neuen Architektur unter
-  `feature-documentation/multi-provider/`.
-- README komplett neu schreiben — Clawdmeter ist nun ein eigenständiges
-  Projekt, nicht mehr „a Claude usage monitor".
+- **Bifrost-Endgültige QA** mit echtem Gateway und virtuellen Keys.
+- **Firmware-Screenshot** des `cost_budget` mit Segmentbalken für README
+  (Layout-Werte für beide Display-Größen wird gerade noch angepasst).
 
 ### Offen 📋
 
-- **Provider-Adapter-Live-Tests** — die neuen aktiven Adapter (Codex,
-  Langdock, OpenCode) haben noch keinen Roundtrip gegen echte APIs gesehen.
+- **Provider-Adapter-Live-Tests** — die aktiven Adapter (Codex, Langdock,
+  Bifrost) sollten gegen echte APIs verifiziert werden.
   Erwartete Nacharbeit:
-  - Codex-`wham/usage`-Schema mit echtem Plus/Pro-Account verifizieren
-    (`limit_window_seconds`-Konstanten, Plan-Typ-Strings).
-  - Langdock-CSV-Spaltennamen via `_log_unknown_columns_once`-Output gegen
-    den jacques.de-Workspace nachziehen (Adapter ist auf `/export/users`
-    umgestellt, Request-Body + Response-Wrapper sind doc-konform, drei
-    Workspace-Modi BYOK/hybrid/managed werden unterschieden).
-  - OpenCode-DB-Schema bei nächstem Migrations-Drop neu prüfen.
+  - Codex-`wham/usage`-Schema mit echtem Plus/Pro-Account verifizieren.
+  - Langdock-CSV-Spaltennamen via jacques.de-Workspace prüfen
+    (drei Workspace-Modi BYOK/hybrid/managed Unterscheidung prüfen).
+  - Bifrost-Quota-Endpunkt gegen Live-Gateway mit mehreren Budgets testen.
 - **Bedrock-Reaktivierung (deferred)** — sobald ein Read-Only-IAM-User
   eingerichtet ist: `enabled = true`, `pip install boto3`, Quota-Namen-
   Lookup am echten Account verifizieren.
-- **Geräte-Foto + Screenshots** mit echtem Multi-Provider-Dashboard für die
-  README — sobald die Hardware läuft.
 - **Sleep/Idle-Verhalten** mit mehreren Screens validieren (heute springt
   der UI-Cycler nach Wake auf den ersten Provider zurück; das ist OK, aber
   ggf. „letzter aktiver Screen" merken wäre netter).
@@ -87,18 +82,18 @@ das obere CLAUDE.md.
 
 ## MVP-Definition (zum Abhaken)
 
-Der Clawdmeter 2.0 ist „MVP-ready", wenn:
+Der Clawdmeter 2.1 (Multi-Provider mit Bifrost) ist „Release-ready", wenn:
 
 - [x] Daemon kann ohne Config gestartet werden und schreibt Default-TOML.
 - [x] `clawdmeter-daemon setup` führt durch die aktiven Provider (Anthropic,
-      Codex, Langdock, OpenCode).
+      Codex, Bifrost, Langdock).
 - [x] Firmware compiliert für alle drei Envs (`wine-216`, `standard-216`,
       `standard-180`).
 - [x] Empty-State auf dem Gerät zeigt klare Anweisung wenn nichts konfiguriert.
+- [x] OpenCode-Adapter entfernt, Sparkline-Strecke aus Daemon+Firmware gelöscht.
+- [x] Bifrost-Provider mit Modell-Mix-Segmentierung dokumentiert + implementiert.
 - [x] README + feature-docs weisen klar auf den pausierten Bedrock-Adapter hin.
-- [x] feature-documentation hat einen multi-provider/ Block mit Datenfluss
-      und Kind-Layouts.
-- [ ] Anthropic-Adapter spielt 1:1 die alten Werte aus (Regression-Test
-      gegen einen Live-Account).
-- [ ] Mindestens ein zweiter aktiver Provider live verifiziert (OpenCode-
-      DB-Lesepfad ist am ehesten testbar — keine externen Credentials nötig).
+- [x] feature-documentation hat einen multi-provider/ Block mit Datenfluss,
+      Kind-Layouts (incl. segmentierter `cost_budget`), und BLE-Beispiel.
+- [ ] Bifrost-Adapter live gegen ein Gateway mit mehreren Budgets verifiziert.
+- [ ] Anthropic + ein zweiter Provider (Langdock/Bifrost/Codex) live verifiziert.

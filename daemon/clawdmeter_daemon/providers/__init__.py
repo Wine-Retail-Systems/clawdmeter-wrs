@@ -1,7 +1,7 @@
 """Provider plugin registry.
 
 Each adapter registers a factory keyed by `provider.id` (anthropic, codex,
-langdock, opencode, bedrock). The polling loop instantiates only the providers
+langdock, bifrost, bedrock). The polling loop instantiates only the providers
 that are enabled in the user's config — missing optional dependencies (boto3
 etc.) are imported lazily so a user without AWS can still run the daemon.
 """
@@ -41,7 +41,7 @@ def known_provider_ids() -> list[str]:
 from . import anthropic as _anthropic  # noqa: F401
 from . import codex as _codex  # noqa: F401
 from . import langdock as _langdock  # noqa: F401
-from . import opencode as _opencode  # noqa: F401
+from . import bifrost as _bifrost  # noqa: F401
 from . import bedrock as _bedrock  # noqa: F401
 
 __all__ = ["Provider", "Snapshot", "register", "create", "known_provider_ids"]

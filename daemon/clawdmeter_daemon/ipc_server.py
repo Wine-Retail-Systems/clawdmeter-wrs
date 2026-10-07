@@ -143,11 +143,9 @@ async def _provider_detect(
         env = args.get("env", "LANGDOCK_API_KEY")
         src = setup_wizard.detect_langdock_key(env)
         return _detect_result(pid, src)
-    if pid == "opencode":
-        db = setup_wizard.detect_opencode_db()
-        ver = setup_wizard.detect_opencode_version()
-        notes = f"CLI: {ver}" if ver else None
-        return _detect_result(pid, db, notes=notes)
+    if pid == "bifrost":
+        d = setup_wizard.detect_bifrost(args.get("env") or "BIFROST_VIRTUAL_KEY")
+        return {"id": pid, **d}
     if pid == "bedrock":
         ok, where = setup_wizard.detect_aws()
         return _detect_result(pid, where if ok else "")
@@ -175,7 +173,7 @@ async def _provider_save(
     """Headless-Variante des Setup-Wizards.
 
     Args:
-        id      — provider-Kind (anthropic/codex/langdock/opencode/bedrock)
+        id      — provider-Kind (anthropic/codex/langdock/bifrost/bedrock)
         fields  — Flat-Dict mit den Werten, die im Provider-Block landen
                   (enabled, poll_seconds, slot_id, display_name, …).
                   Wir mergen sie in den bestehenden Block oder legen einen
@@ -188,9 +186,40 @@ async def _provider_save(
     from . import paths as paths_mod
 
     pid = args.get("id", "")
-    fields = args.get("fields") or {}
-    if pid not in ("anthropic", "codex", "langdock", "opencode", "bedrock"):
+    fields = dict(args.get("fields") or {})
+    if pid not in ("anthropic", "codex", "langdock", "bifrost", "bedrock"):
         return {"saved": False, "reason": f"Unbekannte Provider-ID: {pid!r}"}
+
+    # Bifrost: ``fields.source`` steuert nur die Key-Übernahme und landet nie in
+    # config.toml. ``"claude-settings"`` kopiert den erkannten sk-bf-Token
+    # serverseitig nach secrets.env (der Klartext verlässt den Daemon nie).
+    masked_key = None
+    if pid == "bifrost":
+        from . import secrets as secrets_mod
+        from . import setup_wizard
+
+        source = fields.pop("source", None)
+        env_name = str(fields.get("api_key_env") or "BIFROST_VIRTUAL_KEY")
+        fields["api_key_env"] = env_name
+        if source == "claude-settings":
+            found = setup_wizard.find_claude_bifrost_key()
+            if not found:
+                return {"saved": False,
+                        "reason": "Kein sk-bf-Token in Umgebung oder ~/.claude/settings.json gefunden"}
+            try:
+                secrets_mod.write(env_name, found["token"])
+            except OSError as e:
+                return {"saved": False, "reason": f"secrets.env nicht schreibbar: {e}"}
+            os.environ[env_name] = found["token"]
+            masked_key = setup_wizard.mask_bifrost_key(found["token"])
+            if not fields.get("base_url"):
+                fields["base_url"] = found["base_url"]
+        base = fields.get("base_url")
+        if base is not None and not (isinstance(base, str) and base.startswith(("http://", "https://"))):
+            return {"saved": False, "reason": "base_url muss mit http:// oder https:// beginnen"}
+        fields.setdefault("base_url", setup_wizard.BIFROST_DEFAULT_URL)
+        for k, v in (("poll_seconds", 120), ("display_name", "LLM Gateway")):
+            fields.setdefault(k, v)
 
     # config einlesen — wir nutzen tomllib statt load_config, weil wir die
     # Roh-Tabelle brauchen (nicht den Config-Dataclass).
@@ -239,7 +268,10 @@ async def _provider_save(
 
     written = cfg_mod.write_config_dict(data)
     state.reload_event.set()
-    return {"saved": True, "path": str(written)}
+    result: dict[str, Any] = {"saved": True, "path": str(written)}
+    if masked_key:
+        result["masked"] = masked_key
+    return result
 
 
 @command("secret-write")

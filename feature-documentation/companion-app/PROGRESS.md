@@ -63,7 +63,8 @@ _Keine._
   Progress-Events.
 * **Phase 4** abgeschlossen: Provider-Detect für alle 5 Provider liefert echte
   Werte (Anthropic→Keychain, Codex→OAuth-File, Langdock→secrets.env,
-  OpenCode→DB+CLI, Bedrock→Creds). Provider-Save merged in `config.toml` und
+  OpenCode→DB+CLI, Bedrock→Creds; OpenCode ist seit 2026-10-07 durch
+  LLM Gateway/Bifrost→Claude-Code-Settings ersetzt). Provider-Save merged in `config.toml` und
   löst `reload-config` aus.
 * **Phase 5** abgeschlossen: LaunchAgent-Template + Scheduled-Task-Aufruf, plus
   Tail-Logs aus `~/Library/Logs/clawdmeter-daemon.log`.

@@ -1,8 +1,12 @@
 # UI-Layouts pro Provider-Kind
 
-Stand 2026-05-24. Vier kind-Werte, vier Render-Funktionen in
+Stand 2026-10-07. Vier kind-Werte, vier Render-Funktionen in
 [firmware/src/ui.cpp](../../firmware/src/ui.cpp). Jeder Provider-Screen
 ruft genau eine davon basierend auf dem zuletzt gesehenen `kind`.
+
+> **Wichtige Änderungen (2026-10-07):**
+> - `cost_budget`: Budget-Balken ist jetzt nach Modellfamilie segmentiert (wenn `sh` vorhanden), mit Farblegend darunter.
+> - `tokens_abs`: Sparkline und „vs. gestern"-Zeile entfernt — nur noch Wert, Donut und Reset-Countdown.
 
 ## `pct_window` — Anthropic-Stil
 
@@ -29,59 +33,86 @@ ruft genau eine davon basierend auf dem zuletzt gesehenen `kind`.
 Bar-Farbe ist `pct_color(m1)` resp. `pct_color(m2)` (grün <50%, amber
 50-80%, rot >=80%). Pace-Glyph erscheint nur, wenn `pace != UNSET`.
 
-## `cost_budget` — Langdock-Stil
+## `cost_budget` — Budget-Monitor mit Segmentierung
 
-**Anwendung**: Workspace-Budgets in EUR/USD. Wenn `m2 > 0` (Budget
-konfiguriert) gibt es einen Auslastungs-Bar; bei `m2 == 0` nur die
-Verbrauchszahl mit der Note „Kein Budget gesetzt".
+**Anwendung**: Workspace-Budgets in EUR/USD (Langdock, Bifrost, etc.). Wenn `m2 > 0` (Budget konfiguriert) gibt es einen Auslastungs-Bar. Bei Vorhandensein von `sh` (Modellfamilien-Anteile) ist der Balken nach Anteilen segmentiert; sonst einfarbig nach Auslastungsstatus. Bei `m2 == 0` nur die Verbrauchszahl mit der Note „Kein Budget gesetzt", ohne Pace-Glyph.
+
+Beträge ab 10.000 erscheinen ohne Nachkommastellen mit Tausenderpunkt (`$16.500`, `von $15.000`), darunter mit zwei Nachkommastellen. Der Pace-Glyph (Mono 18) steht rechts neben der Prozentangabe, nicht in der Kopfzeile.
+
+**Mit Segmentierung (z. B. Bifrost):**
+
+```
+┌─────────────────────────────────────┐
+│            LLM Gateway               │
+│              sascha.krinke           │   <- note (optional)
+│                                      │
+│  ┌───────────────────────────────┐  │
+│  │  $3769.16       von $15.000   │  │   <- m1+currency, m2
+│  │  ███████░░░░░░░░░░░░░░░░░░░░░░│  │   <- segmentiert nach sh
+│  │  ● Opus 74%  ● Sonnet 26%     │  │   <- Legende mit Farbe + %
+│  │  25% Budget ▲     Reset in 7d │  │   <- pct (Statusfarbe) + pace + r2
+│  └───────────────────────────────┘  │
+│                                      │
+│         · Dekantieren…               │
+└─────────────────────────────────────┘
+```
+
+**Ohne Segmentierung (Langdock oder Bifrost ohne `sh`):**
 
 ```
 ┌─────────────────────────────────────┐
 │              Langdock                │
-│                BYOK                  │   <- note (optional)
+│                BYOK                  │
 │                                      │
 │  ┌───────────────────────────────┐  │
-│  │  €87.40    ▼      von €250    │  │   <- m1+currency, pace, m2
-│  │  ███████░░░░░░░░░░░░░░░░░░░░░░│  │   <- (m1/m2)*100 als Bar
-│  │  35% Budget       Reset in 7d │  │   <- pct text + r2
+│  │  €87.40               von €250│  │   <- m1+currency, m2
+│  │  ███████░░░░░░░░░░░░░░░░░░░░░░│  │   <- einfarbig nach Status
+│  │  35% Budget       Reset in 7d │  │
 │  └───────────────────────────────┘  │
 │                                      │
 │         · Reflektieren…              │
 └─────────────────────────────────────┘
 ```
 
-Bei `m2 == 0`:
+**Bei `m2 == 0` (kein Budget):**
 
 ```
 │  €87.40                              │
 │  Kein Budget gesetzt   Reset in 7d   │
 ```
 
-## `tokens_abs` — OpenCode-Stil
+**Segmentpalette:** Graustufenrampe aus hellem zu dunklerem Grau, absteigend nach Anteil. Keine Grün-/Amber-/Rot-Farben im Balken selbst — die Auslastungswarnung bleibt auf der Prozentangabe (z. B. rot ab 80 %), damit Status auch mit Segmentierung erkennbar bleibt.
 
-**Anwendung**: Lokaler Token-Counter ohne harte Obergrenze. Optionaler
-Backend-Quota-Bar (m2) wenn das Daemon-Polling die korrelierte
-Backend-Auslastung erfolgreich ermitteln konnte.
+## `tokens_abs` — Token-Aktivität
+
+**Anwendung**: Token-Counter ohne harte Obergrenze (z. B. Langdock managed-Modus). Zeigt Tageswert, Donut-Breakdown nach Aktivitäts-Kategorie und Reset-Countdown bis Mitternacht.
+
+Optionaler Backend-Quota-Bar (m2, 0–100 %), wenn das Gateway Quota-Daten liefert.
 
 ```
 ┌─────────────────────────────────────┐
-│              OpenCode                │
-│         amazon-bedrock               │   <- active backend (note)
+│              Langdock                │
+│              Aktivität               │   <- note
 │                                      │
 │  ┌───────────────────────────────┐  │
 │  │  420k          Tokens heute   │  │   <- m1 (format_tokens)
-│  │  +40k vs. gestern             │  │   <- (m1 - m3) Trend
 │  │                                │  │
-│  │  Backend: 52%                  │  │   <- m2 as bar
-│  │  ███████████░░░░░░░░░░░░░░░░░░│  │
+│  │  ● Chat 45%  ● Projekt 35%    │  │   <- Donut-Legende (sh)
+│  │  ● Workflow 20%                │  │
 │  │                  Reset 9h 12m │  │   <- r2
 │  └───────────────────────────────┘  │
 │         · Werkeln…                   │
 └─────────────────────────────────────┘
 ```
 
-Ohne Backend-Korrelation (z.B. OpenCode auf Ollama) wird die Backend-Zeile
-+ der Bar versteckt; nur die große Token-Zahl bleibt.
+Mit Backend-Quota (z. B. Langdock BYOK mit quota-Tracking):
+
+```
+│  Backend-Quota: 52%                │
+│  ███████████░░░░░░░░░░░░░░░░░░     │
+```
+
+**Wichtig (seit 2026-10-07):** Die vorherige 24-Stunden-Sparkline und „vs. gestern"-Vergleich werden nicht mehr angezeigt. Das Feld `sp` im BLE-Payload wird ignoriert (Rückwärtskompatibilität mit älteren Daemons).
 
 ## `tpm_rpm` — Bedrock-Stil
 

@@ -150,7 +150,7 @@ usd_to_eur = 0.92              # statischer Kurs für USD-Pricing → EUR-Spend
 
 ## Setup-Wizard
 
-`clawdmeter-daemon setup` ruft `wizard_langdock` zwischen Codex und OpenCode auf. Fragt:
+`clawdmeter-daemon setup` ruft `wizard_langdock` nach Codex auf. Fragt:
 
 - **Aktivieren?** Default = bestehender Block.
 - **Monatsbudget in EUR** (0 = ohne).

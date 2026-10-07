@@ -1,12 +1,17 @@
 # Config-Datei `config.toml`
 
-Stand 2026-05-24. Die TOML ist die einzige Quelle für „welcher Provider
+Stand 2026-10-07. Die TOML ist die einzige Quelle für „welcher Provider
 ist aktiv, wie heißt er, wie oft wird gepollt, wo liegen Credentials".
 
 > ⏸️ **Bedrock-Hinweis**: Die Bedrock-Beispielblöcke unten zeigen das
 > Schema, falls du den Adapter manuell reaktivierst. Der Setup-Wizard
 > fragt Bedrock derzeit nicht ab; ohne IAM-Profil pollt der Adapter
 > nichts. Details: [providers/bedrock.md](../providers/bedrock.md).
+
+> **OpenCode entfernt (seit 2026-10-07):** Der OpenCode-Adapter wird nicht
+> mehr unterstützt. Bestehende `config.toml`-Dateien mit einem
+> `id = "opencode"`-Block können lokal gelöscht oder vom Setup-Wizard
+> überschrieben werden.
 
 ## Pfad
 
@@ -27,7 +32,7 @@ name = "Clawdmeter"            # Muss dem BLE-Namen der Firmware entsprechen
 scan_timeout_seconds = 8.0
 
 [[provider]]
-id = "anthropic"               # Adapter-Familie (anthropic|langdock|opencode|bedrock)
+id = "anthropic"               # Adapter-Familie (anthropic|langdock|bifrost|bedrock|codex)
 enabled = true
 slot_id = "anthropic"          # Eindeutige Slot-ID auf dem Gerät (≤12 chars)
 display_name = "Claude"         # 16 chars max
@@ -48,13 +53,14 @@ currency = "EUR"
 usd_to_eur = 0.92
 
 [[provider]]
-id = "opencode"
+id = "bifrost"
 enabled = false
-slot_id = "opencode"
-display_name = "OpenCode"
-poll_seconds = 15
-db_path = ""                   # Leer = XDG-Auto-Detect
-include_backend_quota = true
+slot_id = "bifrost"
+display_name = "LLM Gateway"
+display_note = ""
+poll_seconds = 120
+api_key_env = "BIFROST_VIRTUAL_KEY"
+# base_url = "https://llm-gw.wineretailsystems.cloud"  # optional, default shown
 
 # Bedrock: ein Block pro Modell, alle teilen Region + Profile
 [[provider]]

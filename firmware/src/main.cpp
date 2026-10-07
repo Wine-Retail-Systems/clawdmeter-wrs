@@ -188,22 +188,10 @@ static ParseResult parse_json(const char* json) {
         p->regen_set = false;
     }
 
-    // Optional tokens_abs extras: "sp" → 24-bucket sparkline, "sh" → up to
-    // 4 provider-share entries. Both are reset to "absent" if missing so a
-    // provider that stops sending them doesn't keep stale visuals.
-    p->spark_set = false;
-    memset(p->spark, 0, sizeof(p->spark));
-    if (doc["sp"].is<JsonArrayConst>()) {
-        JsonArrayConst sp = doc["sp"].as<JsonArrayConst>();
-        size_t n = sp.size();
-        if (n > CLAWD_SPARK_LEN) n = CLAWD_SPARK_LEN;
-        for (size_t i = 0; i < n; ++i) {
-            long v = sp[i].as<long>();
-            p->spark[i] = (v < 0) ? 0u : (uint32_t)v;
-        }
-        if (n > 0) p->spark_set = true;
-    }
-
+    // Optional "sh" → up to 4 share entries (donut on tokens_abs, bar
+    // segments on cost_budget). Reset to "absent" if missing so a provider
+    // that stops sending them doesn't keep stale visuals. A legacy "sp"
+    // (sparkline) field from older daemons is silently ignored.
     p->shares_count = 0;
     memset(p->shares, 0, sizeof(p->shares));
     if (doc["sh"].is<JsonArrayConst>()) {
@@ -229,7 +217,7 @@ static ParseResult parse_json(const char* json) {
 }
 
 // ---- Serial command buffer ----
-#define CMD_BUF_SIZE 64
+#define CMD_BUF_SIZE 512
 static char cmd_buf[CMD_BUF_SIZE];
 static int cmd_pos = 0;
 
@@ -275,6 +263,12 @@ static void check_serial_cmd() {
             else if (strcmp(cmd_buf, "usage") == 0) ui_show_screen(SCREEN_USAGE_BASE);
             else if (strcmp(cmd_buf, "bluetooth") == 0) ui_show_screen(SCREEN_BLUETOOTH);
             else if (strcmp(cmd_buf, "cycle") == 0) ui_cycle_screen();
+            else if (strncmp(cmd_buf, "inject ", 7) == 0) {
+                // QA helper: feed a payload through the same parser as BLE RX.
+                ParseResult pr = parse_json(cmd_buf + 7);
+                if (pr == PR_EOC) ui_set_state(&g_state);
+                Serial.printf("inject: %s\n", pr == PR_BAD ? "bad" : "ok");
+            }
             else if (strncmp(cmd_buf, "slot ", 5) == 0) ui_show_screen(SCREEN_USAGE_BASE + atoi(cmd_buf + 5));
             cmd_pos = 0;
         } else if (cmd_pos < CMD_BUF_SIZE - 1) {
@@ -290,6 +284,7 @@ static void check_serial_cmd() {
 extern "C" void board_init(void);
 
 void setup() {
+    Serial.setRxBufferSize(1024);   // room for "inject <json>" QA payloads
     Serial.begin(115200);
     delay(300);
     Serial.println("{\"ready\":true}");
@@ -417,13 +412,17 @@ void loop() {
 
     check_serial_cmd();
 
-    if (ble_has_data()) {
+    static uint16_t cycle_payloads = 0;
+    while (ble_has_data()) {
         ParseResult pr = parse_json(ble_get_data());
         if (pr == PR_BAD) {
             ble_send_nack();
         } else {
             ble_send_ack();
+            if (pr == PR_PROVIDER) cycle_payloads++;
             if (pr == PR_EOC) {
+                Serial.printf("rx: cycle %u payloads\n", (unsigned)cycle_payloads);
+                cycle_payloads = 0;
                 // Cycle complete — recompute rate-group + push to UI.
                 float primary = ui_primary_pct_for_rate();
                 int g_before = usage_rate_group();

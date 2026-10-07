@@ -13,13 +13,16 @@ type Props = { onDone: () => void };
 
 const ORDER: ProviderId[] = [
   "anthropic",
+  "bifrost",
   "codex",
   "langdock",
-  "opencode",
   "bedrock",
 ];
 
 const LANGDOCK_API_KEY_ENV = "LANGDOCK_API_KEY";
+const BIFROST_API_KEY_ENV = "BIFROST_VIRTUAL_KEY";
+const BIFROST_DEFAULT_URL = "https://llm-gw.wineretailsystems.cloud";
+const BIFROST_KEY_PREFIX = "sk-bf-";
 
 function isLoaded(
   s: ProviderDetectResult | "pending" | undefined,
@@ -37,6 +40,8 @@ export function SetupWizard({ onDone }: Props) {
   // nicht und benutzen den klassischen Auto-Detect-Save.
   const [langdockApiKey, setLangdockApiKey] = useState("");
   const [langdockEmail, setLangdockEmail] = useState("");
+  const [bifrostKey, setBifrostKey] = useState("");
+  const [bifrostUrl, setBifrostUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -50,7 +55,12 @@ export function SetupWizard({ onDone }: Props) {
       .catch(() =>
         setResults((r) => ({
           ...r,
-          [current]: { id: current, detected: false, source: null, notes: null },
+          [current]: {
+            id: current,
+            detected: false,
+            source: null,
+            notes: null,
+          },
         })),
       );
   }, [current, results]);
@@ -59,11 +69,52 @@ export function SetupWizard({ onDone }: Props) {
   const loaded = isLoaded(status) ? status : null;
   const detected = loaded?.detected ?? false;
 
+  function advance() {
+    if (step + 1 < ORDER.length) {
+      setStep(step + 1);
+    } else {
+      onDone();
+    }
+  }
+
+  // Bifrost: der Daemon kopiert den erkannten Key selbst aus der
+  // Claude-Code-Konfiguration; hier läuft nur das Kürzel "claude-settings".
+  async function adoptDetectedBifrost() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveProvider("bifrost", { source: "claude-settings" });
+    } catch (e) {
+      setSaveError(
+        e instanceof Error ? e.message : STRINGS.setup.bifrost.saveError,
+      );
+      setSaving(false);
+      return;
+    }
+    setSaving(false);
+    advance();
+  }
+
   async function saveAndAdvance() {
     setSaving(true);
     setSaveError(null);
     try {
-      if (current === "langdock") {
+      if (current === "bifrost") {
+        const key = bifrostKey.trim();
+        if (key) {
+          if (!key.startsWith(BIFROST_KEY_PREFIX)) {
+            setSaveError(STRINGS.setup.bifrost.apiKeyInvalid);
+            setSaving(false);
+            return;
+          }
+          await saveSecret(BIFROST_API_KEY_ENV, key);
+          const fields: Record<string, string> = {
+            api_key_env: BIFROST_API_KEY_ENV,
+          };
+          if (bifrostUrl.trim()) fields.base_url = bifrostUrl.trim();
+          await saveProvider("bifrost", fields);
+        }
+      } else if (current === "langdock") {
         // Langdock: API-Key + Email aus dem Formular. Beides optional —
         // Key leer = vorhandenen behalten (oder Provider deaktiviert lassen),
         // Email leer = keine User-Filterung (Org-Summe).
@@ -94,11 +145,9 @@ export function SetupWizard({ onDone }: Props) {
     setSaving(false);
     setLangdockApiKey("");
     setLangdockEmail("");
-    if (step + 1 < ORDER.length) {
-      setStep(step + 1);
-    } else {
-      onDone();
-    }
+    setBifrostKey("");
+    setBifrostUrl("");
+    advance();
   }
 
   return (
@@ -123,6 +172,10 @@ export function SetupWizard({ onDone }: Props) {
           Schritt {step + 1} von {ORDER.length}
         </p>
         <h3 className="card__heading">{STRINGS.setup.providers[current]}</h3>
+
+        {current === "bifrost" && (
+          <p className="card__body">{STRINGS.setup.bifrost.intro}</p>
+        )}
 
         {!status || status === "pending" ? (
           <p className="card__body">
@@ -151,6 +204,76 @@ export function SetupWizard({ onDone }: Props) {
               </>
             )}
           </p>
+        )}
+
+        {current === "bifrost" && (
+          <div className="form-stack">
+            {detected && loaded?.masked && (
+              <div className="form-field">
+                <span className="form-field__label">
+                  {STRINGS.setup.bifrost.detectedKey}
+                </span>
+                <code>{loaded.masked}</code>
+                {loaded.source && (
+                  <small className="form-field__help">{loaded.source}</small>
+                )}
+                <div className="button-row">
+                  <button
+                    type="button"
+                    className="cta"
+                    onClick={adoptDetectedBifrost}
+                    disabled={saving}
+                  >
+                    {STRINGS.setup.bifrost.useDetected}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <label className="form-field">
+              <span className="form-field__label">
+                {detected && loaded?.masked
+                  ? STRINGS.setup.bifrost.manualHeading
+                  : STRINGS.setup.bifrost.apiKeyLabel}
+              </span>
+              <input
+                type="password"
+                autoComplete="off"
+                spellCheck={false}
+                placeholder={STRINGS.setup.bifrost.apiKeyPlaceholder}
+                value={bifrostKey}
+                onChange={(e) => setBifrostKey(e.target.value)}
+                disabled={saving}
+              />
+              <small className="form-field__help">
+                {STRINGS.setup.bifrost.apiKeyHelp}
+              </small>
+            </label>
+
+            <label className="form-field">
+              <span className="form-field__label">
+                {STRINGS.setup.bifrost.baseUrlLabel}
+              </span>
+              <input
+                type="url"
+                autoComplete="off"
+                spellCheck={false}
+                placeholder={loaded?.base_url ?? BIFROST_DEFAULT_URL}
+                value={bifrostUrl}
+                onChange={(e) => setBifrostUrl(e.target.value)}
+                disabled={saving}
+              />
+              <small className="form-field__help">
+                {STRINGS.setup.bifrost.baseUrlHelp}
+              </small>
+            </label>
+
+            {saveError && (
+              <p className="form-error">
+                {STRINGS.setup.bifrost.saveError}: {saveError}
+              </p>
+            )}
+          </div>
         )}
 
         {current === "langdock" && (

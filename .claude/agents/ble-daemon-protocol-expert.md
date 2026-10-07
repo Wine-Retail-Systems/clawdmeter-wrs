@@ -13,7 +13,7 @@ WICHTIG: Der Abschnitt "Daemon / host side" in `CLAUDE.md` beschreibt noch den a
 ## Dateien
 
 - Firmware: `firmware/src/ble.{h,cpp}` (NimBLE-Peripheral, HID-Keyboard + Daten-Service), `firmware/src/data.h` (`ProviderUsage`, `ProviderKind`, `CLAWD_*`-Längenlimits), `firmware/src/main.cpp::parse_json` (ArduinoJson-Parser), `usage_rate.*`.
-- Daemon (`daemon/`): Einstieg `clawdmeter_daemon.py` -> `clawdmeter_daemon/cli.py` (`run | setup | config | doctor`); `ble.py` (Scan, Connect, `Session.send_cycle`), `polling.py` (Loop), `config.py` (config.toml), `secrets.py` (`secrets.env`), `paths.py`, `ipc_server.py` (JSON-Lines-IPC zur Companion-App), `setup_wizard.py`, `providers/{base,anthropic,langdock,opencode,bedrock,codex}.py`.
+- Daemon (`daemon/`): Einstieg `clawdmeter_daemon.py` -> `clawdmeter_daemon/cli.py` (`run | setup | config | doctor`); `ble.py` (Scan, Connect, `Session.send_cycle`), `polling.py` (Loop), `config.py` (config.toml), `secrets.py` (`secrets.env`), `paths.py`, `ipc_server.py` (JSON-Lines-IPC zur Companion-App), `setup_wizard.py`, `providers/{base,anthropic,bifrost,langdock,bedrock,codex}.py`.
 - Service-Units: `daemon/clawdmeter-daemon.service` (Linux/systemd), `daemon/com.clawdmeter.daemon.plist` (macOS/launchd); Windows siehe `feature-documentation/windows-daemon.md`.
 
 ## Protokoll

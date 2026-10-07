@@ -8,7 +8,6 @@ existing config and uses found values as defaults.
 from __future__ import annotations
 
 import os
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -87,35 +86,6 @@ def detect_codex_token() -> str:
     return f"{path} (kein Token gefunden)"
 
 
-def detect_opencode_db() -> str:
-    candidates = []
-    xdg = os.environ.get("XDG_DATA_HOME")
-    if xdg:
-        candidates.append(Path(xdg) / "opencode" / "opencode.db")
-    candidates.append(Path.home() / ".local" / "share" / "opencode" / "opencode.db")
-    if sys.platform == "win32":
-        local = os.environ.get("LOCALAPPDATA")
-        if local:
-            candidates.append(Path(local) / "opencode" / "opencode.db")
-    for c in candidates:
-        if c.exists():
-            return str(c)
-    return ""
-
-
-def detect_opencode_version() -> str:
-    bin_ = shutil.which("opencode")
-    if not bin_:
-        return ""
-    try:
-        r = subprocess.run([bin_, "--version"], capture_output=True, text=True, timeout=5)
-        if r.returncode == 0:
-            return r.stdout.strip()
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        pass
-    return ""
-
-
 def detect_aws() -> tuple[bool, str]:
     """Return (creds_available, profile_or_source)."""
     cred = Path.home() / ".aws" / "credentials"
@@ -124,6 +94,82 @@ def detect_aws() -> tuple[bool, str]:
     if os.environ.get("AWS_ACCESS_KEY_ID"):
         return True, "env"
     return False, ""
+
+
+BIFROST_KEY_ENV = "BIFROST_VIRTUAL_KEY"
+BIFROST_DEFAULT_URL = "https://llm-gw.wineretailsystems.cloud"
+BIFROST_PREFIX = "sk-bf-"
+
+
+def mask_bifrost_key(value: str) -> str:
+    """``sk-bf-…abcd`` — prefix plus last four characters only."""
+    if len(value) < 14:
+        return secrets.mask(value)
+    return f"{value[:6]}…{value[-4:]}"
+
+
+def _gateway_root(url: str) -> str:
+    """Strip any path from a base URL; invalid input -> default gateway."""
+    from urllib.parse import urlparse
+
+    try:
+        u = urlparse((url or "").strip())
+    except ValueError:
+        return BIFROST_DEFAULT_URL
+    if u.scheme not in ("http", "https") or not u.netloc:
+        return BIFROST_DEFAULT_URL
+    return f"{u.scheme}://{u.netloc}"
+
+
+def find_claude_bifrost_key() -> dict | None:
+    """Look for a Bifrost virtual key in the Claude Code setup.
+
+    Returns ``{"token", "base_url", "source"}`` (token in clear text — callers
+    must never print or return it) or None. Sources, in order: process env,
+    then the ``env`` block of ``<claude config dir>/settings.json``.
+    """
+    token = os.environ.get("ANTHROPIC_AUTH_TOKEN", "")
+    if token.startswith(BIFROST_PREFIX):
+        return {"token": token,
+                "base_url": _gateway_root(os.environ.get("ANTHROPIC_BASE_URL", "")),
+                "source": "env:ANTHROPIC_AUTH_TOKEN"}
+    settings = paths.claude_credentials_dir() / "settings.json"
+    try:
+        import json as _json
+        blob = _json.loads(settings.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    env = blob.get("env") if isinstance(blob, dict) else None
+    if not isinstance(env, dict):
+        return None
+    token = env.get("ANTHROPIC_AUTH_TOKEN")
+    if isinstance(token, str) and token.startswith(BIFROST_PREFIX):
+        base = env.get("ANTHROPIC_BASE_URL")
+        return {"token": token,
+                "base_url": _gateway_root(base if isinstance(base, str) else ""),
+                "source": f"{settings}"}
+    return None
+
+
+def detect_bifrost(env_name: str = BIFROST_KEY_ENV) -> dict:
+    """Clear-text-free detection result for CLI wizard and IPC.
+
+    Keys: detected, source, notes, masked, base_url.
+    """
+    found = find_claude_bifrost_key()
+    if found:
+        return {"detected": True, "source": found["source"],
+                "notes": "Virtual Key aus Claude-Code-Konfiguration",
+                "masked": mask_bifrost_key(found["token"]),
+                "base_url": found["base_url"]}
+    stored = os.environ.get(env_name) or secrets.read_all().get(env_name) or ""
+    if stored:
+        return {"detected": True, "source": secrets.describe_source(env_name) or "secrets.env",
+                "notes": f"{env_name} bereits hinterlegt",
+                "masked": mask_bifrost_key(stored), "base_url": BIFROST_DEFAULT_URL}
+    return {"detected": False, "source": None,
+            "notes": "Kein sk-bf-Token in Umgebung oder ~/.claude/settings.json",
+            "masked": None, "base_url": BIFROST_DEFAULT_URL}
 
 
 def detect_langdock_key(env_name: str = "LANGDOCK_API_KEY") -> str:
@@ -247,37 +293,56 @@ def wizard_langdock(existing: dict, out: list[dict]) -> None:
     })
 
 
-def wizard_opencode(existing: dict, out: list[dict]) -> None:
-    print("\nOpenCode")
-    db = detect_opencode_db()
-    ver = detect_opencode_version()
-    if db:
-        print(f"  ✓ SQLite-DB gefunden: {db}")
-    else:
-        print("  ✗ opencode.db nicht gefunden")
-    if ver:
-        print(f"  ✓ OpenCode-CLI installiert ({ver})")
+def wizard_bifrost(existing: dict, out: list[dict]) -> None:
+    import getpass
 
-    cur = existing_block(existing, "opencode")
-    enable = confirm("OpenCode aktivieren?", default=bool(db) or bool(cur.get("enabled")))
+    print("\nBifrost (LLM Gateway)")
+    cur = existing_block(existing, "bifrost")
+    env_name = cur.get("api_key_env", BIFROST_KEY_ENV)
+    found = find_claude_bifrost_key()
+    det = detect_bifrost(env_name)
+    base_url = cur.get("base_url") or (found["base_url"] if found else BIFROST_DEFAULT_URL)
+
+    if det["detected"]:
+        print(f"  ✓ Virtual Key gefunden: {det['source']} ({det['masked']})")
+    else:
+        print("  ✗ Kein sk-bf-Virtual-Key gefunden")
+
+    enable = confirm("Bifrost aktivieren?", default=bool(cur.get("enabled")) or det["detected"])
     if not enable:
-        out.append({"id": "opencode", "enabled": False,
-                    "slot_id": cur.get("slot_id", "opencode")})
+        out.append({"id": "bifrost", "enabled": False,
+                    "slot_id": cur.get("slot_id", "bifrost"),
+                    "api_key_env": env_name, "base_url": base_url})
         return
 
-    include = confirm(
-        "Backend-Provider-Quota mit anzeigen (m2)?",
-        default=bool(cur.get("include_backend_quota", True)),
-    )
+    if found and confirm(f"Erkannten Key aus {found['source']} übernehmen?", default=True):
+        path = secrets.write(env_name, found["token"])
+        os.environ[env_name] = found["token"]
+        print(f"  ✓ Key gespeichert in {path} ({mask_bifrost_key(found['token'])})")
+    else:
+        try:
+            new_key = getpass.getpass("  Virtual Key (Eingabe verdeckt, Enter = vorhandenen behalten): ").strip()
+        except EOFError:
+            new_key = ""
+        if new_key:
+            path = secrets.write(env_name, new_key)
+            os.environ[env_name] = new_key
+            print(f"  ✓ Key gespeichert in {path} ({mask_bifrost_key(new_key)})")
+        elif not det["detected"]:
+            print("  ! Kein Key hinterlegt — Daemon wird beim Polling skippen.")
+
+    base_url = prompt("Gateway-URL", default=base_url)
+    note = prompt("Display-Untertitel (leer = Name aus dem Key)",
+                  default=str(cur.get("display_note", "")))
     out.append({
-        "id": "opencode",
+        "id": "bifrost",
         "enabled": True,
-        "poll_seconds": int(cur.get("poll_seconds", 15)),
-        "slot_id": cur.get("slot_id", "opencode"),
-        "display_name": cur.get("display_name", "OpenCode"),
-        "display_note": cur.get("display_note", ""),
-        "db_path": cur.get("db_path", "") or "",
-        "include_backend_quota": include,
+        "poll_seconds": int(cur.get("poll_seconds", 120)),
+        "slot_id": cur.get("slot_id", "bifrost"),
+        "display_name": cur.get("display_name", "LLM Gateway"),
+        "display_note": note,
+        "api_key_env": env_name,
+        "base_url": base_url,
     })
 
 
@@ -402,7 +467,7 @@ def run() -> None:
     wizard_anthropic(existing, out)
     wizard_codex(existing, out)
     wizard_langdock(existing, out)
-    wizard_opencode(existing, out)
+    wizard_bifrost(existing, out)
     # AWS Bedrock ist aktuell nicht im interaktiven Wizard — der Adapter
     # braucht IAM-Credentials für CloudWatch + Service Quotas, die ein
     # Bedrock-API-Key alleine nicht abdeckt. Bestehende Bedrock-Blöcke aus

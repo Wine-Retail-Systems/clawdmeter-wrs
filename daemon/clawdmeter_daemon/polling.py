@@ -20,7 +20,7 @@ from bleak.exc import BleakError
 
 from . import ble, ipc_server, paths, secrets
 from .config import Config, load_config
-from .providers import Provider, Snapshot, create
+from .providers import Provider, Snapshot, create, known_provider_ids
 
 TICK = 5.0
 
@@ -47,32 +47,12 @@ def build_provider_states(cfg: Config) -> list[ProviderState]:
         if provider is None:
             print(
                 f"[startup] Unknown provider id: {pcfg.id!r} — "
-                f"expected one of {sorted(['anthropic', 'codex', 'langdock', 'opencode', 'bedrock'])}",
+                f"expected one of {known_provider_ids()}",
                 file=sys.stderr,
             )
             continue
         states.append(ProviderState(provider))
     return states
-
-
-def correlate_backend_quota(states: list[ProviderState]) -> None:
-    """For OpenCode entries with include_backend_quota=true, copy m1 (utilization
-    %) from the matching backend provider into m2 of the OpenCode snapshot."""
-    by_kind = {s.provider.id: s for s in states}
-    for s in states:
-        snap = s.last_snapshot
-        if not snap or snap.kind != "tokens_abs":
-            continue
-        if not snap.extra.get("include_backend_quota"):
-            continue
-        backend_id = snap.extra.get("active_provider") or ""
-        # OpenCode uses "amazon-bedrock", "anthropic", "openai", "openrouter",
-        # "ollama". We map "amazon-bedrock" → "bedrock" for our adapter id.
-        clawd_id = "bedrock" if backend_id == "amazon-bedrock" else backend_id
-        backend = by_kind.get(clawd_id)
-        if backend and backend.last_snapshot:
-            # Take whichever metric the backend exposes as "primary load".
-            snap.m2 = float(backend.last_snapshot.m1)
 
 
 async def run_cycle(session: ble.Session, states: list[ProviderState], force_all: bool) -> bool:
@@ -94,7 +74,6 @@ async def run_cycle(session: ble.Session, states: list[ProviderState], force_all
     if not polled_any:
         return True  # no work to do this tick
 
-    correlate_backend_quota(states)
     payloads = [s.last_snapshot.to_payload() for s in states if s.last_snapshot]
     if not payloads:
         return True

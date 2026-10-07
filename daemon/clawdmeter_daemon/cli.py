@@ -34,6 +34,29 @@ def cmd_config() -> int:
     return 0
 
 
+def _doctor_bifrost(p) -> None:
+    import os
+
+    from .providers import bifrost
+
+    env_name = p.get("api_key_env", bifrost.DEFAULT_KEY_ENV)
+    src = secrets.describe_source(env_name)
+    if not src:
+        print(f"      Key: FEHLT — {env_name} nicht gesetzt. "
+              "`clawdmeter-daemon setup` ausführen oder Key in der Companion-App hinterlegen.")
+        return
+    base = p.get("base_url", bifrost.DEFAULT_BASE_URL)
+    status, err = bifrost.check_quota_sync(base, os.environ.get(env_name, "") or secrets.read_all().get(env_name, ""))
+    if status is None:
+        print(f"      Key: {src}; Gateway {base} nicht erreichbar ({err})")
+    elif status == 200:
+        print(f"      Key: {src}; Gateway {base} -> HTTP 200 OK")
+    elif status in (401, 403):
+        print(f"      Key: {src}; Gateway {base} -> HTTP {status} (Key ungültig oder abgelaufen)")
+    else:
+        print(f"      Key: {src}; Gateway {base} -> HTTP {status}")
+
+
 def cmd_doctor() -> int:
     loaded = secrets.load_into_env()
     cfg = load_config()
@@ -53,6 +76,8 @@ def cmd_doctor() -> int:
             src = secrets.describe_source(env_name)
             line += f"  key={src or 'FEHLT'}"
         print(line)
+        if p.id == "bifrost":
+            _doctor_bifrost(p)
     return 0
 
 

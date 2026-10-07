@@ -26,7 +26,7 @@ class Snapshot:
     The meaning of m1/m2/m3 and r1/r2 depends on `kind`:
       pct_window  → m1=short %, m2=long %, r1/r2=resets (s)
       cost_budget → m1=spent (currency), m2=budget (0=no budget), r2=sec to month end
-      tokens_abs  → m1=tokens today, m2=optional backend quota %, m3=yesterday compare, r2=sec to midnight
+      tokens_abs  → m1=activity/tokens total, m2=unused, r2=sec to month end (donut via extra["shares"])
       tpm_rpm     → m1=TPM %, m2=RPM %, m3=month tokens, r2=sec to month end
     """
 
@@ -69,12 +69,9 @@ class Snapshot:
         if self.currency:
             p["cur"] = self.currency
 
-        # Optional visualisation extras (currently used by tokens_abs/OpenCode).
-        # `sp` (sparkline): up to 24 integer buckets, oldest → newest.
-        # `sh` (shares):   up to 4 {"s": slug, "p": percent} entries summing ≈100.
-        sp = self.extra.get("spark")
-        if isinstance(sp, (list, tuple)) and sp:
-            p["sp"] = [int(round(v)) for v in sp[:24]]
+        # Optional visualisation extras.
+        # `sh` (shares): up to 4 {"s": slug, "p": percent} entries summing ≈100
+        # (tokens_abs donut; cost_budget model-mix bar).
         sh = self.extra.get("shares")
         if isinstance(sh, (list, tuple)) and sh:
             trimmed = []

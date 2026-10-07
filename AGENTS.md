@@ -14,7 +14,7 @@ Two reference ports today, plus one brand variant:
 
 The shared code calls a small HAL (`firmware/src/hal/`) that each board implements: display, touch, input, power, IMU. Optional features are guarded by `BoardCaps` (runtime) and `BOARD_HAS_*` (compile-time) rather than `#ifdef BOARD_*`.
 
-Connects to a host daemon over BLE; daemon polls Anthropic API for usage data. This file is for future agent sessions (Claude Code, Codex CLI, Cursor, etc.) to bootstrap quickly. Read this first. CLAUDE.md is the Claude-specific counterpart and carries the same technical content — keep them in sync when the architecture changes.
+Connects to a host daemon over BLE; daemon polls multiple LLM providers (Anthropic, Codex, Bifrost/LLM-Gateway, Langdock) for usage data. This file is for future agent sessions (Claude Code, Codex CLI, Cursor, etc.) to bootstrap quickly. Read this first. CLAUDE.md is the Claude-specific counterpart and carries the same technical content — keep them in sync when the architecture changes.
 
 ## Hardware (critical pins)
 
@@ -179,7 +179,7 @@ Python package `daemon/clawdmeter_daemon/` (BLE via `bleak`), entry shim `daemon
 
 **Modules:**
 
-- `providers/` — one adapter per provider (`anthropic`, `codex`, `langdock`, `opencode`, `bedrock` — Bedrock is paused) on a shared `base.py`. Each emits a payload with a `kind` (`pct_window`, `cost_budget`, `tokens_abs`, `tpm_rpm`).
+- `providers/` — one adapter per provider (`anthropic`, `codex`, `bifrost`, `langdock`, `bedrock` — Bedrock is paused) on a shared `base.py`. Each emits a payload with a `kind` (`pct_window`, `cost_budget`, `tokens_abs`, `tpm_rpm`).
 - `config.py` — TOML config with `[[provider]]` blocks, every provider opt-in via `enabled = true`; `[device]` holds `name = "Clawdmeter"` and `scan_timeout_seconds`.
 - `secrets.py` — API keys live in `secrets.env` next to the config, never in `config.toml`.
 - `paths.py` — config at `~/.config/clawdmeter/` (Windows: `%APPDATA%\clawdmeter\`), state/cache under the platform state dir (Windows: `%LOCALAPPDATA%\clawdmeter\`).

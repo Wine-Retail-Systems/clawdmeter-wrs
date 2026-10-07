@@ -24,6 +24,12 @@ pub struct ProviderDetectResult {
     pub detected: bool,
     pub source: Option<String>,
     pub notes: Option<String>,
+    /// Nur Bifrost: maskierter Key. Der Daemon liefert nie den Klartext.
+    #[serde(default)]
+    pub masked: Option<String>,
+    /// Nur Bifrost: aus ANTHROPIC_BASE_URL abgeleitete Gateway-URL.
+    #[serde(default)]
+    pub base_url: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -139,6 +145,8 @@ pub async fn provider_detect(
                 "Daemon nicht erreichbar. Wurde er installiert und gestartet?"
                     .into(),
             ),
+            masked: None,
+            base_url: None,
         }),
     }
 }

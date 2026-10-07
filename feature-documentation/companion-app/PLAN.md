@@ -38,7 +38,7 @@ bleiben als Power-User-Pfad erhalten.
 | Firmware-Auswahl | Im Flash-Wizard, alle 3 Envs sichtbar, **Default `wine-216`** | Spiegelt heutiges Verhalten der Shell-Skripte |
 | Firmware-Bundling | **Eingebettet** im App-Bundle (`resources/firmware/*.bin`) | Offline-fähig, atomares App+FW-Release, ~+3 MB Bundle-Größe |
 | Sprache | Nur Deutsch (MVP) | Konsistent zur Firmware-UI; EN später nachrüstbar |
-| Provider-Scope | **Alle 6** (Anthropic, Bedrock, Codex, Langdock, OpenCode) | 1:1-Feature-Parität mit dem Python-Setup-Wizard |
+| Provider-Scope | **Alle 5** (Anthropic, Bedrock, Codex, Langdock, LLM Gateway/Bifrost; OpenCode seit 2026-10-07 entfernt) | 1:1-Feature-Parität mit dem Python-Setup-Wizard |
 | OAuth-Tokens | **Auto-Detect** aus claude/codex CLI | Wie heute: macOS-Keychain für Claude, `~/.codex/auth.json` für Codex |
 | BLE-Pairing | **Hybrid** — Discovery in App, Pairing im OS | Tauri-App scannt zur Bestätigung, eigentliches Pairing macht weiter macOS/Windows |
 | macOS-Signing | **Notarized ab Tag 1** | Apple Developer Account vorhanden |

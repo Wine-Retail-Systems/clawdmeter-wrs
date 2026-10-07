@@ -1,6 +1,6 @@
 """Clawdmeter daemon — multi-provider LLM usage monitor.
 
-Polls one or more LLM providers (Anthropic, Langdock, OpenCode, AWS Bedrock)
+Polls one or more LLM providers (Anthropic, Langdock, Bifrost, AWS Bedrock)
 and forwards normalized usage snapshots to the Clawdmeter ESP32 firmware over
 BLE.
 """

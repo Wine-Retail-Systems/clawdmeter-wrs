@@ -1,6 +1,6 @@
 # Companion ↔ Daemon — IPC-Protokoll
 
-Stand: 2026-05-28 (Phase 2)
+Stand: 2026-10-07 (Phase 2)
 
 Bidirektionales JSON-Lines-Protokoll. Die Companion-App (Rust) ist Client,
 der Python-Daemon ist Server.
@@ -68,9 +68,9 @@ Response-`result`:
   "reachable": true,
   "running": true,
   "device_connected": true,
-  "last_poll_at": "2026-05-28T01:12:30+02:00",
+  "last_poll_at": "2026-10-07T14:30:00+02:00",
   "active_provider": "anthropic",
-  "providers": ["anthropic", "codex", "langdock", "opencode"],
+  "providers": ["anthropic", "codex", "bifrost", "langdock"],
   "snapshots": [...],
   "message": null
 }
@@ -91,23 +91,56 @@ Beendet den Daemon sauber.
 
 ### `provider-detect`
 
-Args: `{"id": "anthropic"|"codex"|...}`.
+Args: `{"id": "anthropic"|"codex"|"bifrost"|"langdock"|...}`.
 
-Response-`result`:
+Response-`result` (Beispiel Bifrost):
 
 ```json
-{ "id": "anthropic", "detected": true, "source": "macOS Keychain", "notes": null }
+{
+  "id": "bifrost",
+  "detected": true,
+  "source": "env:ANTHROPIC_AUTH_TOKEN",
+  "notes": "Virtual Key aus Claude-Code-Konfiguration",
+  "masked": "sk-bf-…abc",
+  "base_url": "https://llm-gw.wineretailsystems.cloud"
+}
+```
+
+Oder (nicht erkannt):
+
+```json
+{ "id": "bifrost", "detected": false, "source": null, "notes": "Kein sk-bf-Token in Umgebung oder ~/.claude/settings.json", "masked": null, "base_url": "https://llm-gw.wineretailsystems.cloud" }
 ```
 
 `source` ist ein menschenlesbarer Hinweis, kein Token-Inhalt. Der Daemon
-liest niemals Secrets im Klartext über die IPC.
+liest niemals Secrets im Klartext über die IPC. Zusätzliche Felder wie
+`masked`, `base_url` und `notes` sind provider-spezifisch.
 
 ### `provider-save`
 
 Args: `{"id": "...", "fields": {...}}`. Schreibt einen Provider-Eintrag in
-`config.toml`. **Phase 4** — aktuell antwortet der Daemon mit
-`{"saved": false, "reason": "..."}`, weil die Setup-Wizard-Logik noch
-interaktiv ist und auf Headless umgebaut wird.
+`config.toml`.
+
+**Bifrost-Spezifisch:** Wenn `fields.source = "claude-settings"`, kopiert der
+Daemon den erkannten Virtual Key aus der Claude-Konfiguration direkt nach
+`secrets.env` (ohne ihn über die IPC zu schicken) und aktualisiert nur die
+Config-Felder in der TOML.
+
+Beispiel für Bifrost:
+
+```json
+{
+  "id": "bifrost",
+  "fields": {
+    "enabled": true,
+    "display_name": "LLM Gateway",
+    "display_note": "",
+    "source": "claude-settings"
+  }
+}
+```
+
+Response: `{"saved": true}` bei Erfolg, sonst `{"saved": false, "reason": "..."}`.
 
 ### `secret-write`
 

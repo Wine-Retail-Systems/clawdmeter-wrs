@@ -66,8 +66,18 @@ static NimBLECharacteristic* req_char = nullptr;
 
 static ble_state_t state = BLE_STATE_INIT;
 static bool need_advertise = false;
-static char rx_buf[BLE_BUF_SIZE];
-static volatile bool data_ready = false;
+// RX ring: NimBLE host task (producer, onWrite) -> Arduino loop (consumer).
+// The daemon sends several payloads back-to-back (~80 ms apart), so a single
+// buffer loses messages. All index/buffer access is under rx_mux (a short
+// spinlock; a 512-byte memcpy is a few microseconds), which also makes
+// "drop oldest on overflow" safe against a concurrent pop.
+#define BLE_RX_SLOTS 8
+static char rx_ring[BLE_RX_SLOTS][BLE_BUF_SIZE];
+static uint8_t rx_head = 0;      // next write index
+static uint8_t rx_count = 0;     // queued messages
+static char rx_cur[BLE_BUF_SIZE];  // loop-side copy returned by ble_get_data()
+static volatile bool rx_overflow = false;
+static portMUX_TYPE rx_mux = portMUX_INITIALIZER_UNLOCKED;
 static volatile bool has_received_data = false;
 static char mac_str[18];
 
@@ -130,9 +140,16 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     void onWrite(NimBLECharacteristic* chr, NimBLEConnInfo& info) override {
         std::string val = chr->getValue();
         size_t len = std::min(val.length(), (size_t)(BLE_BUF_SIZE - 1));
-        memcpy(rx_buf, val.c_str(), len);
-        rx_buf[len] = '\0';
-        data_ready = true;
+        portENTER_CRITICAL(&rx_mux);
+        if (rx_count == BLE_RX_SLOTS) {      // full: overwrite the oldest
+            rx_count--;
+            rx_overflow = true;
+        }
+        memcpy(rx_ring[rx_head], val.c_str(), len);
+        rx_ring[rx_head][len] = '\0';
+        rx_head = (rx_head + 1) % BLE_RX_SLOTS;
+        rx_count++;
+        portEXIT_CRITICAL(&rx_mux);
         has_received_data = true;
     }
 };
@@ -240,12 +257,24 @@ void ble_clear_bonds(void) {
 }
 
 bool ble_has_data(void) {
-    return data_ready;
+    if (rx_overflow) {
+        rx_overflow = false;
+        Serial.println("ble: rx overflow, dropped oldest");
+    }
+    return rx_count > 0;
 }
 
 const char* ble_get_data(void) {
-    data_ready = false;
-    return rx_buf;
+    portENTER_CRITICAL(&rx_mux);
+    if (rx_count == 0) {
+        rx_cur[0] = '\0';
+    } else {
+        uint8_t tail = (rx_head + BLE_RX_SLOTS - rx_count) % BLE_RX_SLOTS;
+        memcpy(rx_cur, rx_ring[tail], BLE_BUF_SIZE);
+        rx_count--;
+    }
+    portEXIT_CRITICAL(&rx_mux);
+    return rx_cur;   // valid until the next ble_get_data() call
 }
 
 void ble_send_ack(void) {

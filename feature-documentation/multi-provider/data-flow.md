@@ -1,11 +1,14 @@
 # Multi-Provider Datenfluss
 
-Wie Daten von einem LLM-Provider zum Display kommen — Stand 2026-05-24.
+Wie Daten von einem LLM-Provider zum Display kommen — Stand 2026-10-07.
 
 > ⏸️ **Bedrock-Hinweis**: Der Bedrock-Adapter wird in diesem Dokument als
 > Architektur-Beispiel weiter mitgeführt, ist aber aktuell pausiert. Im
 > echten Polling-Lauf taucht er nicht auf. Details:
 > [providers/bedrock.md](../providers/bedrock.md).
+
+> **OpenCode entfernt (seit 2026-10-07):** Der Adapter wird nicht mehr
+> unterstützt. Die Sparkline-Strecke wurde aus dem Datenfluss entfernt.
 
 ## Übersicht
 
@@ -14,15 +17,14 @@ Wie Daten von einem LLM-Provider zum Display kommen — Stand 2026-05-24.
 │  LLM-Provider-APIs       │ ◄──────────── │  Provider-Adapter      │
 │  (Anthropic / Codex /    │               │  (anthropic.py /       │
 │   Langdock / Bedrock /   │ ───Snapshot──►│   codex.py / ...)      │
-│   OpenCode-DB)           │               │                        │
+│   Bifrost-Gateway)       │               │                        │
 └──────────────────────────┘               └───────────┬────────────┘
                                                        │
                                                        ▼
                                   ┌────────────────────────────────────┐
                                   │  polling.py                        │
                                   │  - Per-Provider TTL                │
-                                  │  - Backend-Quota-Korrelation       │
-                                  │    (OpenCode ↔ Bedrock etc.)       │
+                                  │  - Snapshot-Aggregation            │
                                   └───────────┬────────────────────────┘
                                               │ list[Snapshot]
                                               ▼
@@ -64,23 +66,18 @@ Eine Iteration des Daemon-Loops (`polling.main_loop` → `connect_and_run`):
    ODER ob ein Refresh-Request einen Force-All ausgelöst hat.
 3. **Poll**: jedes fällige Provider-Objekt liefert ein `Snapshot` oder
    `None` (Fehler/keine Credentials).
-4. **Korrelation**: `correlate_backend_quota()` schaut, ob ein `tokens_abs`-
-   Snapshot (typisch: OpenCode) einen `active_provider` im `extra`-Feld
-   trägt, und kopiert in dem Fall den primären Auslastungswert (`m1`) des
-   passenden Backend-Snapshots in das `m2`-Feld des OpenCode-Snapshots.
-   Mapping: OpenCode-ID `amazon-bedrock` → unser Adapter-ID `bedrock`.
-5. **BLE-Send**: `ble.Session.send_cycle(payloads)` schreibt sequentiell
+4. **BLE-Send**: `ble.Session.send_cycle(payloads)` schreibt sequentiell
    alle Snapshots als JSON-Strings auf die RX-Characteristic, mit 80 ms
    Pause zwischen Schreibvorgängen (sonst koalesziert NimBLE die Writes
    und verschluckt sich). Am Ende ein zusätzlicher `{"end":1}`-Write.
-6. **Firmware-Aufnahme**: jeder Write triggert `RxCallbacks::onWrite`,
+5. **Firmware-Aufnahme**: jeder Write triggert `RxCallbacks::onWrite`,
    setzt `data_ready=true`. Main-Loop ruft `parse_json` auf:
    - Provider-Payload → Slot-Suche/Erzeugung in `g_state.providers[]`,
      Update aller Felder, `cycle_seen = current_cycle`.
    - EOC-Marker → `prune_stale_slots()` (entfernt alles, was nicht in
      diesem Zyklus gesehen wurde), `current_cycle++`,
      `ui_set_state(&g_state)`.
-7. **Render**: `ui_set_state` läuft pro Slot, baut bei Bedarf das
+6. **Render**: `ui_set_state` läuft pro Slot, baut bei Bedarf das
    kind-spezifische Widget-Set neu (`ensure_slot_built`), aktualisiert
    Werte. Springt aus `SCREEN_EMPTY` automatisch in den ersten Provider-
    Screen, sobald Daten ankommen.
@@ -118,7 +115,7 @@ aus dem TOML löscht und den Daemon neustartet:
 | --------- | --------------------- | ------------------------------------------- |
 | Anthropic | 60                    | Header-Polling ist quasi kostenfrei         |
 | Codex     | 60                    | `wham/usage` ist genauso billig wie Anthropic-Header |
-| OpenCode  | 15                    | Lokaler SQLite-Read, kein Netz              |
+| Bifrost   | 120                   | Gateway-Quota-Abfrage über HTTPS; Aktualisierung alle 2 min |
 | Langdock  | 600                   | CSV-Export-Latenz ~30s; öfter ist sinnlos   |
 | Bedrock   | 60 *(pausiert)*       | CloudWatch-GetMetricData kostet ~$2/Monat   |
 

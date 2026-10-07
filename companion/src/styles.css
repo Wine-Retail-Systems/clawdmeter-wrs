@@ -587,7 +587,7 @@ code, pre, kbd { font-family: var(--font-mono); }
 }
 
 .form-error {
-  color: var(--accent);
+  color: var(--danger);
   font-size: 12px;
   margin: 0;
 }

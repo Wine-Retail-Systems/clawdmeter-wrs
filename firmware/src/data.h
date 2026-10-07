@@ -17,14 +17,13 @@
 
 #define CLAWD_PACE_UNSET    127  // sentinel — no pace data this cycle
 
-#define CLAWD_SPARK_LEN     24   // hourly buckets for tokens_abs sparkline
-#define CLAWD_SHARES_MAX    4    // donut slices for tokens_abs provider mix
+#define CLAWD_SHARES_MAX    4    // shares: donut slices (tokens_abs) / budget-bar segments (cost_budget)
 #define CLAWD_SLUG_LEN      8    // 7 chars + NUL per share entry
 
 enum ProviderKind : uint8_t {
     PK_PCT_WINDOW = 0,   // Anthropic-style: 5h-% + 7d-%, two resets
-    PK_COST_BUDGET = 1,  // Langdock-style: spent vs budget (m2=0 → no budget)
-    PK_TOKENS_ABS = 2,   // OpenCode-style: absolute tokens + optional backend %
+    PK_COST_BUDGET = 1,  // Langdock/Bifrost: spent vs budget (m2=0 → no budget); optional "sh" segments the bar
+    PK_TOKENS_ABS = 2,   // Langdock-managed: absolute tokens + optional "sh" donut
     PK_TPM_RPM = 3,      // Bedrock-style: TPM/RPM %, plus monthly tokens
     PK_UNKNOWN = 255,
 };
@@ -55,10 +54,9 @@ struct ProviderUsage {
     uint32_t last_update_ms;
     uint32_t cycle_seen;  // monotonic cycle counter — drop providers older than current
 
-    // Optional tokens_abs visualisation extras. Populated when the daemon
-    // sends "sp" / "sh" fields (currently only the OpenCode adapter).
-    uint32_t spark[CLAWD_SPARK_LEN];    // hourly token buckets, oldest → newest
-    bool     spark_set;
+    // Optional share list ("sh"): donut slices on tokens_abs, model-mix
+    // segments of the budget bar on cost_budget. Payload order is preserved.
+    // A legacy "sp" sparkline field is ignored by the parser.
     ProviderShare shares[CLAWD_SHARES_MAX];
     uint8_t  shares_count;
 };

@@ -51,6 +51,9 @@ struct Layout {
     int16_t panel_gap;
     int16_t bar_y;
     int16_t reset_y;
+    int16_t leg_row_h;      // cost_budget legend row pitch
+    int16_t leg_gap;        // gap bar -> legend and legend -> pct row
+    const lv_font_t* leg_font;  // cost_budget legend font
     int16_t bt_info_panel_h;
     int16_t bt_reset_zone_h;
     const lv_font_t* title_font;       // big screen title
@@ -77,6 +80,8 @@ static void compute_layout(const BoardCaps& c) {
         L.panel_gap = 16;
         L.bar_y = 56;
         L.reset_y = 94;
+        L.leg_row_h = 26;
+        L.leg_gap = 12;
         L.bt_info_panel_h = 160;
         L.bt_reset_zone_h = 110;
         L.title_font       = &font_tiempos_56;
@@ -84,6 +89,7 @@ static void compute_layout(const BoardCaps& c) {
         L.mid_font          = &font_styrene_28;
         L.small_font        = &font_styrene_20;
         L.tiny_font         = &font_styrene_16;
+        L.leg_font          = &font_styrene_20;
         L.bt_status_font   = &font_styrene_48;
         L.bt_device_font   = &font_styrene_28;
         L.bt_credit_1_font = &font_styrene_24;
@@ -94,6 +100,8 @@ static void compute_layout(const BoardCaps& c) {
         L.panel_gap = 12;
         L.bar_y = 48;
         L.reset_y = 78;
+        L.leg_row_h = 22;
+        L.leg_gap = 10;
         L.bt_info_panel_h = 140;
         L.bt_reset_zone_h = 90;
         L.title_font       = &font_tiempos_34;
@@ -101,6 +109,7 @@ static void compute_layout(const BoardCaps& c) {
         L.mid_font          = &font_styrene_24;
         L.small_font        = &font_styrene_16;
         L.tiny_font         = &font_styrene_14;
+        L.leg_font          = &font_styrene_14;
         L.bt_status_font   = &font_styrene_28;
         L.bt_device_font   = &font_styrene_20;
         L.bt_credit_1_font = &font_styrene_16;
@@ -135,9 +144,11 @@ struct ProviderScreen {
     lv_obj_t* reset_lbl;
     lv_obj_t* status_lbl;
 
-    // tokens_abs visualisation extras (Sparkline + Donut).
-    lv_obj_t* spark_chart;
-    lv_chart_series_t* spark_series;
+    // cost_budget: segmented budget bar (track + up to 4 segments).
+    lv_obj_t* bar_track;
+    lv_obj_t* bar_seg[CLAWD_SHARES_MAX];
+
+    // tokens_abs / cost_budget share visuals (donut arcs; legend dots+labels).
     lv_obj_t* donut_arcs[CLAWD_SHARES_MAX];
     lv_obj_t* legend_dot[CLAWD_SHARES_MAX];
     lv_obj_t* legend_lbl[CLAWD_SHARES_MAX];
@@ -439,13 +450,39 @@ static void build_cost_budget(ProviderScreen& s) {
     lv_obj_set_style_text_color(s.m1_unit_lbl, COL_DIM, 0);
     lv_obj_align(s.m1_unit_lbl, LV_ALIGN_TOP_RIGHT, 0, 12);
 
+    // Pace glyph sits in the bottom row, right next to "N % Budget"
+    // (positioned in update_cost_budget). Mono — arrows only live in font_mono_*.
     s.pace_lbl = lv_label_create(p);
     lv_label_set_text(s.pace_lbl, "");
-    // Pace uses Mono — the arrow glyphs (↑↓▲▼—) only live in font_mono_*.
-    lv_obj_set_style_text_font(s.pace_lbl, &font_mono_32, 0);
-    lv_obj_align(s.pace_lbl, LV_ALIGN_TOP_RIGHT, -90, 14);
+    lv_obj_set_style_text_font(s.pace_lbl, &font_mono_18, 0);
 
-    s.m1_bar = make_bar(p, 0, L.bar_y + 12, L.content_w - 32, 24);
+    // Segmented budget bar: track container + up to 4 filled rectangles.
+    s.bar_track = lv_obj_create(p);
+    lv_obj_set_pos(s.bar_track, 0, L.bar_y + 12);
+    lv_obj_set_size(s.bar_track, L.content_w - 32, 24);
+    lv_obj_set_style_bg_color(s.bar_track, COL_BAR_BG, 0);
+    lv_obj_set_style_bg_opa(s.bar_track, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(s.bar_track, 6, 0);
+    lv_obj_set_style_border_width(s.bar_track, 0, 0);
+    lv_obj_set_style_pad_all(s.bar_track, 0, 0);
+    lv_obj_set_style_clip_corner(s.bar_track, true, 0);
+    lv_obj_clear_flag(s.bar_track, LV_OBJ_FLAG_SCROLLABLE);
+    s.m1_bar = nullptr;
+    for (uint8_t i = 0; i < CLAWD_SHARES_MAX; ++i) {
+        lv_obj_t* seg = lv_obj_create(s.bar_track);
+        lv_obj_set_pos(seg, 0, 0);
+        lv_obj_set_size(seg, 0, 24);
+        lv_obj_set_style_bg_color(seg, COL_TEXT, 0);
+        lv_obj_set_style_bg_opa(seg, LV_OPA_COVER, 0);
+        lv_obj_set_style_radius(seg, 0, 0);
+        lv_obj_set_style_border_width(seg, 0, 0);
+        lv_obj_set_style_pad_all(seg, 0, 0);
+        lv_obj_clear_flag(seg, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_add_flag(seg, LV_OBJ_FLAG_HIDDEN);
+        s.bar_seg[i] = seg;
+        s.legend_dot[i] = nullptr;
+        s.legend_lbl[i] = nullptr;
+    }
 
     s.m2_value_lbl = lv_label_create(p);
     lv_label_set_text(s.m2_value_lbl, "");
@@ -460,46 +497,165 @@ static void build_cost_budget(ProviderScreen& s) {
     lv_obj_align(s.reset_lbl, LV_ALIGN_TOP_RIGHT, 0, L.reset_y + 6);
 }
 
+// Greyscale ramp for budget-bar segments: brightness steps of THEME_TEXT,
+// largest share (first entry) brightest, last step a dark grey that still
+// stands out from COL_BAR_BG. No status/accent colours on purpose.
+static lv_color_t seg_color(uint8_t idx) {
+    static const uint8_t level[CLAWD_SHARES_MAX] = {255, 175, 125, 92};
+    return lv_color_mix(COL_TEXT, lv_color_hex(0x000000), level[idx]);
+}
+
+// Money: >= 10000 -> no decimals, German thousands dot ("$16.500");
+// below keeps the existing "%.2f" format ("$3769.16").
+static void format_money(char* buf, size_t len, const char* sym, float v, bool decimals_ok) {
+    if (v < 10000.0f) {
+        if (decimals_ok) snprintf(buf, len, "%s%.2f", sym, v);
+        else             snprintf(buf, len, "%s%.0f", sym, v);
+        return;
+    }
+    long n = (long)(v + 0.5f);
+    char digits[16];
+    snprintf(digits, sizeof(digits), "%ld", n);
+    int dl = (int)strlen(digits);
+    char out[24]; int o = 0;
+    for (int i = 0; i < dl; ++i) {
+        if (i > 0 && (dl - i) % 3 == 0) out[o++] = '.';
+        out[o++] = digits[i];
+    }
+    out[o] = '\0';
+    snprintf(buf, len, "%s%s", sym, out);
+}
+
 static void update_cost_budget(ProviderScreen& s, const ProviderUsage& p) {
     const char* sym = currency_symbol(p.currency);
     char buf[64];
-    snprintf(buf, sizeof(buf), "%s%.2f", sym, p.m1);
+    format_money(buf, sizeof(buf), sym, p.m1, true);
     lv_label_set_text(s.m1_value_lbl, buf);
 
-    if (p.m2 > 0) {
-        // Budget configured — show utilization bar + budget figure
-        float pct = (p.m1 / p.m2) * 100.0f;
-        if (pct > 100.0f) pct = 100.0f;
-        lv_obj_clear_flag(s.m1_bar, LV_OBJ_FLAG_HIDDEN);
-        lv_bar_set_value(s.m1_bar, (int)(pct + 0.5f), LV_ANIM_ON);
-        lv_obj_set_style_bg_color(s.m1_bar, pct_color(pct), LV_PART_INDICATOR);
+    lv_obj_t* panel = lv_obj_get_parent(s.m1_value_lbl);
+    const int bar_y = L.bar_y + 12;
+    const int bar_h = 24;
+    const int inner_w = L.content_w - 32;
+    const int lh = lv_font_get_line_height(L.small_font);
+    int pct_y = L.reset_y + 6;
+    int panel_h = L.panel_h + 40;
 
-        snprintf(buf, sizeof(buf), "von %s%.0f", sym, p.m2);
+    // Hide everything first; re-enable what this payload needs.
+    for (uint8_t i = 0; i < CLAWD_SHARES_MAX; ++i) {
+        lv_obj_add_flag(s.bar_seg[i], LV_OBJ_FLAG_HIDDEN);
+        if (s.legend_dot[i]) { lv_obj_delete(s.legend_dot[i]); s.legend_dot[i] = nullptr; }
+        if (s.legend_lbl[i]) { lv_obj_delete(s.legend_lbl[i]); s.legend_lbl[i] = nullptr; }
+    }
+
+    if (p.m2 > 0) {
+        float pct = (p.m1 / p.m2) * 100.0f;   // real value, may exceed 100
+        float fill = pct > 100.0f ? 100.0f : (pct < 0.0f ? 0.0f : pct);
+        int fill_w = (int)(fill / 100.0f * inner_w + 0.5f);
+        lv_obj_clear_flag(s.bar_track, LV_OBJ_FLAG_HIDDEN);
+
+        uint32_t total = 0;
+        for (uint8_t i = 0; i < p.shares_count; ++i) total += p.shares[i].pct;
+
+        if (p.shares_count > 0 && total > 0) {
+            uint32_t cum = 0;
+            int legend_rows = 0;
+            int lx = 0;
+            for (uint8_t i = 0; i < p.shares_count; ++i) {
+                int x0 = (int)((uint64_t)fill_w * cum / total);
+                cum += p.shares[i].pct;
+                int x1 = (int)((uint64_t)fill_w * cum / total);
+                lv_obj_t* seg = s.bar_seg[i];
+                lv_obj_set_pos(seg, x0, 0);
+                lv_obj_set_size(seg, x1 - x0, bar_h);
+                lv_obj_set_style_bg_color(seg, seg_color(i), 0);
+                if (x1 > x0) lv_obj_clear_flag(seg, LV_OBJ_FLAG_HIDDEN);
+
+                // Legend entry: dot + "Kuerzel NN %", flowing, wrapping when full.
+                char lb[24];
+                snprintf(lb, sizeof(lb), "%s %d %%", p.shares[i].slug, p.shares[i].pct);
+                lv_point_t sz;
+                lv_text_get_size(&sz, lb, L.leg_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+                const int dot = 10, dot_gap = 6, item_gap = 14;
+                int item_w = dot + dot_gap + sz.x;
+                if (lx > 0 && lx + item_w > inner_w) { lx = 0; legend_rows++; }
+                int ly = bar_y + bar_h + L.leg_gap + legend_rows * L.leg_row_h;
+
+                lv_obj_t* d = lv_obj_create(panel);
+                lv_obj_set_size(d, dot, dot);
+                lv_obj_set_pos(d, lx, ly + (L.leg_row_h - dot) / 2 - 1);
+                lv_obj_set_style_bg_color(d, seg_color(i), 0);
+                lv_obj_set_style_bg_opa(d, LV_OPA_COVER, 0);
+                lv_obj_set_style_radius(d, 5, 0);
+                lv_obj_set_style_border_width(d, 0, 0);
+                lv_obj_set_style_pad_all(d, 0, 0);
+                lv_obj_clear_flag(d, LV_OBJ_FLAG_SCROLLABLE);
+                s.legend_dot[i] = d;
+
+                lv_obj_t* l = lv_label_create(panel);
+                lv_label_set_text(l, lb);
+                lv_obj_set_style_text_font(l, L.leg_font, 0);
+                lv_obj_set_style_text_color(l, COL_TEXT, 0);
+                lv_obj_set_pos(l, lx + dot + dot_gap, ly);
+                s.legend_lbl[i] = l;
+
+                lx += item_w + item_gap;
+            }
+            pct_y = bar_y + bar_h + L.leg_gap + (legend_rows + 1) * L.leg_row_h + L.leg_gap;
+            int need = pct_y + lh + 24 + 6;
+            if (need > panel_h) panel_h = need;
+        } else {
+            // No shares: single segment in utilisation colour (legacy look).
+            lv_obj_t* seg = s.bar_seg[0];
+            lv_obj_set_pos(seg, 0, 0);
+            lv_obj_set_size(seg, fill_w, bar_h);
+            lv_obj_set_style_bg_color(seg, pct_color(pct), 0);
+            if (fill_w > 0) lv_obj_clear_flag(seg, LV_OBJ_FLAG_HIDDEN);
+        }
+
+        char mb[32];
+        format_money(mb, sizeof(mb), sym, p.m2, false);
+        snprintf(buf, sizeof(buf), "von %s", mb);
         lv_label_set_text(s.m1_unit_lbl, buf);
 
-        snprintf(buf, sizeof(buf), "%d%% Budget", (int)(pct + 0.5f));
+        snprintf(buf, sizeof(buf), "%d %% Budget", (int)(pct + 0.5f));
         lv_label_set_text(s.m2_value_lbl, buf);
+        lv_obj_set_style_text_color(s.m2_value_lbl, pct_color(pct), 0);
     } else {
-        // No budget — hide bar, show plain "no budget"
-        lv_obj_add_flag(s.m1_bar, LV_OBJ_FLAG_HIDDEN);
+        // No budget: hide bar + legend, show plain "no budget"
+        lv_obj_add_flag(s.bar_track, LV_OBJ_FLAG_HIDDEN);
         lv_label_set_text(s.m1_unit_lbl, "");
         lv_label_set_text(s.m2_value_lbl, "Kein Budget gesetzt");
+        lv_obj_set_style_text_color(s.m2_value_lbl, COL_DIM, 0);
     }
+
+    lv_obj_set_height(panel, panel_h);
+    lv_obj_set_pos(s.m2_value_lbl, 0, pct_y);
+    lv_obj_align(s.reset_lbl, LV_ALIGN_TOP_RIGHT, 0, pct_y);
 
     char rbuf[48];
     format_reset_seconds(p.r2, rbuf, sizeof(rbuf));
     lv_label_set_text(s.reset_lbl, rbuf);
 
+    // Pace glyph: right after the "N % Budget" text, vertically centred on
+    // that row. Hidden when there is no budget (no utilisation to pace).
     lv_label_set_text(s.pace_lbl, pace_glyph(p.pace));
     lv_obj_set_style_text_color(s.pace_lbl, pace_color(p.pace), 0);
+    if (p.m2 > 0 && p.pace != CLAWD_PACE_UNSET) {
+        lv_point_t tsz;
+        lv_text_get_size(&tsz, lv_label_get_text(s.m2_value_lbl), L.small_font, 0, 0,
+                         LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        int ph = lv_font_get_line_height(&font_mono_18);
+        lv_obj_set_pos(s.pace_lbl, tsz.x + 10, pct_y + (lh - ph) / 2);
+        lv_obj_clear_flag(s.pace_lbl, LV_OBJ_FLAG_HIDDEN);
+    } else {
+        lv_obj_add_flag(s.pace_lbl, LV_OBJ_FLAG_HIDDEN);
+    }
 }
 
-// tokens_abs — OpenCode style: big number + 24h sparkline + provider donut.
+// tokens_abs — Langdock-managed: big number + share donut with legend.
 // Layout inside the panel (480×480, compact: 368×448 numbers in parens):
 //   y=0..52   big m1 value (left) + "Tokens heute" pill (right)
-//   y=58..82  "+X vs. gestern" (left)
-//   y=92..172 (88) 24h-sparkline bar chart, full width
-//   y=190..278 (78) donut left + legend right
+//   y=64..    donut left + legend right
 //   y=bottom  reset string (right)
 static const lv_color_t DONUT_SLICE_COLORS[CLAWD_SHARES_MAX] = {
     LV_COLOR_MAKE(0xE5, 0x6C, 0x4C),  // primary (terra-cotta / Bordeaux)
@@ -509,10 +665,7 @@ static const lv_color_t DONUT_SLICE_COLORS[CLAWD_SHARES_MAX] = {
 };
 
 struct AbsMetrics {
-    int spark_h;
     int donut_size;
-    int sub_y;
-    int spark_y;
     int donut_y;
     const lv_font_t* legend_font;
 };
@@ -520,11 +673,8 @@ struct AbsMetrics {
 static AbsMetrics abs_metrics() {
     AbsMetrics m;
     bool large = (L.scr_h >= 460);
-    m.spark_h    = large ? 80  : 60;
-    m.donut_size = large ? 80  : 60;
-    m.sub_y      = large ? 60  : 52;
-    m.spark_y    = large ? 96  : 76;
-    m.donut_y    = m.spark_y + m.spark_h + (large ? 14 : 8);
+    m.donut_size = large ? 96  : 72;
+    m.donut_y    = large ? 70  : 58;
     m.legend_font = L.small_font;
     return m;
 }
@@ -533,7 +683,10 @@ static AbsMetrics abs_metrics() {
 // visible on the tokens_abs screen (the spinner lives on the screen root and
 // sits at LV_ALIGN_BOTTOM_MID, -15 → ~50px from the bottom).
 static int abs_panel_height() {
-    return L.scr_h - L.content_y - L.margin - 50;
+    AbsMetrics M = abs_metrics();
+    int h = M.donut_y + M.donut_size + 24 + 40;   // donut row + pads + reset line
+    int maxh = L.scr_h - L.content_y - L.margin - 50;
+    return h < maxh ? h : maxh;
 }
 
 static void build_tokens_abs(ProviderScreen& s) {
@@ -557,34 +710,7 @@ static void build_tokens_abs(ProviderScreen& s) {
     lv_obj_set_style_text_color(s.m1_unit_lbl, COL_DIM, 0);
     lv_obj_align(s.m1_unit_lbl, LV_ALIGN_TOP_RIGHT, 0, 14);
 
-    // Sub-line: day-over-day delta
-    s.m3_value_lbl = lv_label_create(p);
-    lv_label_set_text(s.m3_value_lbl, "");
-    lv_obj_set_style_text_font(s.m3_value_lbl, L.small_font, 0);
-    lv_obj_set_style_text_color(s.m3_value_lbl, COL_DIM, 0);
-    lv_obj_set_pos(s.m3_value_lbl, 0, M.sub_y);
-
-    // --- 24h Sparkline (lv_chart, bar mode) ---
     int chart_w = L.content_w - 32;  // panel inner width
-    s.spark_chart = lv_chart_create(p);
-    lv_obj_set_size(s.spark_chart, chart_w, M.spark_h);
-    lv_obj_set_pos(s.spark_chart, 0, M.spark_y);
-    lv_chart_set_type(s.spark_chart, LV_CHART_TYPE_BAR);
-    lv_chart_set_point_count(s.spark_chart, CLAWD_SPARK_LEN);
-    lv_chart_set_range(s.spark_chart, LV_CHART_AXIS_PRIMARY_Y, 0, 1);
-    lv_chart_set_div_line_count(s.spark_chart, 0, 0);
-    lv_obj_set_style_pad_all(s.spark_chart, 0, 0);
-    lv_obj_set_style_pad_column(s.spark_chart, 2, 0);
-    lv_obj_set_style_bg_opa(s.spark_chart, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_border_width(s.spark_chart, 0, 0);
-    lv_obj_set_style_radius(s.spark_chart, 0, 0);
-    // The bar fill — use the brand accent for a single coherent colour bar.
-    lv_obj_set_style_bg_color(s.spark_chart, COL_ACCENT, LV_PART_ITEMS);
-    lv_obj_set_style_bg_opa(s.spark_chart, LV_OPA_COVER, LV_PART_ITEMS);
-    lv_obj_set_style_radius(s.spark_chart, 1, LV_PART_ITEMS);
-    lv_obj_clear_flag(s.spark_chart, LV_OBJ_FLAG_SCROLLABLE);
-    s.spark_series = lv_chart_add_series(
-        s.spark_chart, COL_ACCENT, LV_CHART_AXIS_PRIMARY_Y);
 
     // --- Donut + legend ---
     int donut_x = 0;
@@ -647,32 +773,6 @@ static void update_tokens_abs(ProviderScreen& s, const ProviderUsage& p) {
     char buf[48];
     format_tokens(p.m1, buf, sizeof(buf));
     lv_label_set_text(s.m1_value_lbl, buf);
-
-    if (p.m3_set && p.m3 > 0) {
-        float delta = p.m1 - p.m3;
-        char dbuf[40];
-        format_tokens(fabsf(delta), dbuf, sizeof(dbuf));
-        if (delta >= 0) snprintf(buf, sizeof(buf), "+%s vs. gestern", dbuf);
-        else            snprintf(buf, sizeof(buf), "-%s vs. gestern", dbuf);
-        lv_label_set_text(s.m3_value_lbl, buf);
-    } else {
-        lv_label_set_text(s.m3_value_lbl, "");
-    }
-
-    // Sparkline: rescale Y range to the actual max so quiet hours don't
-    // flatten the active hours into invisibility.
-    if (s.spark_chart && s.spark_series) {
-        uint32_t peak = 1;  // avoid 0..0 collapse
-        for (uint8_t i = 0; i < CLAWD_SPARK_LEN; ++i) {
-            if (p.spark[i] > peak) peak = p.spark[i];
-        }
-        lv_chart_set_range(s.spark_chart, LV_CHART_AXIS_PRIMARY_Y, 0, (int32_t)peak);
-        for (uint8_t i = 0; i < CLAWD_SPARK_LEN; ++i) {
-            lv_chart_set_next_value(s.spark_chart, s.spark_series,
-                                     p.spark_set ? (int32_t)p.spark[i] : 0);
-        }
-        lv_chart_refresh(s.spark_chart);
-    }
 
     // Donut + legend: hide unused slices, lay out the active ones as a
     // contiguous arc starting at 12 o'clock.

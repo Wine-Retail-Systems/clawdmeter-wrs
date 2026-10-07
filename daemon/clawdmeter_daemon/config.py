@@ -87,20 +87,18 @@ usd_to_eur = 0.92
 # email to scope the slot to your personal usage.
 # user_email = "you@example.com"
 
-# ---- OpenCode (sst/opencode local CLI) ----
+# ---- Bifrost (WRS LLM gateway, budget of your virtual key in USD) ----
 [[provider]]
-id = "opencode"
+id = "bifrost"
 enabled = false
-poll_seconds = 15
-slot_id = "opencode"
-display_name = "OpenCode"
+poll_seconds = 120
+slot_id = "bifrost"
+display_name = "LLM Gateway"
 display_note = ""
-# Empty = auto-detect from XDG_DATA_HOME / platform default.
-db_path = ""
-# When true, the OpenCode screen also shows the backend provider's quota
-# as a secondary metric (m2). Requires the backend provider to be enabled
-# as a separate [[provider]] entry.
-include_backend_quota = true
+# Env var holding the virtual key (sk-bf-...). The value lives in
+# ~/.config/clawdmeter/secrets.env (chmod 600), never in this file.
+api_key_env = "BIFROST_VIRTUAL_KEY"
+base_url = "https://llm-gw.wineretailsystems.cloud"
 
 # ---- AWS Bedrock — AKTUELL DEAKTIVIERT ----
 # Der Bedrock-Adapter pollt CloudWatch (`GetMetricStatistics`) + Service Quotas

@@ -11,7 +11,7 @@ Unterstützt heute folgende Provider:
 | **Anthropic Claude** (Claude Code) | aktiv        | 5h + 7d Rolling-Window-Auslastung, Reset-Timer, Burn-Rate     |
 | **OpenAI Codex / ChatGPT**         | aktiv        | 5h-Session + 7d-Weekly-Auslastung, Plan-Typ, Reset-Timer      |
 | **Langdock**                       | aktiv        | EUR-Workspace-Verbrauch vs. Budget, BYOK/managed-Aufschlüsselung |
-| **OpenCode** (sst/opencode)        | aktiv        | Tokens heute, Vergleich Vortag, Backend-Mix-Donut, Aktivitäts-Histogramm |
+| **LLM Gateway (Bifrost)**          | aktiv        | USD-Verbrauch vs. Virtual-Key-Budget, Modell-Mix-Segmentierung |
 | **AWS Bedrock**                    | ⏸️ pausiert   | Adapter-Code vorhanden, vom Setup-Wizard nicht angeboten — siehe Hinweis unten |
 
 > **AWS-Bedrock-Status (Stand 2026-05-24)**: Der Bedrock-Adapter liest
@@ -38,10 +38,10 @@ Vorlage richtet sich nach dem `kind`-Feld des Daemons:
 | ![Claude screen](screenshots/anthropic.png) |    ![Codex screen](screenshots/codex.png)    | ![Langdock screen](screenshots/langdock.png) |
 |  5h-Session + 7d-Weekly als Bar + Reset-Timer  | gleiches Layout wie Claude, Plan-Typ als Notiz |   EUR-Verbrauch, Budget-Bar, Monatsreset    |
 
-|       OpenCode (`tokens_today`)        |          Splash (Wine Edition)          |         Bluetooth (Pairing/Status)         |
+|       Bifrost (`cost_budget`)        |          Splash (Wine Edition)          |         Bluetooth (Pairing/Status)         |
 | :------------------------------------: | :-------------------------------------: | :----------------------------------------: |
-| ![OpenCode screen](screenshots/opencode.png) | ![Wine splash](screenshots/splash.png) | ![Bluetooth screen](screenshots/bluetooth.png) |
-| Tokens heute, Histogramm, Backend-Donut |  zyklische Pixel-Art (PWR-Taste blättert)  |     Connect-State, MAC, Bond-Reset      |
+| ![Bifrost screen](screenshots/bifrost.png) | ![Wine splash](screenshots/splash.png) | ![Bluetooth screen](screenshots/bluetooth.png) |
+| USD-Budget, Modell-Mix-Segment, Reset-Countdown |  zyklische Pixel-Art (PWR-Taste blättert)  |     Connect-State, MAC, Bond-Reset      |
 
 Gemeinsam ist allen Provider-Screens: oben links der **80×80-Logo-Slot**
 (Wine-Glas in der Brand-Fork, sonst Anthropic-„Clawd"), oben mittig der
@@ -83,8 +83,8 @@ rechts der **Akku- bzw. USB-Status**. Unten am Bildschirmrand läuft ein
 
 Der **Daemon** läuft als systemd-User-Service (Linux), LaunchAgent (macOS)
 oder Scheduled Task (Windows). Er pollt jeden aktiven Provider in seinem
-eigenen Intervall (Anthropic 60s, Codex 60s, Bedrock 60s, OpenCode 15s,
-Langdock 600s), normalisiert das Ergebnis und schickt es als JSON-Sequenz
+eigenen Intervall (Anthropic 60s, Codex 60s, Bifrost 120s, Langdock 600s,
+Bedrock 60s), normalisiert das Ergebnis und schickt es als JSON-Sequenz
 über BLE an das Gerät.
 
 Das **Gerät** hat keine Cloud-Anbindung. Es zeigt nur an, was der Daemon
@@ -211,7 +211,7 @@ ob er aktiviert werden soll. Auto-Detect findet typischerweise von alleine:
 
 - Claude OAuth-Token (Keychain auf macOS, `~/.claude/.credentials.json` sonst)
 - Codex/ChatGPT OAuth-Token (`~/.codex/auth.json`, hinterlassen von `codex login`)
-- OpenCode-DB (`~/.local/share/opencode/opencode.db` oder Windows-Pendant)
+- Bifrost Virtual Key (aus Claude-Code-Konfiguration oder `ANTHROPIC_AUTH_TOKEN`)
 - AWS-Credentials (`~/.aws/credentials` oder `AWS_ACCESS_KEY_ID`-Env)
 - Langdock-API-Key in `LANGDOCK_API_KEY`
 
@@ -366,31 +366,24 @@ Discovery-Details + IAM-JSON-Snippet:
 Discovery + alle Caveats:
 [feature-documentation/providers/langdock.md](feature-documentation/providers/langdock.md).
 
-### OpenCode (sst/opencode)
+### Bifrost / LLM-Gateway
 
-![OpenCode Screen](screenshots/opencode.png)
+![Bifrost Screen](screenshots/bifrost.png)
 
-> Der Screenshot oben ist ein Demo-Render mit synthetischen Daten — Aktivität
-> über den Tag, drei Backend-Provider gleichzeitig. Live sieht das Layout
-> identisch aus, nur die Zahlen variieren.
+- **Was wird gezeigt**: USD-Verbrauch laufender Monat gegen Virtual-Key-Budget,
+  Auslastung als Balken (segmentiert nach Modellfamilie, wenn Daten vorliegen),
+  Reset-Timer auf Monatsende, Pace-Indikator gegen erwarteten Verbrauch.
+- **Quelle**: `/api/governance/virtual-keys/quota` Self-Service-Endpunkt des
+  WRS-LLM-Gateways, keine Admin-Rechte nötig — nur der Virtual Key reicht.
+- **Credentials**: Virtual Key aus Claude-Code-Konfiguration (`ANTHROPIC_AUTH_TOKEN`
+  mit Präfix `sk-bf-…`) oder manuell in `secrets.env` als `BIFROST_VIRTUAL_KEY`.
+- **Modell-Mix**: Der Balken wird nach Modellfamilie (Opus, Sonnet, Haiku, Andere)
+  segmentiert, sofern Daten verfügbar sind. Sonst einfarbiger Balken wie bei
+  anderen Cost-Providern.
+- **Polling-Default**: 120 s (Gateway-Quota wird nicht häufiger als alle 2 min
+  aktualisiert).
 
-- **Was wird gezeigt**: Tokens heute (Mitternacht bis jetzt), Vergleich
-  zu gestern (Delta-Label), **Histogramm** der Token-Aktivität pro Stunde,
-  **Donut-Chart** mit dem Backend-Mix (welcher Underlying-Provider wie viel
-  Anteil — z. B. `anthro 62% / bedrock 30% / openai 8%`) und optional die
-  Quota-Auslastung des dahinterliegenden Backend-Providers.
-- **Quelle**: lokale SQLite-DB (`~/.local/share/opencode/opencode.db`),
-  geöffnet read-only mit `mode=ro` + WAL — koexistiert mit einem
-  laufenden OpenCode-Prozess.
-- **Credentials**: keine — der Daemon liest nur die DB.
-- **Backend-Quota-Korrelation**: Wenn OpenCode auf z. B. `amazon-bedrock`
-  läuft UND ein passender `[[provider]]`-Block für Bedrock im Config ist,
-  zeigt das OpenCode-Screen den Backend-Auslastungsbar als sekundäre
-  Metrik. Mapping: OpenCode-`providerID amazon-bedrock` → Clawdmeter-`bedrock`.
-- **Polling-Default**: 15 s.
-
-Schema-Notes (das OpenCode-DB-Schema ändert sich häufig, defensive Reads
-nötig): [feature-documentation/providers/opencode.md](feature-documentation/providers/opencode.md).
+Full Details: [feature-documentation/providers/bifrost.md](feature-documentation/providers/bifrost.md).
 
 ## BLE-Protokoll
 

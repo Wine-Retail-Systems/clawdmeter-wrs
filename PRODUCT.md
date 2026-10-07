@@ -10,7 +10,7 @@ Die Companion-App ist eine Tauri-2-Desktop-App (macOS, Windows) mit React-Oberfl
 
 ## Users
 
-Entwickler im JAC-/WRS-Team, die täglich mit LLM-Werkzeugen arbeiten (Claude Code, OpenAI Codex, Langdock, OpenCode) und ihr Kontingent im Blick behalten wollen, ohne dafür einen Browser-Tab oder ein Terminal zu öffnen. Sie sind technisch versiert, wollen das Gerät aber ohne Shell-, Python- oder PlatformIO-Setup in Betrieb nehmen.
+Entwickler im JAC-/WRS-Team, die täglich mit LLM-Werkzeugen arbeiten (Claude Code, OpenAI Codex, Langdock, Bifrost/LLM-Gateway) und ihr Kontingent im Blick behalten wollen, ohne dafür einen Browser-Tab oder ein Terminal zu öffnen. Sie sind technisch versiert, wollen das Gerät aber ohne Shell-, Python- oder PlatformIO-Setup in Betrieb nehmen.
 
 Ihr Job: einmal einrichten (flashen, koppeln, Provider-Zugänge hinterlegen), danach nebenbei auf einen Blick sehen, wie viel vom 5-Stunden- und Wochenfenster bzw. vom Budget verbraucht ist und wann es zurückgesetzt wird.
 
@@ -32,7 +32,7 @@ Ein physisches, immer sichtbares Instrument statt eines weiteren Dashboards: Die
 
 ## Capabilities and Constraints
 
-- Provider: Anthropic Claude (5h- und 7d-Fenster), OpenAI Codex (5h + Weekly, Plan-Typ), Langdock (EUR-Budget), OpenCode (Tokens heute, Histogramm, Backend-Mix). AWS Bedrock ist pausiert; der Adapter existiert, wird aber nicht angeboten.
+- Provider: Anthropic Claude (5h- und 7d-Fenster), OpenAI Codex (5h + Weekly, Plan-Typ), Bifrost/LLM-Gateway (USD-Budget mit Modell-Mix), Langdock (EUR-Budget mit Modus-Erkennung). AWS Bedrock ist pausiert; der Adapter existiert, wird aber nicht angeboten.
 - Pro Provider ein Screen-Typ nach `kind` (`pct_window`, `cost_budget`, `tokens_abs`, `tpm_rpm`); maximal sechs Provider-Slots auf dem Gerät.
 - Sprache: nur Deutsch, in App und Firmware (MVP). Glyphenbereich der Gerätefonts umfasst deutsche Umlaute.
 - Plattformen der App: macOS (aarch64) und Windows. Linux ist kein Ziel im MVP.
@@ -49,7 +49,7 @@ Ein physisches, immer sichtbares Instrument statt eines weiteren Dashboards: Die
 
 ## Evidence on Hand
 
-- Geräte-Screenshots: `screenshots/` (anthropic, codex, langdock, opencode, splash, bluetooth); `screenshot.sh` erzeugt neue direkt vom Gerät.
+- Geräte-Screenshots: `screenshots/` (anthropic, codex, bifrost, langdock, splash, bluetooth); `screenshot.sh` erzeugt neue direkt vom Gerät.
 - Logos und Fonts: `assets/` (`logo_80.png`, Tiempos, Styrene, DejaVu Sans Mono, Lucide-Icons), `firmware/src/logo_wine.h`.
 - Spezifikation und Stand: `feature-documentation/companion-app/PLAN.md`, `PROGRESS.md`, `feature-documentation/providers/`.
 - Es gibt keine Nutzer-Testimonials, Kennzahlen oder Fremdkunden; solche Angaben dürfen nicht erfunden werden.

@@ -52,7 +52,8 @@ HIDDEN_IMPORTS = [
     "clawdmeter_daemon.providers.bedrock",
     "clawdmeter_daemon.providers.codex",
     "clawdmeter_daemon.providers.langdock",
-    "clawdmeter_daemon.providers.opencode",
+    "clawdmeter_daemon.providers.bifrost",
+    "clawdmeter_daemon.providers._budget",
 ]
 
 COLLECT_ALL = [
