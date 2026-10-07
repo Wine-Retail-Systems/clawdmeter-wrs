@@ -1,0 +1,611 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T07:35:48.745717+00:00",
+  "title": "Design System: Clawdmeter",
+  "extensions": {
+    "colorMeta": {
+      "bordeaux": {
+        "role": "primary",
+        "displayName": "Bordeaux",
+        "canonical": "#7c2d3a",
+        "tonalRamp": [
+          "oklch(15% 0.110 13.3)",
+          "oklch(25% 0.110 13.3)",
+          "oklch(35% 0.110 13.3)",
+          "oklch(45% 0.110 13.3)",
+          "oklch(58% 0.110 13.3)",
+          "oklch(70% 0.110 13.3)",
+          "oklch(82% 0.110 13.3)",
+          "oklch(95% 0.110 13.3)"
+        ]
+      },
+      "bordeaux-deep": {
+        "role": "primary",
+        "displayName": "Tiefes Bordeaux",
+        "canonical": "#682530",
+        "tonalRamp": [
+          "oklch(15% 0.096 13.3)",
+          "oklch(25% 0.096 13.3)",
+          "oklch(35% 0.096 13.3)",
+          "oklch(45% 0.096 13.3)",
+          "oklch(58% 0.096 13.3)",
+          "oklch(70% 0.096 13.3)",
+          "oklch(82% 0.096 13.3)",
+          "oklch(95% 0.096 13.3)"
+        ]
+      },
+      "bordeaux-night": {
+        "role": "primary",
+        "displayName": "Nacht-Bordeaux",
+        "canonical": "#d05a6c",
+        "tonalRamp": [
+          "oklch(15% 0.150 13.2)",
+          "oklch(25% 0.150 13.2)",
+          "oklch(35% 0.150 13.2)",
+          "oklch(45% 0.150 13.2)",
+          "oklch(58% 0.150 13.2)",
+          "oklch(70% 0.150 13.2)",
+          "oklch(82% 0.150 13.2)",
+          "oklch(95% 0.150 13.2)"
+        ]
+      },
+      "bordeaux-night-hover": {
+        "role": "primary",
+        "displayName": "Nacht-Bordeaux Hover",
+        "canonical": "#de7080",
+        "tonalRamp": [
+          "oklch(15% 0.138 12.3)",
+          "oklch(25% 0.138 12.3)",
+          "oklch(35% 0.138 12.3)",
+          "oklch(45% 0.138 12.3)",
+          "oklch(58% 0.138 12.3)",
+          "oklch(70% 0.138 12.3)",
+          "oklch(82% 0.138 12.3)",
+          "oklch(95% 0.138 12.3)"
+        ]
+      },
+      "cellar-shadow": {
+        "role": "primary",
+        "displayName": "Kellerschatten",
+        "canonical": "#2a0e14",
+        "tonalRamp": [
+          "oklch(15% 0.047 8.6)",
+          "oklch(25% 0.047 8.6)",
+          "oklch(35% 0.047 8.6)",
+          "oklch(45% 0.047 8.6)",
+          "oklch(58% 0.047 8.6)",
+          "oklch(70% 0.047 8.6)",
+          "oklch(82% 0.047 8.6)",
+          "oklch(95% 0.047 8.6)"
+        ]
+      },
+      "linen": {
+        "role": "neutral",
+        "displayName": "Leinen",
+        "canonical": "#f7f5f2",
+        "tonalRamp": [
+          "oklch(15% 0.005 78.3)",
+          "oklch(25% 0.005 78.3)",
+          "oklch(35% 0.005 78.3)",
+          "oklch(45% 0.005 78.3)",
+          "oklch(58% 0.005 78.3)",
+          "oklch(70% 0.005 78.3)",
+          "oklch(82% 0.005 78.3)",
+          "oklch(95% 0.005 78.3)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Papier",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(25% 0.000 89.9)",
+          "oklch(35% 0.000 89.9)",
+          "oklch(45% 0.000 89.9)",
+          "oklch(58% 0.000 89.9)",
+          "oklch(70% 0.000 89.9)",
+          "oklch(82% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ]
+      },
+      "linen-subtle": {
+        "role": "neutral",
+        "displayName": "Leinen gedämpft",
+        "canonical": "#f0ede8",
+        "tonalRamp": [
+          "oklch(15% 0.007 80.7)",
+          "oklch(25% 0.007 80.7)",
+          "oklch(35% 0.007 80.7)",
+          "oklch(45% 0.007 80.7)",
+          "oklch(58% 0.007 80.7)",
+          "oklch(70% 0.007 80.7)",
+          "oklch(82% 0.007 80.7)",
+          "oklch(95% 0.007 80.7)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinte",
+        "canonical": "#1a1614",
+        "tonalRamp": [
+          "oklch(15% 0.008 48.3)",
+          "oklch(25% 0.008 48.3)",
+          "oklch(35% 0.008 48.3)",
+          "oklch(45% 0.008 48.3)",
+          "oklch(58% 0.008 48.3)",
+          "oklch(70% 0.008 48.3)",
+          "oklch(82% 0.008 48.3)",
+          "oklch(95% 0.008 48.3)"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Tinte gedämpft",
+        "canonical": "#6b6259",
+        "tonalRamp": [
+          "oklch(15% 0.018 67.4)",
+          "oklch(25% 0.018 67.4)",
+          "oklch(35% 0.018 67.4)",
+          "oklch(45% 0.018 67.4)",
+          "oklch(58% 0.018 67.4)",
+          "oklch(70% 0.018 67.4)",
+          "oklch(82% 0.018 67.4)",
+          "oklch(95% 0.018 67.4)"
+        ]
+      },
+      "ink-subtle": {
+        "role": "neutral",
+        "displayName": "Tinte blass",
+        "canonical": "#9a9088",
+        "tonalRamp": [
+          "oklch(15% 0.017 61.2)",
+          "oklch(25% 0.017 61.2)",
+          "oklch(35% 0.017 61.2)",
+          "oklch(45% 0.017 61.2)",
+          "oklch(58% 0.017 61.2)",
+          "oklch(70% 0.017 61.2)",
+          "oklch(82% 0.017 61.2)",
+          "oklch(95% 0.017 61.2)"
+        ]
+      },
+      "cellar": {
+        "role": "neutral",
+        "displayName": "Keller",
+        "canonical": "#15110f",
+        "tonalRamp": [
+          "oklch(15% 0.008 48.3)",
+          "oklch(25% 0.008 48.3)",
+          "oklch(35% 0.008 48.3)",
+          "oklch(45% 0.008 48.3)",
+          "oklch(58% 0.008 48.3)",
+          "oklch(70% 0.008 48.3)",
+          "oklch(82% 0.008 48.3)",
+          "oklch(95% 0.008 48.3)"
+        ]
+      },
+      "cellar-elev": {
+        "role": "neutral",
+        "displayName": "Keller erhaben",
+        "canonical": "#1e1a17",
+        "tonalRamp": [
+          "oklch(15% 0.009 59.2)",
+          "oklch(25% 0.009 59.2)",
+          "oklch(35% 0.009 59.2)",
+          "oklch(45% 0.009 59.2)",
+          "oklch(58% 0.009 59.2)",
+          "oklch(70% 0.009 59.2)",
+          "oklch(82% 0.009 59.2)",
+          "oklch(95% 0.009 59.2)"
+        ]
+      },
+      "cellar-subtle": {
+        "role": "neutral",
+        "displayName": "Keller gedämpft",
+        "canonical": "#221d1a",
+        "tonalRamp": [
+          "oklch(15% 0.010 53.0)",
+          "oklch(25% 0.010 53.0)",
+          "oklch(35% 0.010 53.0)",
+          "oklch(45% 0.010 53.0)",
+          "oklch(58% 0.010 53.0)",
+          "oklch(70% 0.010 53.0)",
+          "oklch(82% 0.010 53.0)",
+          "oklch(95% 0.010 53.0)"
+        ]
+      },
+      "chalk": {
+        "role": "neutral",
+        "displayName": "Kreide",
+        "canonical": "#f4efea",
+        "tonalRamp": [
+          "oklch(15% 0.009 67.7)",
+          "oklch(25% 0.009 67.7)",
+          "oklch(35% 0.009 67.7)",
+          "oklch(45% 0.009 67.7)",
+          "oklch(58% 0.009 67.7)",
+          "oklch(70% 0.009 67.7)",
+          "oklch(82% 0.009 67.7)",
+          "oklch(95% 0.009 67.7)"
+        ]
+      },
+      "chalk-muted": {
+        "role": "neutral",
+        "displayName": "Kreide gedämpft",
+        "canonical": "#b3aaa1",
+        "tonalRamp": [
+          "oklch(15% 0.016 67.6)",
+          "oklch(25% 0.016 67.6)",
+          "oklch(35% 0.016 67.6)",
+          "oklch(45% 0.016 67.6)",
+          "oklch(58% 0.016 67.6)",
+          "oklch(70% 0.016 67.6)",
+          "oklch(82% 0.016 67.6)",
+          "oklch(95% 0.016 67.6)"
+        ]
+      },
+      "chalk-subtle": {
+        "role": "neutral",
+        "displayName": "Kreide blass",
+        "canonical": "#7d736a",
+        "tonalRamp": [
+          "oklch(15% 0.018 64.5)",
+          "oklch(25% 0.018 64.5)",
+          "oklch(35% 0.018 64.5)",
+          "oklch(45% 0.018 64.5)",
+          "oklch(58% 0.018 64.5)",
+          "oklch(70% 0.018 64.5)",
+          "oklch(82% 0.018 64.5)",
+          "oklch(95% 0.018 64.5)"
+        ]
+      },
+      "status-ok": {
+        "role": "status",
+        "displayName": "OK",
+        "canonical": "#15803d",
+        "tonalRamp": [
+          "oklch(15% 0.137 150.1)",
+          "oklch(25% 0.137 150.1)",
+          "oklch(35% 0.137 150.1)",
+          "oklch(45% 0.137 150.1)",
+          "oklch(58% 0.137 150.1)",
+          "oklch(70% 0.137 150.1)",
+          "oklch(82% 0.137 150.1)",
+          "oklch(95% 0.137 150.1)"
+        ]
+      },
+      "status-warn": {
+        "role": "status",
+        "displayName": "Warnung",
+        "canonical": "#b45309",
+        "tonalRamp": [
+          "oklch(15% 0.146 49.0)",
+          "oklch(25% 0.146 49.0)",
+          "oklch(35% 0.146 49.0)",
+          "oklch(45% 0.146 49.0)",
+          "oklch(58% 0.146 49.0)",
+          "oklch(70% 0.146 49.0)",
+          "oklch(82% 0.146 49.0)",
+          "oklch(95% 0.146 49.0)"
+        ]
+      },
+      "status-danger": {
+        "role": "status",
+        "displayName": "Fehler",
+        "canonical": "#b91c1c",
+        "tonalRamp": [
+          "oklch(15% 0.190 27.5)",
+          "oklch(25% 0.190 27.5)",
+          "oklch(35% 0.190 27.5)",
+          "oklch(45% 0.190 27.5)",
+          "oklch(58% 0.190 27.5)",
+          "oklch(70% 0.190 27.5)",
+          "oklch(82% 0.190 27.5)",
+          "oklch(95% 0.190 27.5)"
+        ]
+      },
+      "device-black": {
+        "role": "device",
+        "displayName": "Gerät Schwarz",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "oklch(15% 0.000 0.0)",
+          "oklch(25% 0.000 0.0)",
+          "oklch(35% 0.000 0.0)",
+          "oklch(45% 0.000 0.0)",
+          "oklch(58% 0.000 0.0)",
+          "oklch(70% 0.000 0.0)",
+          "oklch(82% 0.000 0.0)",
+          "oklch(95% 0.000 0.0)"
+        ]
+      },
+      "device-panel": {
+        "role": "device",
+        "displayName": "Gerät Panel",
+        "canonical": "#1f1f1e",
+        "tonalRamp": [
+          "oklch(15% 0.002 106.5)",
+          "oklch(25% 0.002 106.5)",
+          "oklch(35% 0.002 106.5)",
+          "oklch(45% 0.002 106.5)",
+          "oklch(58% 0.002 106.5)",
+          "oklch(70% 0.002 106.5)",
+          "oklch(82% 0.002 106.5)",
+          "oklch(95% 0.002 106.5)"
+        ]
+      },
+      "device-text": {
+        "role": "device",
+        "displayName": "Gerät Text",
+        "canonical": "#faf9f5",
+        "tonalRamp": [
+          "oklch(15% 0.005 95.1)",
+          "oklch(25% 0.005 95.1)",
+          "oklch(35% 0.005 95.1)",
+          "oklch(45% 0.005 95.1)",
+          "oklch(58% 0.005 95.1)",
+          "oklch(70% 0.005 95.1)",
+          "oklch(82% 0.005 95.1)",
+          "oklch(95% 0.005 95.1)"
+        ]
+      },
+      "device-dim": {
+        "role": "device",
+        "displayName": "Gerät gedimmt",
+        "canonical": "#b0aea5",
+        "tonalRamp": [
+          "oklch(15% 0.013 96.5)",
+          "oklch(25% 0.013 96.5)",
+          "oklch(35% 0.013 96.5)",
+          "oklch(45% 0.013 96.5)",
+          "oklch(58% 0.013 96.5)",
+          "oklch(70% 0.013 96.5)",
+          "oklch(82% 0.013 96.5)",
+          "oklch(95% 0.013 96.5)"
+        ]
+      },
+      "device-terracotta": {
+        "role": "device",
+        "displayName": "Terra-Cotta (Standard-Firmware)",
+        "canonical": "#d97757",
+        "tonalRamp": [
+          "oklch(15% 0.131 38.8)",
+          "oklch(25% 0.131 38.8)",
+          "oklch(35% 0.131 38.8)",
+          "oklch(45% 0.131 38.8)",
+          "oklch(58% 0.131 38.8)",
+          "oklch(70% 0.131 38.8)",
+          "oklch(82% 0.131 38.8)",
+          "oklch(95% 0.131 38.8)"
+        ]
+      },
+      "device-bordeaux": {
+        "role": "device",
+        "displayName": "Geräte-Bordeaux (Wine Edition)",
+        "canonical": "#7a2e36",
+        "tonalRamp": [
+          "oklch(15% 0.106 16.7)",
+          "oklch(25% 0.106 16.7)",
+          "oklch(35% 0.106 16.7)",
+          "oklch(45% 0.106 16.7)",
+          "oklch(58% 0.106 16.7)",
+          "oklch(70% 0.106 16.7)",
+          "oklch(82% 0.106 16.7)",
+          "oklch(95% 0.106 16.7)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Seitenüberschrift, eine pro Screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Markenname im Header."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Karten- und Action-Card-Titel."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Fließtext in Karten."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Buttons, Felder, Optionen, Hinweisboxen."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Overlines in Großbuchstaben."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Ports, Versionen, Fortschritt, Logs."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 1px 2px rgba(26,22,20,.04), 0 1px 1px rgba(26,22,20,.06)",
+        "purpose": "Ruhe: Karten, Buttons, Statuschip. Dunkel: 0 1px 2px rgba(0,0,0,.25)."
+      },
+      {
+        "name": "shadow-md",
+        "value": "0 4px 12px rgba(26,22,20,.06), 0 1px 3px rgba(26,22,20,.08)",
+        "purpose": "Anheben beim Hover. Dunkel: 0 4px 14px rgba(0,0,0,.4)."
+      },
+      {
+        "name": "shadow-accent",
+        "value": "0 6px 20px rgba(124,45,58,.18)",
+        "purpose": "Bordeaux-Schimmer nur für Brand-Mark und primäre Action-Card. Dunkel: 0 6px 22px rgba(208,90,108,.28)."
+      },
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 3px var(--accent-soft)",
+        "purpose": "Fokus aller interaktiven Elemente."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control",
+        "value": "120ms ease",
+        "purpose": "Farb- und Rahmenwechsel an Bedienelementen."
+      },
+      {
+        "name": "press",
+        "value": "80ms ease",
+        "purpose": "Button-Druck (translateY 1px)."
+      },
+      {
+        "name": "lift",
+        "value": "180ms ease",
+        "purpose": "Action-Card hebt sich um 2px."
+      },
+      {
+        "name": "progress",
+        "value": "220ms ease-out",
+        "purpose": "Fortschrittsbalken."
+      },
+      {
+        "name": "rise",
+        "value": "360ms ease-out, 60ms stagger",
+        "purpose": "Gestaffeltes Einblenden von Seiteninhalten."
+      },
+      {
+        "name": "pulse",
+        "value": "2s ease-in-out infinite",
+        "purpose": "Statuspunkt bei laufendem Vorgang."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "single-column",
+        "value": "720px"
+      },
+      {
+        "name": "window-default",
+        "value": "880x700"
+      },
+      {
+        "name": "window-min",
+        "value": "720x540"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Hauptaktion eines Schritts, z. B. Flashen starten.",
+      "html": "<button class=\"ds-cta\">Firmware flashen</button>",
+      "css": ".ds-cta{appearance:none;background:var(--accent, #7c2d3a);color:#fff;border:0;padding:9px 16px;border-radius:10px;font:500 13px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;cursor:pointer;transition:background 120ms ease,transform 80ms ease,box-shadow 120ms ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(26,22,20,.04),0 1px 1px rgba(26,22,20,.06)}.ds-cta:hover{background:var(--accent-hover, #682530)}.ds-cta:active{transform:translateY(1px)}.ds-cta:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft, rgba(124,45,58,.08))}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Nebenaktion neben dem Primärbutton, z. B. Abbrechen oder Neu laden.",
+      "html": "<button class=\"ds-cta-ghost\">Abbrechen</button>",
+      "css": ".ds-cta-ghost{appearance:none;background:var(--bg-elev, #ffffff);color:var(--fg, #1a1614);border:1px solid var(--border-strong, rgba(26,22,20,.14));padding:9px 16px;border-radius:10px;font:500 13px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;cursor:pointer;transition:background 120ms ease;box-shadow:0 1px 2px rgba(26,22,20,.04)}.ds-cta-ghost:hover{background:var(--bg-subtle, #f0ede8)}.ds-cta-ghost:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft, rgba(124,45,58,.08))}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Standardcontainer für Wizard-Schritte und Statusblöcke.",
+      "html": "<section class=\"ds-card\"><p class=\"ds-card-label\">Schritt 2</p><h3 class=\"ds-card-title\">Gerät koppeln</h3><p class=\"ds-card-body\">Halte die PWR-Taste gedrückt, bis der Bluetooth-Screen erscheint.</p><p class=\"ds-card-mono\">/dev/cu.usbmodem101</p></section>",
+      "css": ".ds-card{background:var(--bg-elev, #ffffff);border:1px solid var(--border, rgba(26,22,20,.08));border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(26,22,20,.04),0 1px 1px rgba(26,22,20,.06);color:var(--fg, #1a1614);font:14px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;max-width:420px}.ds-card-label{margin:0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--fg-subtle, #9a9088)}.ds-card-title{margin:0;font:500 18px \"Fraunces\", \"SF Pro Display\", Georgia, serif;letter-spacing:-.005em}.ds-card-body{margin:0;color:var(--fg-muted, #6b6259);line-height:1.55}.ds-card-mono{margin:0;font:12px ui-monospace, \"SF Mono\", Menlo, monospace;color:var(--fg-muted, #6b6259);background:var(--bg-subtle, #f0ede8);border:1px solid var(--border, rgba(26,22,20,.08));padding:6px 10px;border-radius:6px}"
+    },
+    {
+      "name": "Primary Action Card",
+      "kind": "custom",
+      "refersTo": "action-card-primary",
+      "description": "Signatur der Landing-Seite: die eine empfohlene Aktion, als Bordeaux-Verlauf.",
+      "html": "<button class=\"ds-action\"><span class=\"ds-action-icon\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13 2 4.5 13.5h6L10 22l9-12.5h-6z\"/></svg></span><span class=\"ds-action-title\">Gerät einrichten</span><span class=\"ds-action-hint\">Firmware flashen, koppeln und Provider verbinden.</span><span class=\"ds-action-cta\">Los geht’s <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></span></button>",
+      "css": ".ds-action{all:unset;box-sizing:border-box;cursor:pointer;width:320px;display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:14px;color:#fff;font-family:-apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;background:linear-gradient(135deg,var(--accent, #7c2d3a) 0%,color-mix(in oklab,var(--accent, #7c2d3a) 65%,#2a0e14) 100%);box-shadow:0 6px 20px rgba(124,45,58,.18);transition:transform 180ms ease,box-shadow 180ms ease}.ds-action:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(124,45,58,.28)}.ds-action:focus-visible{box-shadow:0 0 0 3px var(--accent-soft, rgba(124,45,58,.08)),0 6px 20px rgba(124,45,58,.18)}.ds-action-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center}.ds-action-title{font:500 19px \"Fraunces\", \"SF Pro Display\", Georgia, serif;letter-spacing:-.01em}.ds-action-hint{font-size:13px;line-height:1.5;color:rgba(255,255,255,.78)}.ds-action-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding-top:8px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Eingabe für Provider-Zugänge im Setup-Wizard.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Langdock API-Key</span><input class=\"ds-input\" placeholder=\"sk-…\"><span class=\"ds-field-help\">Wird nur lokal gespeichert.</span></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:4px;font-family:-apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;width:320px}.ds-field-label{font-size:12px;font-weight:600;color:var(--fg, #1a1614)}.ds-input{appearance:none;font:13px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;color:var(--fg, #1a1614);background:var(--bg, #f7f5f2);border:1px solid var(--border-strong, rgba(26,22,20,.14));border-radius:10px;padding:8px 11px;transition:border-color 120ms ease,box-shadow 120ms ease}.ds-input:hover{border-color:var(--fg-muted, #6b6259)}.ds-input:focus-visible{outline:none;border-color:var(--accent, #7c2d3a);box-shadow:0 0 0 3px var(--accent-soft, rgba(124,45,58,.08))}.ds-field-help{font-size:11px;line-height:1.5;color:var(--fg-muted, #6b6259)}"
+    },
+    {
+      "name": "Option List",
+      "kind": "custom",
+      "refersTo": "option",
+      "description": "Auswahl der Firmware-Variante bzw. des Ports.",
+      "html": "<div class=\"ds-options\"><label class=\"ds-option ds-option--active\"><input type=\"radio\" name=\"fw\" checked><span class=\"ds-option-label\">Wine Edition 2.16″</span><span class=\"ds-option-meta\">wine-216</span></label><label class=\"ds-option\"><input type=\"radio\" name=\"fw\"><span class=\"ds-option-label\">Standard 1.8″</span><span class=\"ds-option-meta\">standard-180</span></label></div>",
+      "css": ".ds-options{display:flex;flex-direction:column;gap:8px;width:360px;font:13px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;color:var(--fg, #1a1614)}.ds-option{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--border, rgba(26,22,20,.08));border-radius:10px;background:var(--bg-elev, #ffffff);cursor:pointer;transition:border-color 120ms ease,background 120ms ease}.ds-option:hover{border-color:var(--border-strong, rgba(26,22,20,.14));background:var(--bg-subtle, #f0ede8)}.ds-option--active{border-color:var(--accent, #7c2d3a);background:var(--accent-soft, rgba(124,45,58,.08))}.ds-option input{accent-color:var(--accent, #7c2d3a);margin:0}.ds-option-label{flex:1}.ds-option-meta{font:12px ui-monospace, \"SF Mono\", Menlo, monospace;color:var(--fg-muted, #6b6259)}"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "statuschip",
+      "description": "Zustand von Daemon und Gerät rechts im Header.",
+      "html": "<span class=\"ds-chip\"><span class=\"ds-dot\"></span>Daemon <strong>läuft</strong></span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 10px;background:var(--bg-elev, #ffffff);border:1px solid var(--border, rgba(26,22,20,.08));border-radius:999px;font:12px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;color:var(--fg-muted, #6b6259);box-shadow:0 1px 2px rgba(26,22,20,.04)}.ds-chip strong{color:var(--fg, #1a1614);font-weight:500}.ds-dot{width:8px;height:8px;border-radius:50%;background:var(--ok, #15803d);color:var(--ok, #15803d);box-shadow:0 0 0 3px color-mix(in oklab,currentColor 12%,transparent)}@media (prefers-reduced-motion:no-preference){.ds-dot{animation:ds-pulse 2s ease-in-out infinite}}@keyframes ds-pulse{50%{box-shadow:0 0 0 6px color-mix(in oklab,currentColor 18%,transparent)}}"
+    },
+    {
+      "name": "Brand Mark",
+      "kind": "nav",
+      "refersTo": "headline",
+      "description": "Weinglas im Bordeaux-Quadrat mit Wortmarke; führt zur Landing-Seite.",
+      "html": "<button class=\"ds-brand\"><span class=\"ds-brand-mark\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 22h8M12 15v7M7 3h10l-1 6a4 4 0 0 1-8 0z\"/><path d=\"M8 8h8\"/></svg></span><span class=\"ds-brand-text\"><span class=\"ds-brand-name\">Clawdmeter</span><span class=\"ds-brand-sub\">Companion</span></span></button>",
+      "css": ".ds-brand{all:unset;display:inline-flex;align-items:center;gap:12px;cursor:pointer;border-radius:10px}.ds-brand:focus-visible{box-shadow:0 0 0 3px var(--accent-soft, rgba(124,45,58,.08))}.ds-brand-mark{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--accent, #7c2d3a) 0%,color-mix(in oklab,var(--accent, #7c2d3a) 70%,#2a0e14) 100%);box-shadow:0 6px 20px rgba(124,45,58,.18)}.ds-brand-text{display:flex;flex-direction:column;line-height:1.1}.ds-brand-name{font:600 20px \"Fraunces\", \"SF Pro Display\", Georgia, serif;letter-spacing:-.01em;color:var(--fg, #1a1614)}.ds-brand-sub{font:500 11px -apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--fg-subtle, #9a9088)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Das Sommelier-Werkzeug",
+    "overview": "Clawdmeter serviert, es präsentiert nicht. Die Companion-App ist ein ruhiges, präzises Werkzeug auf warmem Leinen, mit genau einem Akzent: Bordeaux. Sie nutzt die Systemschrift und die native Titelleiste des Betriebssystems, damit sie sich wie ein Mac- oder Windows-Programm anfühlt. Nur Überschriften tragen eine weiche Serife (Fraunces), so wie ein Etikett den Inhalt einer Flasche benennt, ohne ihn zu übertönen.\n\nDie Dichte ist kompakt-desktop: 14px Grundschrift, 13px Bedienelemente, Karten mit 20px Innenabstand in einer zentrierten Spalte von höchstens 980px. Tiefe ist leicht erhaben: Karten liegen mit einem Hauchschatten auf dem Grund, heben sich beim Hover um 2px, und nur die primäre Aktion bekommt einen Bordeaux-Schimmer. Hell und Dunkel folgen der Systemeinstellung; im Dunkeln wird aus Leinen ein Kellergewölbe (`cellar`), und Bordeaux hellt sich auf, damit es lesbar bleibt.\n\nDie zweite Oberfläche ist das Gerät selbst: ein AMOLED-Display auf echtem Schwarz. Es teilt sich mit der App die Rollenverteilung der Schriften (Serife für Titel, Grotesk für UI, Mono für Zahlen) und, in der Wine Edition, den Bordeaux-Akzent. Standard-Firmware-Builds tragen stattdessen Terra-Cotta.",
+    "keyCharacteristics": [
+      "Ein einziger warmer Akzent (Bordeaux) auf warm getönten Neutraltönen, nie kaltes Grau.",
+      "Native OS-Chrome und Systemschrift für Bedienung; Fraunces nur für Überschriften und Marke.",
+      "Ruhige, leicht erhabene Karten; Bewegung nur als Antwort auf Interaktion.",
+      "Status wird über kleine Punkte mit Halo kommuniziert, nicht über flächige Farbbalken.",
+      "Weinglas als Brand-Mark in einem Bordeaux-Verlaufsquadrat."
+    ],
+    "rules": [
+      {
+        "name": "The One Voice Rule",
+        "body": "Bordeaux ist die einzige Akzentfarbe der App. Statusfarben bezeichnen Zustände und werden nie dekorativ eingesetzt.",
+        "section": "colors"
+      },
+      {
+        "name": "The Warm Neutral Rule",
+        "body": "Jedes Neutral hat einen Braunstich. Kaltes Grau, reines Schwarz oder reines Weiß als Fenstergrund gibt es in der App nicht; reines Schwarz gehört dem AMOLED-Gerät.",
+        "section": "colors"
+      },
+      {
+        "name": "The Label Rule",
+        "body": "Fraunces erscheint nur in Überschriften und im Markennamen. Bedienelemente, Fließtext und Zahlen stehen nie in der Serife.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lift-On-Intent Rule",
+        "body": "Flächen ruhen. Sie heben sich nur, wenn der Nutzer auf sie zeigt, und nur die eine primäre Aktion darf schimmern.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** jede Farbe über die CSS-Variablen in `companion/src/styles.css` beziehen und für jede neue Farbe eine Hell- und eine Dunkel-Variante anlegen.",
+      "**Do** die Systemschrift für alles Bedienbare verwenden und Fraunces nur für Überschriften.",
+      "**Do** Statuspunkte mit Halo verwenden, wenn ein Zustand gezeigt werden soll, und die Statusfarben nur dafür einsetzen.",
+      "**Do** neue Abstände aus der 4px-Skala (`spacing`) nehmen und die Radien 6/10/14px einhalten.",
+      "**Do** jede Animation hinter `prefers-reduced-motion: no-preference` stellen und Transitions auf 120–220ms halten.",
+      "**Do** jedem interaktiven Element einen sichtbaren `:focus-visible`-Zustand mit dem 3px-Akzentring geben."
+    ],
+    "donts": [
+      "**Don't** einen zweiten Akzent neben Bordeaux einführen, auch nicht Terra-Cotta: Terra-Cotta gehört ausschließlich zur Standard-Firmware.",
+      "**Don't** reines Weiß oder kaltes Grau als Fenstergrund verwenden.",
+      "**Don't** mehr als eine primäre (Bordeaux-gefüllte) Action-Card pro Screen zeigen.",
+      "**Don't** Webfonts aus dem Netz nachladen: Die App muss offline und unter ihrer eigenen CSP funktionieren.",
+      "**Don't** Fehlertexte in Bordeaux setzen: Fehler tragen `status-danger`, damit sie nicht mit dem Akzent verwechselt werden."
+    ]
+  }
+}

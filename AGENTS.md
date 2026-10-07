@@ -175,16 +175,26 @@ exported so the rest of `ui.cpp` doesn't need its own `#ifdef`.
 
 ## Daemon / host side
 
-Bash daemon (`daemon/claude-usage-daemon.sh`) reads OAuth token, polls Anthropic API, sends JSON over BLE GATT. Run with `systemctl --user start claude-usage-daemon`. The unit file's `ExecStart` is the absolute path to the script — repoint it when switching between the worktree and the main checkout.
+Python package `daemon/clawdmeter_daemon/` (BLE via `bleak`), entry shim `daemon/clawdmeter_daemon.py` → `cli.py` with subcommands `run` (default) / `setup` / `config` / `doctor`. Shipped inside the Companion-App as a PyInstaller onefile; the power-user path installs it as a service (`daemon/clawdmeter-daemon.service` for systemd, `daemon/com.clawdmeter.daemon.plist` for launchd — both templated with `__PYTHON_BIN__` / `__DAEMON_PATH__` by the install scripts).
+
+**Modules:**
+
+- `providers/` — one adapter per provider (`anthropic`, `codex`, `langdock`, `opencode`, `bedrock` — Bedrock is paused) on a shared `base.py`. Each emits a payload with a `kind` (`pct_window`, `cost_budget`, `tokens_abs`, `tpm_rpm`).
+- `config.py` — TOML config with `[[provider]]` blocks, every provider opt-in via `enabled = true`; `[device]` holds `name = "Clawdmeter"` and `scan_timeout_seconds`.
+- `secrets.py` — API keys live in `secrets.env` next to the config, never in `config.toml`.
+- `paths.py` — config at `~/.config/clawdmeter/` (Windows: `%APPDATA%\clawdmeter\`), state/cache under the platform state dir (Windows: `%LOCALAPPDATA%\clawdmeter\`).
+- `polling.py` — per-provider deadlines; loop wakes every `TICK = 5` s, polls whatever is due, and runs a forced full cycle on a device refresh request or IPC `trigger-poll`. A failed poll waits one full interval instead of retrying every tick.
+- `ipc_server.py` — JSON-Lines over Unix socket (macOS/Linux) / Named Pipe (Windows) for the Companion-App: `status`, `reload-config`, `trigger-poll`, `shutdown`, `provider-detect`, `provider-save`, `secret-write`, `list-providers`, `subscribe-events`. Spec: `feature-documentation/companion-app/ipc-protocol.md`.
+- `setup_wizard.py` — auto-detect + interactive provider setup (`clawdmeter setup`).
 
 **Discovery & resilience:**
 
-- Connects by name (`"Claude Controller"`) on first run, caches resolved MAC at `~/.config/claude-usage-monitor/ble-address`. ESP32 BLE addresses are factory-burned per-chip, so swapping any board invalidates the cache.
-- On connect failure: cache is dropped AND device is removed from bluez (`bluetoothctl remove`) so the next scan won't re-pick a dead MAC. Multi-candidate scans pick `head -1` and let the failure cycle converge.
-- `POLL_INTERVAL=60`, `TICK=5`. Inner loop wakes every 5s to detect disconnects fast; polls Anthropic when 60s elapsed OR when ESP fires a refresh request.
+- Scans for the device name (`"Clawdmeter"`, configurable) on first run and caches the resolved address in `<state_dir>/ble-address` (MAC on Linux/Windows, CoreBluetooth UUID on macOS). Swapping the board invalidates the cache.
+- On connect failure the cache is dropped so the next scan re-resolves. A stale pairing on macOS (CoreBluetooth code 14, "Peer removed pairing information") is detected and surfaced as `device-pairing-stale` to the Companion-App.
 
-**GATT characteristics on service `4c41555a-...0001`:**
+**BLE protocol v2 on service `4c41555a-4465-7669-6365-000000000001`:**
 
-- `...0002` RX — daemon writes JSON usage payload here.
+- `...0002` RX — daemon writes one JSON payload per active provider per cycle, then `{"end":1}` as end-of-cycle marker so the firmware can drop providers that disappeared. Writes are spaced by 80 ms (`INTER_WRITE_DELAY_S`) because NimBLE drops back-to-back writes.
 - `...0003` TX — firmware notifies ack/nack (daemon doesn't subscribe).
-- `...0004` REQ — firmware fires `0x01` notify in `onSubscribe` if `has_received_data` is false. Daemon subscribes via `setsid bash -c "stdbuf -oL dbus-monitor … | awk …"`; awk drops a flag file the inner loop picks up.
+- `...0004` REQ — firmware notifies `0x01` in `onSubscribe` while it has no data yet; the daemon subscribes via `bleak` `start_notify` and answers with an immediate full cycle.
+- Payload fields: `p / n / note / k / m1 / m2 / m3 / r1 / r2 / pace / regen / cur / st / ok`. Any change must land in firmware parser (`main.cpp`, `data.h`) and daemon in the same change.

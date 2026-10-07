@@ -1,12 +1,18 @@
-keychaschkey# PlatformIO build artifacts
+# PlatformIO build artifacts
 firmware/.pio/
 firmware/.vscode/
 
 # OS
 .DS_Store
 
-# Claude Code
-.claude/
+# Claude Code — nur Projekt-Konfiguration einchecken, lokale Einstellungen nicht
+.claude/*
+!.claude/settings.json
+!.claude/scripts/
+!.claude/skills/
+!.claude/commands/
+!.claude/agents/
+.claude/settings.local.json
 
 # Node tooling deps (npm install --no-save)
 tools/node_modules/
@@ -18,3 +24,10 @@ daemon/.venv/
 # Python bytecode cache
 __pycache__/
 *.pyc
+
+# Geheimnisse — alle .env*-Dateien außer Vorlagen
+.env*
+!.env.example
+!**/.env.example
+!**/.env.local.example
+!.envrc

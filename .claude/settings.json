@@ -1,0 +1,19 @@
+{
+  "env": {
+    "ANTHROPIC_CUSTOM_HEADERS": "x-bf-lh-repo: Wine-Retail-Systems/clawdmeter-wrs"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/scripts/set-repo-header.sh\" --hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
