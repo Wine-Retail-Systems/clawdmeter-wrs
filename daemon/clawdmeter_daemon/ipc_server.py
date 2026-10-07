@@ -31,6 +31,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import socket
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -417,13 +418,43 @@ async def _connection(
             pass
 
 
-async def _serve_unix(state: ServerState, path: Path) -> asyncio.AbstractServer:
+# (st_dev, st_ino) des Sockets, den dieser Prozess gebunden hat. ``stop``
+# löscht den Pfad nur, wenn er noch auf genau diesen Socket zeigt — sonst
+# würde ein beendeter Daemon den Socket eines inzwischen gestarteten
+# zweiten Daemons entfernen.
+_bound_socket_id: Optional[tuple[int, int]] = None
+
+
+def _socket_is_live(path: Path) -> bool:
+    """True, wenn unter ``path`` ein Prozess Verbindungen annimmt."""
+    probe = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    probe.settimeout(1.0)
+    try:
+        probe.connect(str(path))
+        return True
+    except OSError:
+        return False
+    finally:
+        probe.close()
+
+
+async def _serve_unix(state: ServerState, path: Path) -> Optional[asyncio.AbstractServer]:
+    global _bound_socket_id
     if path.exists():
-        path.unlink()
+        if _socket_is_live(path):
+            print(
+                f"[ipc] {path} gehört einem laufenden Daemon — IPC in dieser "
+                "Instanz deaktiviert.",
+                file=sys.stderr,
+            )
+            return None
+        path.unlink()  # verwaist (z. B. nach Absturz)
     server = await asyncio.start_unix_server(
         lambda r, w: _connection(state, r, w), path=str(path)
     )
     os.chmod(path, 0o600)
+    st = path.stat()
+    _bound_socket_id = (st.st_dev, st.st_ino)
     return server
 
 
@@ -459,9 +490,13 @@ async def stop(server: Optional[asyncio.AbstractServer]) -> None:
         await server.wait_closed()
     except OSError:
         pass
+    global _bound_socket_id
     path = socket_path()
-    if sys.platform != "win32" and path.exists():
+    if sys.platform != "win32" and _bound_socket_id is not None:
         try:
-            path.unlink()
+            st = path.stat()
+            if (st.st_dev, st.st_ino) == _bound_socket_id:
+                path.unlink()
         except OSError:
             pass
+        _bound_socket_id = None
