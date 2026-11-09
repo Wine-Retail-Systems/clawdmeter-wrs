@@ -13,6 +13,10 @@ der Python-Daemon ist Server.
 | Linux     | Unix-Socket: `~/.config/clawdmeter/daemon.sock` (Mode 0600)               |
 | Windows   | Named-Pipe: `\\.\pipe\clawdmeter-daemon`                                  |
 
+Pro Endpoint lauscht genau ein Daemon. Wer den Socket übernimmt, regelt
+[daemon-lifecycle.md](daemon-lifecycle.md): Ein Socket zählt nur als belegt,
+wenn der Besitzer auf `status` mit `running: true` antwortet.
+
 Auf macOS/Linux gilt: Daemon und App laufen unter derselben UID — keine
 weiteren ACL-Maßnahmen nötig. Auf Windows liegt die Pipe im default-DACL
 des Users, der den Daemon-Task startet.

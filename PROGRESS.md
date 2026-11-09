@@ -47,6 +47,13 @@ Anthropic, Codex, Bifrost, Langdock — plus AWS Bedrock weiterhin pausiert.
   Hinweis-Befehl reduziert (Bedrock-Adapter ist pausiert).
 - **Build-Test** aller drei PlatformIO-Envs (`standard-216`, `standard-180`,
   `wine-216` — letzteres ist neuer Default für `./flash-mac.sh`) — alle erfolgreich.
+- **Daemon-Lebenszyklus gehärtet** (2026-11-09): Ein nach dem Ruhezustand
+  hängender BLE-Connect ließ einen verwaisten Daemon zurück, der den IPC-Socket
+  blockierte. Jetzt gibt es eine `status`-Probe statt eines reinen `connect()`,
+  einen abbrechbaren Connect mit Timeout, eine Stop-Frist und eine
+  Elternprozess-Überwachung. Details:
+  [feature-documentation/companion-app/daemon-lifecycle.md](feature-documentation/companion-app/daemon-lifecycle.md).
+  Noch offen: neuer DMG-Build, damit die Fixes in `/Applications` ankommen.
 
 ### In Arbeit 🔧
 

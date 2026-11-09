@@ -60,6 +60,32 @@ class SocketLifecycleTest(unittest.TestCase):
             await ipc_server.stop(srv)
         asyncio.run(run())
 
+    def test_hung_daemon_socket_is_replaced(self):
+        # Ein hängender Prozess lauscht noch (Kernel nimmt connect() über den
+        # Backlog an), beantwortet aber nichts — das ist kein laufender Daemon.
+        hung = bind_foreign(self.path)
+        self.addCleanup(hung.close)
+
+        async def run():
+            srv = await ipc_server.start(make_state())
+            self.assertIsNotNone(srv)
+            self.assertTrue(await ipc_server._daemon_responds(self.path))
+            await ipc_server.stop(srv)
+        asyncio.run(run())
+
+    def test_stopping_daemon_socket_is_replaced(self):
+        # Ein Daemon mit gesetztem stop_event nimmt an, schließt aber sofort.
+        async def run():
+            old_state = make_state()
+            old = await ipc_server.start(old_state)
+            old_state.stop_event.set()
+            ipc_server._bound_socket_id = None  # „anderer Prozess“
+            new = await ipc_server.start(make_state())
+            self.assertIsNotNone(new)
+            old.close()
+            await ipc_server.stop(new)
+        asyncio.run(run())
+
     def test_stop_keeps_socket_of_another_daemon(self):
         async def run():
             srv = await ipc_server.start(make_state())

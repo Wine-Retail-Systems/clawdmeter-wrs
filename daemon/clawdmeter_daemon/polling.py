@@ -10,8 +10,10 @@ enabled provider regardless of its individual cadence.
 from __future__ import annotations
 
 import asyncio
+import os
 import signal
 import sys
+import threading
 import time
 from typing import Optional
 
@@ -102,6 +104,76 @@ async def _wait_any_event(events: list[asyncio.Event], timeout: float) -> None:
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
+# Obergrenze für einen BLE-Verbindungsaufbau. CoreBluetooth kann nach dem
+# Ruhezustand ``connect()`` unbegrenzt hängen lassen, trotz bleak-Timeout.
+CONNECT_TIMEOUT = 30.0
+# Nach einem Stop-Signal bleibt so viel Zeit für ein sauberes Ende; danach
+# beendet sich der Prozess hart. Liegt unter dem launchd-ExitTimeOut (20 s).
+SHUTDOWN_GRACE = 10.0
+PARENT_CHECK_INTERVAL = 5.0
+
+
+async def _connect_or_stop(client, stop_event: asyncio.Event, timeout: float) -> bool:
+    """``client.connect()`` mit hartem Timeout, abbrechbar über ``stop_event``.
+
+    True: verbunden. False: ``stop_event`` kam dazwischen.
+    Wirft ``asyncio.TimeoutError`` nach ``timeout`` und reicht Fehler von
+    ``connect()`` (z. B. ``BleakError``) durch.
+    """
+    connect_task = asyncio.ensure_future(client.connect())
+    stop_task = asyncio.ensure_future(stop_event.wait())
+    try:
+        done, _ = await asyncio.wait(
+            {connect_task, stop_task},
+            timeout=timeout,
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+    finally:
+        stop_task.cancel()
+    if connect_task in done:
+        connect_task.result()
+        return True
+    connect_task.cancel()
+    # Nicht unbegrenzt auf das Abbrechen warten — genau das hängt ja.
+    await asyncio.wait({connect_task}, timeout=1.0)
+    if stop_event.is_set():
+        return False
+    raise asyncio.TimeoutError(f"BLE connect nach {timeout:.0f}s ohne Antwort")
+
+
+async def _watch_parent(
+    stop_event: asyncio.Event,
+    initial_ppid: int,
+    getppid=os.getppid,
+    interval: float = PARENT_CHECK_INTERVAL,
+) -> None:
+    """Setzt ``stop_event``, sobald der Elternprozess wechselt.
+
+    Im PyInstaller-onefile-Build ist der Elternprozess der Bootloader. Stirbt
+    er (z. B. SIGKILL durch launchd), würde dieser Prozess als Waise weiterlaufen
+    und den IPC-Socket blockieren.
+    """
+    while not stop_event.is_set():
+        if getppid() != initial_ppid:
+            ble.log("Elternprozess beendet — Daemon stoppt")
+            stop_event.set()
+            return
+        try:
+            await asyncio.wait_for(stop_event.wait(), timeout=interval)
+        except asyncio.TimeoutError:
+            pass
+
+
+def _start_shutdown_deadline(seconds: float, exit_fn=os._exit) -> threading.Timer:
+    """Beendet den Prozess hart, falls der saubere Stop nicht rechtzeitig
+    fertig wird. Läuft in einem eigenen Thread, damit ein hängender
+    Event-Loop ihn nicht aufhalten kann."""
+    timer = threading.Timer(seconds, exit_fn, args=(1,))
+    timer.daemon = True
+    timer.start()
+    return timer
+
+
 def _is_stale_pairing_error(exc: BaseException) -> bool:
     """CoreBluetooth Code 14 ("Peer removed pairing information") tritt auf,
     wenn das Gerät via Re-Flash sein NVS verloren hat, der Mac aber den
@@ -127,7 +199,8 @@ async def connect_and_run(
     ble.log(f"Connecting to {address}...")
     client = BleakClient(address)
     try:
-        await client.connect()
+        if not await _connect_or_stop(client, stop_event, CONNECT_TIMEOUT):
+            return True  # Stop während des Verbindungsaufbaus — kein Fehler
     except (BleakError, asyncio.TimeoutError) as e:
         ble.log(f"Connection failed: {e}")
         if _is_stale_pairing_error(e):
@@ -226,6 +299,8 @@ async def main_loop() -> None:
 
     def _stop(*_args: object) -> None:
         ble.log("Daemon stopping")
+        if not stop_event.is_set():
+            _start_shutdown_deadline(SHUTDOWN_GRACE)
         stop_event.set()
 
     for sig in (signal.SIGINT, signal.SIGTERM):
@@ -241,6 +316,13 @@ async def main_loop() -> None:
         provider_states_ref=states,
     )
     ipc_srv = await ipc_server.start(ipc_state)
+
+    # Nur überwachen, wenn ein echter Elternprozess existiert (onefile-
+    # Bootloader). Direkt von launchd gestartet ist die PPID ohnehin 1.
+    parent_watch: Optional[asyncio.Task] = None
+    initial_ppid = os.getppid()
+    if sys.platform != "win32" and initial_ppid != 1:
+        parent_watch = asyncio.create_task(_watch_parent(stop_event, initial_ppid))
 
     backoff = 1
     while not stop_event.is_set():
@@ -293,6 +375,8 @@ async def main_loop() -> None:
         else:
             backoff = 1
 
+    if parent_watch is not None:
+        parent_watch.cancel()
     await ipc_server.stop(ipc_srv)
 
 

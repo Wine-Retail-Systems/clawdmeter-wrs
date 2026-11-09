@@ -438,23 +438,63 @@ def _socket_is_live(path: Path) -> bool:
         probe.close()
 
 
+# Wie lange ein bestehender Daemon für die Antwort auf ``status`` braucht,
+# bevor er als hängend gilt. Der Handler ist trivial; zwei Sekunden reichen.
+PROBE_TIMEOUT = 2.0
+
+
+async def _daemon_responds(path: Path, timeout: float = PROBE_TIMEOUT) -> bool:
+    """True, wenn unter ``path`` ein Daemon ``status`` beantwortet.
+
+    Ein reiner ``connect()`` reicht nicht: Der Kernel nimmt Verbindungen
+    über den Listen-Backlog auch für einen hängenden Prozess an, und ein
+    Daemon mit gesetztem ``stop_event`` schließt jede Verbindung sofort.
+    Asynchron, damit ein Server im selben Event-Loop antworten kann.
+    """
+    writer: Optional[asyncio.StreamWriter] = None
+    try:
+        async with asyncio.timeout(timeout):
+            reader, writer = await asyncio.open_unix_connection(str(path))
+            writer.write(b'{"id": "probe", "command": "status", "args": {}}\n')
+            await writer.drain()
+            line = await reader.readline()
+        reply = json.loads(line)
+        return reply.get("ok") is True and reply.get("result", {}).get("running") is True
+    except (OSError, TimeoutError, ValueError, AttributeError):
+        return False
+    finally:
+        if writer is not None:
+            writer.close()
+            try:
+                await writer.wait_closed()
+            except (ConnectionError, OSError):
+                pass
+
+
 async def _serve_unix(state: ServerState, path: Path) -> Optional[asyncio.AbstractServer]:
     global _bound_socket_id
     if path.exists():
-        if _socket_is_live(path):
+        if await _daemon_responds(path):
             print(
                 f"[ipc] {path} gehört einem laufenden Daemon — IPC in dieser "
                 "Instanz deaktiviert.",
                 file=sys.stderr,
             )
             return None
-        path.unlink()  # verwaist (z. B. nach Absturz)
+        if _socket_is_live(path):
+            print(
+                f"[ipc] {path} nimmt Verbindungen an, antwortet aber nicht "
+                "(hängender Daemon) — Socket wird ersetzt.",
+                file=sys.stderr,
+            )
+        path.unlink()  # verwaist (Absturz) oder Besitzer hängt
     server = await asyncio.start_unix_server(
         lambda r, w: _connection(state, r, w), path=str(path)
     )
     os.chmod(path, 0o600)
     st = path.stat()
     _bound_socket_id = (st.st_dev, st.st_ino)
+    print(f"[ipc] listening on {path}", file=sys.stderr)
     return server
 
 
@@ -476,7 +516,6 @@ async def start(state: ServerState) -> Optional[asyncio.AbstractServer]:
     """Startet den IPC-Server. Gibt das ``Server``-Objekt zurück, damit der
     Caller es beim Shutdown sauber schließen kann."""
     path = socket_path()
-    print(f"[ipc] listening on {path}", file=sys.stderr)
     if sys.platform == "win32":
         return await _serve_windows_pipe(state)
     return await _serve_unix(state, path)
