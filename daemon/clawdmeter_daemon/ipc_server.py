@@ -34,6 +34,7 @@ import os
 import socket
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Optional
 
@@ -73,6 +74,13 @@ class ServerState:
     provider_states_ref: list = field(default_factory=list)
     # Subscriber-Liste für Push-Events (StreamWriter).
     subscribers: list = field(default_factory=list)
+    # Vom polling-Loop gepflegt: True zwischen BLE-Connect und Disconnect.
+    device_connected: bool = False
+
+
+def iso_timestamp(epoch: float) -> str:
+    """Epoch-Sekunden als ISO-8601 mit lokalem Offset (IPC-Zeitformat)."""
+    return datetime.fromtimestamp(epoch).astimezone().isoformat(timespec="seconds")
 
 
 # ---------- Command-Handler ----------
@@ -97,11 +105,15 @@ async def _status(state: ServerState, _args: dict[str, Any]) -> dict[str, Any]:
     last_polls = [
         s.last_snapshot.to_payload() if s.last_snapshot else None for s in states
     ]
+    poll_times = [
+        t for t in (getattr(s, "last_polled_at", None) for s in states) if t is not None
+    ]
+    last_poll_at = iso_timestamp(max(poll_times)) if poll_times else None
     return {
         "reachable": True,
         "running": not state.stop_event.is_set(),
-        "device_connected": False,  # wird vom Polling-Loop via Event aktualisiert
-        "last_poll_at": None,
+        "device_connected": state.device_connected,
+        "last_poll_at": last_poll_at,
         "active_provider": enabled[0] if enabled else None,
         "providers": enabled,
         "snapshots": last_polls,

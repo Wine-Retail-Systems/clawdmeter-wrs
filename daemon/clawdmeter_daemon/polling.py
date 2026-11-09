@@ -32,6 +32,8 @@ class ProviderState:
         self.provider = provider
         self.next_poll_at = 0.0
         self.last_snapshot: Optional[Snapshot] = None
+        # Zeitpunkt (epoch) des letzten Poll-Versuchs — für IPC ``status``.
+        self.last_polled_at: Optional[float] = None
 
     def is_due(self, now: float) -> bool:
         return now >= self.next_poll_at
@@ -39,7 +41,9 @@ class ProviderState:
     def schedule(self, ok: bool) -> None:
         # On failure we still wait one full poll cycle — failing every TICK
         # would hammer rate-limited APIs.
-        self.next_poll_at = time.time() + self.provider.poll_seconds
+        now = time.time()
+        self.last_polled_at = now
+        self.next_poll_at = now + self.provider.poll_seconds
 
 
 def build_provider_states(cfg: Config) -> list[ProviderState]:
@@ -57,21 +61,30 @@ def build_provider_states(cfg: Config) -> list[ProviderState]:
     return states
 
 
-async def run_cycle(session: ble.Session, states: list[ProviderState], force_all: bool) -> bool:
+async def run_cycle(
+    session: ble.Session,
+    states: list[ProviderState],
+    force_all: bool,
+    ipc_state: "ipc_server.ServerState | None" = None,
+) -> bool:
     now = time.time()
     polled_any = False
     for s in states:
         if not (force_all or s.is_due(now)):
             continue
+        error: Optional[str] = None
         try:
             snap = await s.provider.poll()
         except Exception as e:  # noqa: BLE001
             print(f"[poll] {s.provider.slot_id} crashed: {e}", file=sys.stderr)
             snap = None
+            error = str(e) or type(e).__name__
         if snap is not None:
             s.last_snapshot = snap
         s.schedule(ok=snap is not None)
         polled_any = True
+        if ipc_state is not None:
+            await _emit_poll_result(ipc_state, s, snap, error)
 
     if not polled_any:
         return True  # no work to do this tick
@@ -80,6 +93,23 @@ async def run_cycle(session: ble.Session, states: list[ProviderState], force_all
     if not payloads:
         return True
     return await session.send_cycle(payloads)
+
+
+async def _emit_poll_result(
+    ipc_state: "ipc_server.ServerState",
+    s: ProviderState,
+    snap: Optional[Snapshot],
+    error: Optional[str],
+) -> None:
+    """``poll-success`` bei Snapshot mit ``ok``, sonst ``poll-error``."""
+    slot = s.provider.slot_id
+    if snap is not None and snap.ok:
+        at = ipc_server.iso_timestamp(s.last_polled_at or time.time())
+        await ipc_server.emit_event(ipc_state, "poll-success", {"provider": slot, "at": at})
+        return
+    if error is None:
+        error = snap.status if snap is not None else "keine Daten"
+    await ipc_server.emit_event(ipc_state, "poll-error", {"provider": slot, "error": error})
 
 
 async def _wait_any_event(events: list[asyncio.Event], timeout: float) -> None:
@@ -223,11 +253,14 @@ async def connect_and_run(
         return False
 
     ble.log("Connected")
-    session = ble.Session(client)
-    await session.setup_refresh_subscription()
+    if ipc_state is not None:
+        ipc_state.device_connected = True
+        await ipc_server.emit_event(ipc_state, "device-connected", {"address": address})
 
     used_successfully = False
     try:
+        session = ble.Session(client)
+        await session.setup_refresh_subscription()
         # Force a full cycle on connect so the firmware leaves the empty state.
         force = True
         while client.is_connected and not stop_event.is_set():
@@ -238,7 +271,7 @@ async def connect_and_run(
                 ble.log("Reload requested — disconnecting to apply new config")
                 used_successfully = True
                 break
-            if await run_cycle(session, states, force_all=force):
+            if await run_cycle(session, states, force_all=force, ipc_state=ipc_state):
                 used_successfully = True
             force = False
             if session.refresh_requested.is_set():
@@ -260,6 +293,8 @@ async def connect_and_run(
                 timeout=TICK,
             )
     finally:
+        if ipc_state is not None:
+            ipc_state.device_connected = False
         try:
             await client.disconnect()
         except BleakError:

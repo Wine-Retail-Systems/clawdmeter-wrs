@@ -55,6 +55,11 @@ Anthropic, Codex, Bifrost, Langdock — plus AWS Bedrock weiterhin pausiert.
   [feature-documentation/companion-app/daemon-lifecycle.md](feature-documentation/companion-app/daemon-lifecycle.md).
   Im DMG `dist/Clawdmeter_0.1.0_aarch64.dmg` enthalten (notarisiert, ohne
   Finder-Layout, da mit `CI=true` gebaut).
+- **IPC-`status` mit echten Werten** (2026-11-09): `device_connected` und
+  `last_poll_at` waren feste Platzhalter (`false`/`null`). Jetzt pflegt der
+  Polling-Loop beide; die dokumentierten Events `device-connected`,
+  `poll-success` und `poll-error` werden tatsächlich gesendet. Details:
+  [feature-documentation/companion-app/ipc-protocol.md](feature-documentation/companion-app/ipc-protocol.md).
 
 ### In Arbeit 🔧
 

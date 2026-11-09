@@ -80,6 +80,13 @@ Response-`result`:
 }
 ```
 
+* `device_connected` — `true` zwischen erfolgreichem BLE-Connect und
+  Disconnect (`ServerState.device_connected`, gesetzt in
+  `polling.connect_and_run`).
+* `last_poll_at` — jüngster Poll-Versuch über alle Provider
+  (`ProviderState.last_polled_at`), ISO-8601 mit lokalem Offset; `null`, bis
+  der erste Poll gelaufen ist. Gepollt wird nur bei aktiver BLE-Verbindung.
+
 ### `reload-config`
 
 Triggert ein Re-Read von `config.toml`. Antwort kommt sofort; der Tausch
@@ -177,10 +184,18 @@ werden gepusht:
 |------------------------|-----------------------------------------------------|
 | `device-connecting`    | `{ "address": "..." }`                              |
 | `device-connected`     | `{ "address": "..." }`                              |
+| `device-pairing-stale` | `{ "address": "...", "error": "..." }`              |
 | `device-disconnected`  | `{ "address": "...", "clean": true }`               |
 | `poll-success`         | `{ "provider": "anthropic", "at": "..." }`          |
 | `poll-error`           | `{ "provider": "anthropic", "error": "..." }`       |
 | `config-changed`       | `{ "providers": 4 }`                                |
+
+`poll-success` / `poll-error` kommen nach jedem einzelnen Provider-Poll
+(`polling._emit_poll_result`). Erfolg heißt: Snapshot vorhanden und
+`ok: true`; `at` ist der Poll-Zeitpunkt im selben Format wie `last_poll_at`.
+Sonst `poll-error` mit `error` = Exception-Text, Snapshot-`status`
+(z. B. `auth`) oder `keine Daten`, wenn der Provider nichts lieferte
+(etwa nicht konfiguriert).
 
 ## Versionierung
 
