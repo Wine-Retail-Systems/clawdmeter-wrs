@@ -53,7 +53,8 @@ Anthropic, Codex, Bifrost, Langdock — plus AWS Bedrock weiterhin pausiert.
   einen abbrechbaren Connect mit Timeout, eine Stop-Frist und eine
   Elternprozess-Überwachung. Details:
   [feature-documentation/companion-app/daemon-lifecycle.md](feature-documentation/companion-app/daemon-lifecycle.md).
-  Noch offen: neuer DMG-Build, damit die Fixes in `/Applications` ankommen.
+  Im DMG `dist/Clawdmeter_0.1.0_aarch64.dmg` enthalten (notarisiert, ohne
+  Finder-Layout, da mit `CI=true` gebaut).
 
 ### In Arbeit 🔧
 
